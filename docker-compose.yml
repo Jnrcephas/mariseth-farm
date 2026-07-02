@@ -1,0 +1,47 @@
+services:
+  frontend:
+    container_name: mariseth_web
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_WEB_SOCKET_URL: ${NEXT_PUBLIC_WEB_SOCKET_URL}
+        NEXT_PUBLIC_GOOGLE_AI_API_KEY: ${NEXT_PUBLIC_GOOGLE_AI_API_KEY:-}
+        NEXT_PUBLIC_ENVIRONMENT: ${NEXT_PUBLIC_ENVIRONMENT:-production}
+        NEXTAUTH_URL: ${NEXTAUTH_URL}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+        SECRET: ${SECRET:-${NEXTAUTH_SECRET}}
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_WEB_SOCKET_URL: ${NEXT_PUBLIC_WEB_SOCKET_URL}
+      NEXT_PUBLIC_GOOGLE_AI_API_KEY: ${NEXT_PUBLIC_GOOGLE_AI_API_KEY:-}
+      NEXT_PUBLIC_ENVIRONMENT: ${NEXT_PUBLIC_ENVIRONMENT:-production}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      SECRET: ${SECRET:-${NEXTAUTH_SECRET}}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    restart: unless-stopped
+    networks:
+      - mariseth
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/', (r) => { r.resume(); process.exit(r.statusCode < 500 ? 0 : 1); }).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  mariseth:
+    external: true
+    name: mariseth
