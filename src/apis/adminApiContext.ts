@@ -49,7 +49,7 @@ export function useAdminApiContext<
     "queryKey" | "queryFn"
   >,
 ): AdminApiContext<TQueryFnData, TError, TData, TQueryKey> {
-  const { user } = useUserStore((state) => state)
+  const user = useUserStore((state) => state.user)
   const token = user?.access_token
   return {
     fetcherOptions: {

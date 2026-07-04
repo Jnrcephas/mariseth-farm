@@ -17,7 +17,7 @@ export const uploadQualificationDocsApi = async (formData: FormData, token: stri
     return response.data;
 };
 export const useUploadQualificationDocs = (callBackFunc?: () => void) => {
-	const { user } = useUserStore((state) => state)
+	const user = useUserStore((state) => state.user)
 	const token = user?.access_token
 
 	const { mutate, isPending } = useMutation({

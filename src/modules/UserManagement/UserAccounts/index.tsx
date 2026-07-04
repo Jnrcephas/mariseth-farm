@@ -20,7 +20,7 @@ import { formatGender } from "@/lib/helpers";
 
 export default function UserAccounts() {
 
-    const { user } = useUserStore((user) => user)
+    const user = useUserStore((state) => state.user)
     const route = useRouter()
 
     const [deleteModal, setDeleteModal] = useState(false)

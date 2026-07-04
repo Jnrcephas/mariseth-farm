@@ -1,7 +1,7 @@
 "use client"
 import "./globals.css";
 import 'react-phone-number-input/style.css';
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { SuspenseLoader } from "@/components/SuspenseLoader";
 import ReactQueryClientProvider from "./providers/query-client-provider";
@@ -14,10 +14,6 @@ export default function App({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const [loading, setLoading] = useState<boolean>(true);
-    useEffect(() => {
-        setTimeout(() => setLoading(false), 2000);
-    }, []);
   return (
     <ReactQueryClientProvider>
         <UserStoreProvider>
@@ -30,7 +26,7 @@ export default function App({
           >
               <Toaster position="top-right" duration={10000}/>
             <Suspense  fallback={<SuspenseLoader />}>
-            {loading ? <SuspenseLoader /> : children}
+            {children}
             </Suspense>
           </ThemeProvider>
         </SessionProvider>

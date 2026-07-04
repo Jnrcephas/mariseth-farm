@@ -1,24 +1,55 @@
-import { useFarmManagementFarmerList, useFarmManagementFarmList } from "@/apis/adminApiComponents"
+import { fetchFarmManagementFarmerList, fetchFarmManagementFarmList } from "@/apis/adminApiComponents"
+import { useAdminApiContext } from "@/apis/adminApiContext"
 import { Region } from "@/apis/adminApiSchemas"
-import { useEffect, useMemo, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { useMemo } from "react"
+
+// NOTE ON WHY THIS FILE LOOKS THE WAY IT DOES:
+// These hooks back searchable dropdowns (farm/farmer pickers in the Inbound
+// Order, Outbound Order, Credit, and Training forms) that need the *entire*
+// list client-side. The previous implementation fetched one page at a time,
+// waiting for each response before requesting the next (page 1 -> wait ->
+// page 2 -> wait -> ... -> page 52), which for ~5,000+ records meant 50+
+// fully sequential round-trips before the form was usable - this is what was
+// showing up as 200+ requests in the Network tab and making the page feel
+// like it had hung.
+//
+// This version fetches page 1 to learn the total page count, then fires
+// every remaining page in parallel with Promise.all, cutting the wall-clock
+// time from "N round-trips in a row" down to roughly "1 round-trip's worth
+// of latency" regardless of how many pages there are. It's still not as
+// good as a true server-side search-as-you-type select (the ideal long-term
+// fix - see the note further down), but it's a safe, drop-in improvement
+// that doesn't require touching every form that uses it.
+
+const PAGE_SIZE = 200
 
 export function useAllFarmers(farmer_type: "lead" | "smallholder" | "") {
-  const [filters, setFilters] = useState({
-    page: 1,
-    page_size: 100,
-    farmer_type,
-  })
-  const [allFarmers, setAllFarmers] = useState<any[]>([])
+  const { fetcherOptions } = useAdminApiContext()
 
-  const { data: farmersData, isLoading } = useFarmManagementFarmerList({
-    queryParams: filters,
-  })
-  const farmers = farmersData as any
-  const pagination = farmers?.pagination
+  const { data, isLoading } = useQuery({
+    queryKey: ["all-farmers", farmer_type],
+    queryFn: async () => {
+      const first: any = await fetchFarmManagementFarmerList({
+        ...fetcherOptions,
+        queryParams: { page: 1, page_size: PAGE_SIZE, farmer_type },
+      } as any)
 
-  useEffect(() => {
-    if (farmers?.results?.length) {
-      const newFarmers = farmers.results.map((item: any) => ({
+      const totalPages = first?.pagination?.pages ?? 1
+      const remainingPages = await Promise.all(
+        Array.from({ length: Math.max(totalPages - 1, 0) }, (_, i) =>
+          fetchFarmManagementFarmerList({
+            ...fetcherOptions,
+            queryParams: { page: i + 2, page_size: PAGE_SIZE, farmer_type },
+          } as any),
+        ),
+      )
+
+      const allResults = [first, ...remainingPages].flatMap(
+        (page: any) => page?.results ?? [],
+      )
+
+      return allResults.map((item: any) => ({
         ...item,
         label:
           item.entity_type === "individual"
@@ -26,51 +57,49 @@ export function useAllFarmers(farmer_type: "lead" | "smallholder" | "") {
             : `${item.organization_name} - ${item.first_name} ${item.last_name}`,
         value: item.id,
       }))
-
-      setAllFarmers(prev => {
-        // Merge and remove duplicates by `id`
-        const merged = [...prev, ...newFarmers]
-        const unique = Array.from(
-          new Map(merged.map(f => [f.id, f])).values()
-        )
-        return unique
-      })
-
-      if (pagination?.has_next) {
-        setFilters(prev => ({ ...prev, page: pagination.page + 1 }))
-      }
-    }
-  }, [pagination?.page, farmers?.results])
+    },
+    // These lists don't change minute-to-minute; avoid re-fetching the
+    // entire dataset every time a form using this hook is opened.
+    staleTime: 5 * 60 * 1000,
+  })
 
   const sortedFarmers = useMemo(() => {
-    return [...allFarmers].sort((a, b) =>
+    return [...(data ?? [])].sort((a, b) =>
       a.first_name && b.first_name
         ? a.first_name.localeCompare(b.first_name)
-        : 0
+        : 0,
     )
-  }, [allFarmers])
+  }, [data])
 
   return { allFarmers: sortedFarmers, isLoading }
 }
 
-
-
 export function useAllFarms() {
-  const [filters, setFilters] = useState({
-    page: 1,
-    page_size: 100,
-  })
-  const [farms, setAllFarms] = useState<any[]>([])
+  const { fetcherOptions } = useAdminApiContext()
 
-  const { data, isLoading } = useFarmManagementFarmList({
-    queryParams: filters,
-  })
-  const farmData = data as any
-  const pagination = farmData?.pagination
+  const { data, isLoading } = useQuery({
+    queryKey: ["all-farms"],
+    queryFn: async () => {
+      const first: any = await fetchFarmManagementFarmList({
+        ...fetcherOptions,
+        queryParams: { page: 1, page_size: PAGE_SIZE },
+      } as any)
 
-  useEffect(() => {
-    if (farmData?.results?.length) {
-      const newFarms = farmData.results.map((item: any) => ({
+      const totalPages = first?.pagination?.pages ?? 1
+      const remainingPages = await Promise.all(
+        Array.from({ length: Math.max(totalPages - 1, 0) }, (_, i) =>
+          fetchFarmManagementFarmList({
+            ...fetcherOptions,
+            queryParams: { page: i + 2, page_size: PAGE_SIZE },
+          } as any),
+        ),
+      )
+
+      const allResults = [first, ...remainingPages].flatMap(
+        (page: any) => page?.results ?? [],
+      )
+
+      return allResults.map((item: any) => ({
         ...item,
         label:
           item.entity_type === "individual"
@@ -78,23 +107,22 @@ export function useAllFarms() {
             : `${item.organization_name} - ${item.first_name} ${item.last_name}`,
         value: item.id,
       }))
+    },
+    staleTime: 5 * 60 * 1000,
+  })
 
-      setAllFarms(prev => {
-        // Merge and remove duplicates by `id`
-        const merged = [...prev, ...newFarms]
-        const unique = Array.from(new Map(merged.map(f => [f.id, f])).values())
-        return unique
-      })
-
-      if (pagination?.has_next) {
-        setFilters(prev => ({ ...prev, page: pagination.page + 1 }))
-      }
-    }
-  }, [pagination?.page, farmData?.results])
-
-  return { farms, isLoading }
+  return { farms: data ?? [], isLoading }
 }
 
+// LONG-TERM RECOMMENDATION: if the farms/farmers list keeps growing, even a
+// parallelized "fetch everything" approach will eventually get slow and
+// wasteful (downloading thousands of records just to populate a dropdown).
+// At that point these should become search-as-you-type selects that call
+// the API with `?search=<query>&page_size=20` as the user types, so the
+// browser only ever fetches the handful of matching records instead of the
+// whole table. Flagging this now rather than doing the larger form refactor
+// silently, since it touches several forms (Inbound/Outbound orders,
+// Credit modals, Training) and is worth a deliberate decision.
 
 export default function useGetRegionDistricts(regions: Region[], selectedRegionId: number){
     const districts = regions?.find((region) => region?.id === selectedRegionId)?.districts || []

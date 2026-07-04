@@ -1,5 +1,5 @@
 "use client";
-import { useCallback} from "react";
+import { useCallback, useRef } from "react";
 import { signOut } from "next-auth/react";
 import { useUserStore } from "@/app/providers/user-store-provider";
 import { IPermObj } from "./useHasAccess";
@@ -8,7 +8,22 @@ import { useAccountsAuthLogout } from "@/apis/adminApiComponents";
 import { toast } from "sonner";
 
 export const useUserActions = () =>{
-    const { updateUser, user} = useUserStore((state) => state)
+    // Select only the slices this hook actually needs, instead of the whole
+    // store object. Subscribing to the whole store means this hook (and every
+    // component that calls it) re-renders on *any* store change, including
+    // ones it doesn't care about (e.g. notifications).
+    const updateUser = useUserStore((state) => state.updateUser)
+    const user = useUserStore((state) => state.user)
+
+    // Keep a live ref to the current user/token so fetchUserDetails and logout
+    // don't need `user` in their dependency arrays. Depending on `user` was the
+    // root cause of an infinite loop: fetchUserDetails() -> updateUser() ->
+    // new `user` reference -> fetchUserDetails recreated -> effects depending on
+    // it re-run -> fetchUserDetails() again -> forever. That loop was hammering
+    // /accounts/auth/me continuously and re-rendering the whole app on every tick.
+    const userRef = useRef(user);
+    userRef.current = user;
+
 	// const [isLoading, setIsLoading] = useState(false);
 
     const {mutate: handleLogout, isPending: isLoading} = useAccountsAuthLogout({
@@ -29,13 +44,13 @@ export const useUserActions = () =>{
         })
     };
 
-    const logout = () =>{
+    const logout = useCallback(() => {
         handleLogout({
             body: {
-                refresh_token: user?.refresh_token ?? ""
+                refresh_token: userRef.current?.refresh_token ?? ""
             }
         })
-    }
+    }, [handleLogout])
 
     const fetchUserDetails = useCallback(async () => {
         try {
@@ -43,7 +58,7 @@ export const useUserActions = () =>{
             method: 'GET',
             headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user?.access_token}`
+            'Authorization': `Bearer ${userRef.current?.access_token}`
             },
         });
 
@@ -65,6 +80,9 @@ export const useUserActions = () =>{
             permissions?.map((perm: IPermObj) => {
                 permObj[`${perm.codename}`] = perm
             })
+            // updateUser() itself now no-ops if the data is unchanged (see
+            // store/user-store.ts), so this is safe to call without causing
+            // extra re-renders when nothing actually changed.
             updateUser({...userData?.user, permissions:permObj} as any)
         }
         } catch (error) {
@@ -72,7 +90,7 @@ export const useUserActions = () =>{
             console.error('Network error while fetching user details');
         }
         }
-    }, [updateUser, user, logout]);
+    }, [updateUser, logout]);
 
     return {logout, user, isLoading, fetchUserDetails}
   }

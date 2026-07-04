@@ -146,8 +146,8 @@ export type permType =
 
 
 export function useHasAccess(hasPerm: permType){
-    const userData = useUserStore((user) => user) as any;
-    const permObj = userData?.user?.permissions
+    const userData = useUserStore((state) => state.user) as any;
+    const permObj = userData?.permissions
     return {
         loading: Object.keys(permObj || {}).length === 0,
         hasAccess: !!permObj?.[hasPerm],

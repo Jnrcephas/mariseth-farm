@@ -360,7 +360,7 @@ function CustomTable({
 
 			<div className="">
 				<table role="table" className="rounded-top-table datatable-table w-full border-0">
-					<thead className={`bg-[#4A8D34] text-white h-10 text-sm  font-medium`}>
+					<thead className={`bg-[#0B3D19] text-white h-12 text-sm font-semibold`}>
 						{table.getHeaderGroups().map((headerGroup, idx) => (
 							<tr key={`trh-${idx}`} role="row" >
 								{headerGroup.headers.map((header, idx) => {
@@ -368,7 +368,7 @@ function CustomTable({
 										<th
                                             role="columnheader"
 											key={`th-${idx}`}
-											className="text-nowrap border text-left px-3 text-xs"
+											className="text-nowrap border-0 text-left px-4 text-xs uppercase tracking-wide"
 										>
 											{header.isPlaceholder
 												? null
@@ -382,7 +382,7 @@ function CustomTable({
 							</tr>
 						))}
 					</thead>
-					<tbody role="rowgroup" className="text-[#667085] font-medium">
+					<tbody role="rowgroup" className="text-[#334155] font-medium">
 						{isLoading ? (
 							<tr className="h-[50px]">
 								<td
@@ -396,15 +396,15 @@ function CustomTable({
 							table.getRowModel().rows.map((row, idx) => (
 								<tr
 									key={`tr-${idx}`}
-									className={`text-sm h-[60px] border-b ${
+									className={`text-sm h-[68px] border-b border-[#F1F5F9] ${
 										(() => {
 											try {
 												return row && typeof row.getIsSelected === 'function' && row.getIsSelected()
 													? 'bg-blue-50 dark:bg-blue-900/20' 
-													: 'hover:bg-[#f1f5f9]';
+													: 'hover:bg-[#F8FAFC]';
 											} catch (error) {
 												console.warn('Error checking row selection state:', error);
-												return 'hover:bg-[#f1f5f9]';
+												return 'hover:bg-[#F8FAFC]';
 											}
 										})()
 									}`}
@@ -419,7 +419,7 @@ function CustomTable({
 									{row.getVisibleCells().map((cell) => (
 										<td
 											key={cell.id}
-											className="content-center px-3 "
+											className="content-center px-4 "
 										>
 											{flexRender(
 												cell.column.columnDef.cell,

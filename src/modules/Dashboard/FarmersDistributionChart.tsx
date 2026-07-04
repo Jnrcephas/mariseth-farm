@@ -1,81 +1,60 @@
 "use client"
 import PieChart from "@/components/charts/PieChart"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 
-export default function FarmersDistributionChart({data}:{data: any}) {
+interface DistributionCardProps {
+  title: string
+  items: { label: string; count: number; color: string }[]
+}
 
-  const genderData = [
-    { gender: "Male", count: data?.gender?.male || 0, color: "#00B3DB" },
-    { gender: "Female", count: data?.gender?.female || 0, color: "#F05125" },
-  ]
-  const farmersTypeData = [
-    { gender: "Lead Farmer", count: data?.farmer_type?.lead_farmer || 0, color: "#FFC803" },
-    { gender: "Smallholder Farmer", count: data?.farmer_type?.smallholder_farmer || 0, color: "#1DAB4B" },
-  ]
-
-  const series = genderData.map((item) => item.count)
-  const colors = genderData.map((item) => item.color)
-  const labels = genderData.map((item) => item.gender)
-
-  const series2 = farmersTypeData.map((item) => item.count)
-  const colors2 = farmersTypeData.map((item) => item.color)
-  const labels2 = farmersTypeData.map((item) => item.gender)
-
+function DistributionCard({ title, items }: DistributionCardProps) {
+  const series = items.map((item) => item.count)
+  const colors = items.map((item) => item.color)
+  const labels = items.map((item) => item.label)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
-      <Card className="w-full  mx-auto">
-        <CardHeader className="pb-2">
-          <CardTitle className=" font-medium text-green-700 mb-3">Gender Distribution Of Farmers</CardTitle>
-          <hr className="border-b-0"/>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="w-full md:w-1/2">
-              <PieChart series={series} colors={colors} labels={labels}/>
-            </div>
-            <div className="w-full md:w-1/2 space-y-6 mt-4 md:mt-0 flex justify-center">
-              <div className="space-y-10">
-                {genderData.map((item, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-1 h-8 mr-4" style={{ backgroundColor: item.color }}></div>
-                    <div>
-                      <p className="text-gray-600">{item.gender}</p>
-                      <p className="text-lg font-bold">{item.count}</p>
-                    </div>
-                  </div>
-                ))}
+    <Card className="w-full p-5 shadow-none border border-[#E2E8F0]">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold text-sm text-black">{title}</h3>
+        <span className="text-xs text-[#94A3B8]">Farmers</span>
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="w-[110px] shrink-0">
+          <PieChart series={series} colors={colors} labels={labels} height={110} showTotal={false} />
+        </div>
+        <div className="flex flex-col gap-3">
+          {items.map((item) => (
+            <div key={item.label} className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+              <div>
+                <p className="text-xs text-[#94A3B8]">{item.label}</p>
+                <p className="text-sm font-bold text-black">{item.count.toLocaleString()}</p>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      <Card className="w-full  mx-auto">
-        <CardHeader className="pb-2">
-          <CardTitle className="font-medium text-green-700 mb-3">Distribution By Farmer Type</CardTitle>
-          <hr className="border-b-0"/>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="w-full md:w-1/2">
-              <PieChart series={series2} colors={colors2} labels={labels2}/>
-            </div>
-            <div className="w-full md:w-1/2 space-y-6 mt-4 md:mt-0 flex justify-center">
-              <div className="space-y-10">
-                {farmersTypeData.map((item, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-1 h-8 mr-4" style={{ backgroundColor: item.color }}></div>
-                    <div>
-                      <p className="text-gray-600">{item.gender}</p>
-                      <p className="text-lg font-bold">{item.count}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+export default function FarmersDistributionChart({ data }: { data: any }) {
+  return (
+    <div className="flex flex-col gap-4 h-full">
+      <DistributionCard
+        title="Gender Distribution"
+        items={[
+          { label: "Males", count: data?.gender?.male || 0, color: "#00B3DB" },
+          { label: "Females", count: data?.gender?.female || 0, color: "#0F766E" },
+        ]}
+      />
+      <DistributionCard
+        title="Distribution by Farmer Type"
+        items={[
+          { label: "Smallholder Farmer", count: data?.farmer_type?.smallholder_farmer || 0, color: "#8B7CF6" },
+          { label: "Lead Farmers", count: data?.farmer_type?.lead_farmer || 0, color: "#E2E8F0" },
+        ]}
+      />
     </div>
   )
 }

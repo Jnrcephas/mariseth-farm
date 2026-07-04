@@ -22,14 +22,18 @@ export default function WebSocketProvider({ children }: { children: ReactNode })
     const accessToken = user?.access_token as string
     const _WSS_URL = WSS_URL as string;
    
-    const {sendJsonMessage, readyState, lastJsonMessage} = useWebSocket(_WSS_URL, 
+    const {sendJsonMessage, readyState, lastJsonMessage} = useWebSocket(
+        // Don't attempt a connection at all until we actually have a token
+        // (e.g. on first mount before the persisted user store hydrates).
+        // Connecting with an undefined token just guarantees an immediate
+        // failed connection + reconnect cycle.
+        accessToken ? _WSS_URL : null,
         {
         onOpen: () => {
           console.log('WebSocket connection established.');
           setIsOnline(true)
         },
         onClose: () => {
-          console.log('WebSocket connection closed.');
           setIsOnline(false)
         },
         onMessage(event) {
@@ -46,8 +50,9 @@ export default function WebSocketProvider({ children }: { children: ReactNode })
           // reconnect only if server closed unexpectedly
           return closeEvent.code !== 1000; 
         },
-        reconnectInterval: 5000,
-        reconnectAttempts: 60,
+        // Back off between attempts instead of hammering the server every 5s.
+        reconnectInterval: (attemptNumber) => Math.min(1000 * 2 ** attemptNumber, 30000),
+        reconnectAttempts: 10,
         retryOnError: true,
         queryParams: {token: accessToken}
     });

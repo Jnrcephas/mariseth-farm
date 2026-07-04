@@ -1,0 +1,16 @@
+venv/
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+staticfiles/
+*.log
+.DS_Store
+
+
+node_modules
+models
+notebooks
+
+.env.example
+.env.local

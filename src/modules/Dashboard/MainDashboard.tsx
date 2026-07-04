@@ -6,11 +6,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useState } from "react";
 import { Calendar } from "lucide-react";
 import FarmersDistributionChart from "./FarmersDistributionChart";
-// import MonthlyRevenueBarChart from "./MonthlyRevenueBarChart";
+import MonthlyRevenueBarChart from "./MonthlyRevenueBarChart";
 import { useDashboardFarmerAnalysis } from "@/apis/adminApiComponents";
 import SuspenseWrapper from "@/components/SuspenseWrapper";
 import { reportDuration } from "./utils/constants";
 import { Skeleton } from "@/components/ui/skeleton";
+import QuickActionsGrid from "./QuickActionsGrid";
 
 export default function MainDashboard(){
     const [dateFilter, setDateFilter] = useState<any>({label: "All Time"})
@@ -69,23 +70,24 @@ export default function MainDashboard(){
                     </DropdownMenu>
                 </div>
                 <MetricsCard data={data}/>
+                <QuickActionsGrid />
                 <SuspenseWrapper isLoading={isLoading}
                     skeleton={
                         <div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-7 mt-5">
-                                <Skeleton className="h-[370px] w-full bg-[#D2D6DC] border" />
-                                <Skeleton className="h-[370px] w-full bg-[#D2D6DC] border" />
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
+                                <Skeleton className="h-[400px] w-full bg-[#D2D6DC] border lg:col-span-2" />
+                                <div className="flex flex-col gap-4">
+                                    <Skeleton className="h-[192px] w-full bg-[#D2D6DC] border" />
+                                    <Skeleton className="h-[192px] w-full bg-[#D2D6DC] border" />
+                                </div>
                              </div>
-                             <Skeleton className="h-[370px] w-full bg-[#D2D6DC] border mt-5" />
                         </div>
                     }>
-                    <div>
-                        <div className="mt-5">
-                            <FarmersDistributionChart data={data}/>
-                        </div>
-                        {/* <div className="mt-5">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
+                        <div className="lg:col-span-2">
                             <MonthlyRevenueBarChart />
-                        </div> */}
+                        </div>
+                        <FarmersDistributionChart data={data}/>
                     </div>
                 </SuspenseWrapper>
             </motion.div>

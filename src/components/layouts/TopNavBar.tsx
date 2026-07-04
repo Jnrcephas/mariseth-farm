@@ -12,22 +12,25 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useUserStore } from '@/app/providers/user-store-provider';
 import { useUserActions } from '@/hooks/auth/useAuth';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { routeTo } from '@/lib/constants';
 import Notifications from './Notifications';
 
 const TopNavbar = () => {
-  const {user} = useUserStore((user) => user)
+  const user = useUserStore((state) => state.user)
   const {logout, fetchUserDetails, isLoading} = useUserActions()
-  const pathName = usePathname();
 
   const router = useRouter()
 
+  // Intentionally run once on mount. Re-running this on every pathName
+  // change fired an extra /accounts/auth/me request on every single
+  // in-app navigation for no benefit (permissions don't change mid-session),
+  // and combined with the update loop in useAuth, was the main source of
+  // app-wide sluggishness.
   useEffect(() => {
-    
     fetchUserDetails();
-
-  }, [fetchUserDetails, pathName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="w-full px-4 p-2 flex justify-between bg-[#4A8D34] h-[57px] sticky top-0 z-50 items-center">

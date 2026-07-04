@@ -6,10 +6,12 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false })
 type ICharts = {
     series: any[], 
     colors: string[], 
-    labels:string[]
+    labels:string[],
+    height?: number,
+    showTotal?: boolean,
 }
 
-export default function PieChart({series, colors, labels}:ICharts){
+export default function PieChart({series, colors, labels, height = 300, showTotal = true}:ICharts){
     const options = {
         chart: {
           type: "donut",
@@ -23,12 +25,12 @@ export default function PieChart({series, colors, labels}:ICharts){
         plotOptions: {
             pie: {
               donut: {
-                size: "60%",
+                size: "65%",
                 background: "#f8f9fa",
                 labels: {
-                  show: true,
+                  show: showTotal,
                   total: {
-                    show: true,
+                    show: showTotal,
                     label: 'Total',
                   }
                 }
@@ -39,7 +41,7 @@ export default function PieChart({series, colors, labels}:ICharts){
           },
           stroke: {
             show: true,
-            width: 8,
+            width: 6,
             colors: ["#f8f9fa"],
             lineCap: "butt",
             curve: 'smooth',
@@ -58,7 +60,7 @@ export default function PieChart({series, colors, labels}:ICharts){
     return(
         <div>
             {typeof window !== "undefined" && (
-              <ReactApexChart options={options as any} series={series} type="donut" height={300} />
+              <ReactApexChart options={options as any} series={series} type="donut" height={height} />
             )}
 
         </div>

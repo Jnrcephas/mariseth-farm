@@ -64,7 +64,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
           title: "Dashboard",
           url: routeTo.dashboard,
-          items: null,
           isActive: true,
           slug: "dashboard",
           icon: LayoutGrid,
@@ -72,169 +71,38 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Farm Management",
-        url: "#",
+        url: routeTo.farms,
         slug: "farm-management",
         icon: Leaf,
         hasAccess: (list_farms ||  list_farmers || list_products),
-        items: [
-          {
-            title: "Farms",
-            url: routeTo.farms,
-            slug: "farm-management",
-            hasAccess: list_farms,
-          },
-          {
-            title: "Farmers",
-            url: routeTo.farmers,
-            slug: "farm-management",
-            hasAccess: list_farmers,
-          },
-          {
-            title: "Products",
-            url: routeTo.products,
-            slug: "farm-management",
-            hasAccess: list_products,
-          },
-        ],
       },
       {
         title: "Supply Chain Management",
-        url: "#",
+        url: routeTo.warehouses,
         slug: "supply-chain-management",
         icon: Box,
         hasAccess: (list_warehouses || list_inflow_orders || list_outflow_orders || list_credits || list_customers),
-        items: [
-          {
-            title: "Warehouses",
-            url: routeTo.warehouses,
-            slug: "supply-chain-management",
-            hasAccess: list_warehouses,
-          },
-          {
-            title: "Inbound Orders",
-            url: routeTo.inflowOrders,
-            slug: "supply-chain-management",
-            hasAccess: list_inflow_orders,
-          },
-          {
-            title: "Outbound Orders",
-            url: routeTo.outflowOrders,
-            slug: "supply-chain-management",
-            hasAccess: list_outflow_orders,
-          },
-          // {
-          //   title: "Credit Management",
-          //   url: routeTo.creditManagement,
-          //   slug: "supply-chain-management",
-          //   hasAccess: list_credits,
-          // },
-          // {
-          //   title: "Input Credit Procurement",
-          //   url: routeTo.inputCreditManagement,
-          //   slug: "supply-chain-management",
-          //   hasAccess: list_credits,
-          // },
-          // {
-          //   title: "Input Credit",
-          //   url: routeTo.inputCreditManagement,
-          //   slug: "supply-chain-management",
-          //   hasAccess: list_credits,
-          // },
-          {
-            title: "Customers",
-            url: routeTo.customers,
-            slug: "accounting",
-            hasAccess: list_customers,
-          }
-        ],
       },
       {
         title: "Credit Management",
-        url: "#",
+        url: routeTo.creditManagement,
         slug: "credit-management",
         icon: ShoppingBasket,
         hasAccess: (list_credits || list_input_credit_purchase || list_input_credit),
-        items: [
-          {
-            title: "Credits",
-            url: routeTo.creditManagement,
-            slug: "credit-management",
-            hasAccess: list_credits,
-          },
-          {
-            title: "Input Credit Procurement",
-            url: routeTo.inputCreditProcurement,
-            slug: "credit-management",
-            hasAccess: list_input_credit_purchase,
-          },
-          {
-            title: "Input Credits",
-            url: routeTo.inputCreditManagement,
-            slug: "credit-management",
-            hasAccess: list_input_credit,
-          }
-        ],
       },
       {
         title: "Approvals",
-        url: "#",
+        url: routeTo.inflowApprovals,
         slug: "approvals",
         icon: BadgeCheck,
-        hasAccess: (approve_inflow_order || approve_inflow_delivery_inspection || approve_deny_credit || list_outflow_approvals || list_farmers),
-        items: [
-          {
-            title: "Inbound",
-            url: routeTo.inflowApprovals,
-            slug: "approvals",
-            hasAccess: (approve_inflow_order || approve_inflow_delivery_inspection),
-          },
-          {
-            title: "Outbound",
-            url: routeTo.outflowApprovals,
-            slug: "approvals",
-            hasAccess: list_outflow_approvals,
-          },
-          {
-            title: "Credit Request",
-            url: routeTo.creditRequestApprovals,
-            slug: "approvals",
-            hasAccess: approve_deny_credit,
-          },
-          {
-            title: "Warehouse Credit",
-            url: routeTo.creditWarehouseApprovals,
-            slug: "approvals",
-            hasAccess: list_credit_fulfill,
-          },
-          {
-            title: "Farmer Registration Requests",
-            url: routeTo.farmerRegistrationRequests,
-            slug: "approvals",
-            hasAccess: list_farmers,
-          },
-        ],
+        hasAccess: (approve_inflow_order || approve_inflow_delivery_inspection || approve_deny_credit || list_outflow_approvals || list_farmers || list_credit_fulfill),
       },
-      
       {
         title: "User Management",
-        url: "#",
+        url: routeTo.userAccount,
         slug: "user-management",
         icon: User,
         hasAccess: (list_admins || list_groups_and_roles),
-        items: [
-          {
-            title: "User Accounts",
-            url: routeTo.userAccount,
-            slug: "user-management",
-            hasAccess: list_admins,
-          },
-          {
-            title: "User Roles",
-            url: routeTo.userRoles,
-            slug: "user-management",
-            hasAccess: list_groups_and_roles,
-          }
-        ],
       },
       {
         title: "Audit Trails",
@@ -242,31 +110,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         slug: "report",
         icon: NotebookPen,
         hasAccess: list_inflow_history || list_outflow_history,
-        // items: [
-        //   {
-        //     title: "Financial Report",
-        //     url: "#",
-        //     slug: "report",
-        //     hasAccess: true,
-        //   },
-        //   {
-        //     title: "Applications",
-        //     url: "#",
-        //     slug: "report",
-        //     hasAccess: true,
-        //   },
-        //   {
-        //     title: "Audit Trails",
-        //     url: "#",
-        //     slug: "report",
-        //     hasAccess: true,
-        //   }
-        // ],
       },
       {
           title: "System Settings",
           url: routeTo.systemSettings,
-          items: null,
           slug: "system-settings",
           icon: MonitorCog,
           hasAccess: create_custom_type,
@@ -279,54 +126,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: [
        {
         title: "Employee Management",
-        url: "#",
+        url: routeTo.employeeProfiles,
         slug: "employee-management",
         icon: UserCircle,
         hasAccess: list_job_titles || list_departments || list_employees,
-        items: [
-          {
-            title: "Employee Profiles",
-            url: routeTo.employeeProfiles,
-            slug: "employee-management",
-            hasAccess: list_employees,
-          },
-          {
-            title: "Job Titles",
-            url: routeTo.employeeJobTitles,
-            slug: "employee-management",
-            hasAccess: list_job_titles,
-          },
-          {
-            title: "Departments",
-            url: routeTo.employeeDepartments,
-            slug: "employee-management",
-            hasAccess: list_departments,
-          },
-          
-        ],
       },
       {
           title: "Leave Management",
-          url: "#",
+          url: routeTo.leaveManagementLeaveRequests,
           isActive: true,
           slug: "leave-management",
           icon: Calendar,
           hasAccess: (list_leave_requests || list_leave_types),
-          items: [
-          {
-            title: "Leave Requests",
-            url: routeTo.leaveManagementLeaveRequests,
-            slug: "leave-management",
-            hasAccess: list_leave_requests,
-          },
-          {
-            title: "Leave Types",
-            url: routeTo.leaveManagementLeaveRequestTypes,
-            slug: "leave-management",
-            hasAccess: list_leave_types,
-          },
-          
-        ],
       },
       {
         title: "Training",
