@@ -359,7 +359,7 @@ function CustomTable({
 			)}
 
 			<div className="">
-				<table role="table" className="rounded-top-table datatable-table w-full border-0">
+				<table role="table" className="rounded-top-table datatable-table w-full border-0 mt-4">
 					<thead className={`bg-[#0B3D19] text-white h-12 text-sm font-semibold`}>
 						{table.getHeaderGroups().map((headerGroup, idx) => (
 							<tr key={`trh-${idx}`} role="row" >

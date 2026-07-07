@@ -98,7 +98,7 @@ export default function Notifications(){
                             {newNotifications.length}
                         </div>:""
                     }
-                  <Bell className={`text-white ${newNotifications.length ? "animate-tada" : ""}`} />
+                  <Bell className={`text-[#4A8D34] ${newNotifications.length ? "animate-tada" : ""}`} />
                 </div>
             </PopoverTrigger>
             <PopoverContent className='px-0 md:w-[350px]' sideOffset={5} align="end" >

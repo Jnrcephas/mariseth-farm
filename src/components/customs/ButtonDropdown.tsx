@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/compon
 import { ReactNode } from "react";
 
 
-export default function DropdownButton({ open, setOpen, title, icon, menuItems, className="w-[233px]"}:
+export default function DropdownButton({ open, setOpen, title, icon, menuItems, className="w-[233px] px-6 py-8" }:
     {   open: boolean; 
         setOpen: (open: boolean) => void;
         title: string; 

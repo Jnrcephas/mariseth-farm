@@ -33,7 +33,7 @@ const TopNavbar = () => {
   }, []);
 
   return (
-    <div className="w-full px-4 p-2 flex justify-between bg-[#4A8D34] h-[57px] sticky top-0 z-50 items-center">
+    <div className="w-full px-4 p-2 flex justify-between bg-[#ffffff] h-[57px] sticky top-0 z-50 items-center">
       <div className="flex lg:gap-2 lg:flex-row items-center">
       </div>
       <div className=" border-l-1 border-[#fff] gap-x-3 flex px-3 items-center">
