@@ -6,7 +6,8 @@ db.sqlite3
 staticfiles/
 *.log
 .DS_Store
-
+.next/
+node_modules/
 
 node_modules
 models
