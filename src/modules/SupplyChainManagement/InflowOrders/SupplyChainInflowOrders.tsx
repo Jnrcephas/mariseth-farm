@@ -1,11 +1,10 @@
 "use client"
 import CustomTable, { IPagination } from "@/components/CustomTable";
-import { CirclePlus, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { useState } from "react";
 import { PAGE_SIZE, routeTo } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
 import { statusBadgeMap } from "@/modules/FarmManagement/utils/constants";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { FilterPropsInflow } from "../utils/types";
@@ -21,7 +20,6 @@ export default function SupplyChainInflowOrders({completed=false}:{completed?: b
         page: 1, page_size: PAGE_SIZE, completed: completed
     })
 
-    const {hasAccess: create_inflow_order} = useHasAccess("inflow_orders|create_inflow_order")
     const {hasAccess: view_inflow_order} = useHasAccess("inflow_orders|view_inflow_order")
 
     const {data, isLoading, refetch} = useInflowList({queryParams: filters})
@@ -106,19 +104,6 @@ export default function SupplyChainInflowOrders({completed=false}:{completed?: b
     ];
     return(
         <AuthorizeAndRenderPage permission={"inflow_orders|list_inflow_orders"}>
-            <div className="flex justify-between">
-                <div className="font-semibold text-black mb-10">
-                    Inbound Orders
-                </div>
-                {create_inflow_order &&
-                    <Link href={routeTo.inflowOrdersAdd}>
-                        <Button className="bg-[#4A8D34] text-white cursor-pointer">
-                            <CirclePlus/>
-                            Add New Inbound Order
-                        </Button>
-                    </Link>
-                }
-            </div>
             <CustomTable 
                 searchFilter={<InflowSearch setFilters={setFilters} filters={filters} refetch={refetch} isLoading={isLoading} completed={completed}/>}
                 columns={columns} 

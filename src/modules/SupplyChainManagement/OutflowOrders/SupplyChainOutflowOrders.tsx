@@ -1,11 +1,10 @@
 "use client"
 import CustomTable, { IPagination } from "@/components/CustomTable";
-import { CirclePlus, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { useState } from "react";
 import { PAGE_SIZE, routeTo } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
 import { statusBadgeMap } from "@/modules/FarmManagement/utils/constants";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { FilterPropsInflow } from "../utils/types";
@@ -21,7 +20,6 @@ export default function SupplyChainOutflowOrders({completed=false}:{completed?: 
     const [filters, setFilters] = useState<FilterPropsInflow>({
         page: 1, page_size: PAGE_SIZE, completed: completed
     })
-    const {hasAccess: create_outflow_order} = useHasAccess("outflow_orders|create_outflow_order")
     const {hasAccess: view_outflow_order} = useHasAccess("outflow_orders|view_outflow_order")
 
     const {data: respData, isLoading, refetch} = useOutflowList({queryParams: filters})
@@ -101,19 +99,6 @@ export default function SupplyChainOutflowOrders({completed=false}:{completed?: 
     ];
     return(
         <AuthorizeAndRenderPage permission={"outflow_orders|list_outflow_orders"}>
-            <div className="flex justify-between">
-                <div className="font-semibold text-black mb-10">
-                    Outbound Orders
-                </div>
-                {create_outflow_order && 
-                    <Link href={routeTo.outflowOrdersAdd}>
-                        <Button className="bg-[#4A8D34] text-white cursor-pointer">
-                            <CirclePlus/>
-                            Add New Outbound Order
-                        </Button>
-                    </Link>
-                }
-            </div>
             <CustomTable 
                 searchFilter={<OutflowSearch setFilters={setFilters} filters={filters} refetch={refetch} isLoading={isLoading} completed={completed}/>}
                 columns={columns} 

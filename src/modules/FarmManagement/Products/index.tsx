@@ -1,7 +1,6 @@
 "use client";
 import DropdownButton from "@/components/customs/ButtonDropdown";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CirclePlus } from "lucide-react";
 import { useState } from "react";
 import AddCropModal from "./Modals/AddCropModal";
@@ -10,6 +9,14 @@ import OtherProductsView from "./OtherProducts";
 import AddOtherProductsModal from "./Modals/AddOtherProducts";
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
+import { cn } from "@/lib/utils";
+
+type ProductTab = "crops" | "other"
+
+const PRODUCT_TABS: { key: ProductTab; label: string }[] = [
+    { key: "crops", label: "Crops" },
+    { key: "other", label: "Other Products" },
+]
 
 export default function Products() {
     const {hasAccess: create_product} = useHasAccess("product|create_product")
@@ -17,6 +24,7 @@ export default function Products() {
     const [open, setOpen] = useState(false)
     const [addNewCropModal, setAddNewCropModal] = useState(false)
     const [addOtherProductsModal, setAddOtherProductsModal] = useState(false)
+    const [activeTab, setActiveTab] = useState<ProductTab>("crops")
 
     function handleAddNewCrop(){
         setOpen(false)
@@ -29,10 +37,27 @@ export default function Products() {
     
   return (
     <AuthorizeAndRenderPage permission={"product|list_products"}>
-        <div className="flex justify-between">
-            <div className="font-semibold text-black mb-10">
-                Products
+        <div className="font-bold text-xl text-black mb-4">Products</div>
+
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+            <div className="flex items-center gap-3">
+                {PRODUCT_TABS.map((tab) => (
+                    <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setActiveTab(tab.key)}
+                        className={cn(
+                            "rounded-sm px-6 py-4 text-base font-bold transition-colors cursor-pointer",
+                            activeTab === tab.key
+                                ? "bg-[#4A8D34] text-white"
+                                : "bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1]"
+                        )}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
+
             {create_product &&
                 <DropdownButton 
                     open={open} 
@@ -50,18 +75,9 @@ export default function Products() {
                 />
             }
         </div>
-        <Tabs defaultValue="1" className="w-full mx-auto">
-            <TabsList className="grid w-[400px] grid-cols-2 mx-auto p- h-[36px] bg-[#F1F5F9] border ">
-                <TabsTrigger className="h-[28px] cursor-pointer" value="1">Crops</TabsTrigger>
-                <TabsTrigger className="h-[28px] cursor-pointer" value="2">Other Products</TabsTrigger>
-            </TabsList>
-            <TabsContent value="1">
-                <CropsView/>
-            </TabsContent>
-            <TabsContent value="2">
-                <OtherProductsView/>
-            </TabsContent>
-        </Tabs>
+
+        {activeTab === "crops" ? <CropsView/> : <OtherProductsView/>}
+
         {addNewCropModal &&
             <AddCropModal
                 open={addNewCropModal} 

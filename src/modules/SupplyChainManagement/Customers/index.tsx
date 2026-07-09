@@ -77,7 +77,7 @@ export default function CustomersView(){
                 <div className="font-semibold text-black mb-10">
                     Customers
                 </div>
-                <Button className="bg-[#4A8D34] text-white cursor-pointer" onClick={() => setAddModal(true)}>
+                <Button className="bg-[#4A8D34] hover:bg-[#3f7a2c] text-white cursor-pointer rounded-sm px-6 py-4 text-base font-bold" onClick={() => setAddModal(true)}>
                     <CirclePlus/>
                     Add New Customer
                 </Button>

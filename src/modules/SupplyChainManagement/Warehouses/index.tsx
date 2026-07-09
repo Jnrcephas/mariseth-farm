@@ -121,7 +121,7 @@ export default function WareHousesView(){
                     Warehouses
                 </div>
                 {create_warehouse &&
-                    <Button className="bg-[#4A8D34] text-white cursor-pointer" onClick={() => setAddModal(true)}>
+                    <Button className="bg-[#4A8D34] hover:bg-[#3f7a2c] text-white cursor-pointer rounded-sm px-6 py-4 text-base font-bold" onClick={() => setAddModal(true)}>
                         <CirclePlus/>
                         Add New Warehouse
                     </Button>

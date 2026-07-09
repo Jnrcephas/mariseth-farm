@@ -1,6 +1,6 @@
 "use client"
 import CustomTable, { IPagination } from "@/components/CustomTable";
-import { CirclePlus, EllipsisVertical } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 import { PAGE_SIZE } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
@@ -16,10 +16,14 @@ import PaybackModal from "./Modals/PaybackModal";
 import { FilterPropsCredit } from "./utils/types";
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
-import { Button } from "@/components/ui/button";
 import AddCreditModal from "./Modals/AddCreditModal";
 
-export default function CreditTable(){
+type CreditTableProps = {
+    addCreditModal: boolean
+    setAddCreditModal: (open: boolean) => void
+}
+
+export default function CreditTable({addCreditModal, setAddCreditModal}: CreditTableProps){
 
     const [filters, setFilters] = useState<FilterPropsCredit>({
         page: 1, page_size: PAGE_SIZE
@@ -28,13 +32,11 @@ export default function CreditTable(){
 
     const {hasAccess: create_payback} = useHasAccess("payback|create_payback")
     const {hasAccess: delete_credit} = useHasAccess("credit|delete_credit")
-    const {hasAccess: create_credit} = useHasAccess("credit|create_credit")
 
     const [viewModal, setViewModal] = useState(false)
     const [deleteModal, setDeleteModal] = useState(false)
     const [paybackModal, setPaybackModal] = useState(false)
     const [selected, setSelected] = useState<any>({})
-    const [addCreditModal, setAddCreditModal] = useState(false)
    
 
     function handleViewModal(data: any){
@@ -157,15 +159,7 @@ export default function CreditTable(){
     ];
     return(
         <AuthorizeAndRenderPage permission="credit|list_credits">
-            <div className="flex justify-end absolute right-0 -mt-5">
-                 {create_credit &&
-                    <Button className="bg-[#4A8D34] text-white cursor-pointer" onClick={() => setAddCreditModal(true)}>
-                        <CirclePlus/>
-                        Record New Credit
-                    </Button>
-                }
-            </div>
-            <div className="mt-5">
+            <div>
                 <CustomTable 
                     searchFilter={<CreditSearch setFilters={setFilters} filters={filters} refetch={refetch} isLoading={isLoading} />}
                     columns={columns} 
