@@ -149,10 +149,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <div>
       <Sidebar {...props}>
-        <SidebarHeader className="bg-[#ffffff] h-[90px] flex flex-col justify-center">
+        <SidebarHeader className="bg-[#ffffff] h-[85px] flex flex-col justify-center">
           <div className="px-1">
             <Image
-              className="w-[180px]"
+              className="w-[150px]"
               src="/images/meriseth-farm-logo 1.png"
               alt="meriseth logo"
               width={500}
