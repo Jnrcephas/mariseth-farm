@@ -126,15 +126,15 @@ function DialogPoweredByFooter(){
   return(
     <div className="absolutes bottom-0 w-full">
         <div className="bg-[#F1F5F9] flex gap-x-1 mt-5 justify-center items-center h-10 rounded-b">
-            <h1 className="text-xs text-[#64748B]">Powered by</h1>{" "}
-            <Image
+            {/* <h1 className="text-xs text-[#64748B]">Powered by</h1>{" "} */}
+            {/* <Image
                 className="w-[80px]"
                 src="/images/sales-forge-logo.jpeg"
                 alt="meriseth logo"
                 width={500}
                 height={500}
                 priority
-            />
+            /> */}
         </div>
         </div>
   )

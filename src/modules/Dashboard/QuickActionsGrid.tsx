@@ -32,7 +32,7 @@ const QUICK_ACTION_CARDS: QuickActionCardConfig[] = [
     bgColor: "#17A2A0",
   },
   {
-    title: "Alerts, Reporting and Analytics",
+    title: "Farm Monitoring",
     href: routeTo.auditTrails,
     icon: BarChart3,
     bgColor: "#1F2A54",
@@ -73,7 +73,7 @@ function QuickActionCard({ card }: { card: QuickActionCardConfig }) {
     "Farm Management": list_farms || list_farmers || list_products,
     "Accounting and Finance": list_expenses || list_waybills || list_invoices,
     "HR Management": list_employees || list_job_titles || list_departments,
-    "Alerts, Reporting and Analytics": list_inflow_history || list_outflow_history,
+    "Farm Monitoring": list_inflow_history || list_outflow_history,
   }
 
   if (!accessByTitle[card.title]) return null

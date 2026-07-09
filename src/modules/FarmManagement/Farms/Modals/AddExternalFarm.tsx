@@ -32,23 +32,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label, LoadingLabel } from "@/components/ui/label";
 import { farmingMethods, fertilizerTypes, landOwnershipTypes, selectColorStyles, yesOrNoTypes } from "../../utils/constants";
 import ReactSelect from 'react-select';
-import { Check, ChevronsUpDown, Loader, XCircle } from "lucide-react";
+import { Loader, XCircle } from "lucide-react";
 import { useCustomTypeList, useFarmManagementFarmCreate, useFarmManagementFarmUpdate, useFarmManagementProductList, useRegionsList } from "@/apis/adminApiComponents";
 import { toast } from "sonner";
 import { getErrorMap, mapSelectOptions } from "@/lib/helpers";
 import { Region } from "@/apis/adminApiSchemas";
-import useGetRegionDistricts, { useAllFarmers } from "../../utils/hooks";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import useGetRegionDistricts from "../../utils/hooks";
+import { FarmerCombobox } from "../../utils/FarmerCombobox";
 
 
 
@@ -57,13 +47,8 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
     const modalTitle = isEdit ? "Edit External Farm" : "Register New External Farm";
     const submitTitle = isEdit ? "Update Farm" : "Register Farm";
 
-    const [openDrop, setOpenDrop] = useState(false)
-    
-    
     const defaultCrops = mapSelectOptions(defaultData?.crops || [], "product")
     const defaultLivestock = mapSelectOptions(defaultData?.livestock || [], "product")
-
-    const {allFarmers, isLoading: isLoadingFarmers} = useAllFarmers("")
 
     const form = useForm<z.infer<typeof externalFarmSchema>>({
         resolver: zodResolver(externalFarmSchema),
@@ -195,97 +180,20 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
                                         <FormItem className="flex flex-col">
                                         <FormLabel>Select Lead Farmer
                                             <div className='text-red-500'>*</div>
-                                            {isLoadingFarmers && <Loader  className="animate-spin"/>}
                                         </FormLabel>
-                                        <Popover open={openDrop} onOpenChange={setOpenDrop}>
-                                            <PopoverTrigger asChild >
-                                            <FormControl>
-                                                <Button
-                                                variant="outline"
-                                                role="combobox"
-                                                className={cn(
-                                                    "w-full justify-between",
-                                                    !field.value && "text-muted-foreground"
-                                                )}
-                                                >
-                                                {
-                                                Number(field.value)
-                                                    ? farmerFullName(allFarmers?.find(
-                                                        (farmer: any) => String(farmer?.id) === field.value
-                                                    ))
-                                                    : "Select Farmer"}
-                                                <ChevronsUpDown className="opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="md:w-[350px] w-full p-0">
-                                            <Command>
-                                                <CommandInput
-                                                placeholder="Search Farmer..."
-                                                className="h-9"
+                                        <FormControl>
+                                            <FarmerCombobox
+                                                value={field.value}
+                                                onChange={(value) => form.setValue("farmer", value)}
+                                                farmerType=""
+                                                selectedLabel={defaultData?.farmer ? farmerFullName(defaultData.farmer) : undefined}
                                                 required
-                                                />
-                                                <CommandList>
-                                                <CommandEmpty>No Farmer found.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {allFarmers?.map((farmer: any) => (
-                                                    <CommandItem
-                                                        value={farmerFullName(farmer)}
-                                                        key={`els-${farmer?.id}`}
-                                                        onSelect={() => {
-                                                        form.setValue("farmer", String(farmer?.id))
-                                                        setOpenDrop(false)
-                                                        }}
-                                                    >
-                                                        {farmerFullName(farmer)}
-                                                        <Check
-                                                        className={cn(
-                                                            "ml-auto",
-                                                            String(farmer?.id) === field.value
-                                                            ? "opacity-100"
-                                                            : "opacity-0"
-                                                        )}
-                                                        />
-                                                    </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                            </PopoverContent>
-                                        </Popover>
+                                            />
+                                        </FormControl>
                                         <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                                {/* <FormField
-                                    control={form.control}
-                                    name="farmer"
-                                    render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Select Lead Farmer
-                                            <div className='text-red-500'>*</div>
-                                            {isLoadingFarmers && <Loader  className="animate-spin"/>}
-                                        </FormLabel>
-                                        <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        required
-                                        >
-                                        <FormControl>
-                                            <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select" />
-                                            </SelectTrigger> 
-                                        </FormControl>
-                                        <SelectContent>
-                                            {allFarmers?.map((item, idx) =>(
-                                                <SelectItem key={`ty-${idx}`} value={String(item?.id)}>{item?.first_name} {item?.last_name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                /> */}
                                 <FormField
                                     control={form.control}
                                     name="location"

@@ -81,6 +81,7 @@ export const routeTo = {
     userRoles: "/app/user-management/roles",
     
     auditTrails: "/app/audit-trails",
+    reportsAndAnalysis: "/app/reports-and-analysis",
     help: "/app/help",
     
   }

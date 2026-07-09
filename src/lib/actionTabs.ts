@@ -3,8 +3,18 @@ import { routeTo } from "./constants";
 
 export interface ActionTabConfig {
   label: string;
-  href: string;
+  // Optional because a tab can instead be given an `onClick` (e.g. a
+  // "Support" tab that opens a modal rather than navigating anywhere).
+  href?: string;
   permission?: permType;
+  // Opens in a new tab via a plain <a>, instead of a Next.js client-side
+  // <Link> transition. Used for the "Accounting" tab, which points at an
+  // external manager.io URL rather than a route inside this app.
+  external?: boolean;
+  // If provided, this tab renders as a <button> that runs this instead of
+  // navigating. Used for "Support" on the Help page, since Support is a
+  // modal, not its own route.
+  onClick?: () => void;
 }
 
 // Each of these mirrors what used to be an expandable sidebar sub-menu.
@@ -43,13 +53,23 @@ export const USER_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "User Roles", href: routeTo.userRoles, permission: "account_management|list_groups_and_roles" },
 ];
 
-export const EMPLOYEE_MANAGEMENT_TABS: ActionTabConfig[] = [
+// "HR Management" is a single flat sidebar item (see AppSidebar.tsx) that
+// lands on Employee Profiles by default; all of Employee Management, Leave
+// Management, and Training are just tabs on that one hub.
+export const HR_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "Employee Profiles", href: routeTo.employeeProfiles, permission: "employee|list_employees" },
   { label: "Job Titles", href: routeTo.employeeJobTitles, permission: "hr|list_job_titles" },
   { label: "Departments", href: routeTo.employeeDepartments, permission: "hr|list_departments" },
-];
-
-export const LEAVE_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "Leave Requests", href: routeTo.leaveManagementLeaveRequests, permission: "leave|list_leave_requests" },
   { label: "Leave Types", href: routeTo.leaveManagementLeaveRequestTypes, permission: "leave|list_leave_types" },
+  { label: "Training", href: routeTo.training, permission: "training|list_trainings" },
+];
+
+// "Finance & Accounting" is one sidebar item landing on Expenses by
+// default, with these as tabs.
+export const FINANCE_TABS: ActionTabConfig[] = [
+  { label: "Expenses", href: routeTo.accountingExpenses, permission: "accounting|list_expenses" },
+  { label: "Waybills", href: routeTo.accountingWaybills, permission: "accounting|list_waybills" },
+  { label: "Invoices", href: routeTo.accountingInvoices, permission: "accounting|list_invoices" },
+  { label: "Accounting", href: "https://meshsuites.manager.io/businesses", external: true },
 ];

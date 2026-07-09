@@ -9,6 +9,9 @@ import { commaSeparator, formatDateReadable } from "@/lib/helpers";
 import { FilterPropsExpenses } from "../utils/types";
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized";
 import Link from "next/link";
+import PageTitle from "@/components/layouts/PageTitle";
+import { Card } from "@/components/ui/card";
+import { Wallet } from "lucide-react";
 
 export default function ExpensesView(){
     
@@ -75,13 +78,18 @@ export default function ExpensesView(){
     
     return(
         <AuthorizeAndRenderPage permission={"accounting|list_expenses"}>
-            <div className="flex justify-center">
-                <div className="border flex items-center bg-[#fff] p-3 rounded-lg gap-3">
-                    <div className="text-sm text-green-600">Total Expenses: </div>
-                    <div className="font-medium">{CEDI} {commaSeparator(data?.total_expenses?.total_sum)}</div>
+            <PageTitle title="Expenses" />
+            <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
+                <div className="flex items-center gap-4">
+                    <div className="rounded-full p-2.5 flex items-center justify-center bg-[#FEE2E2]">
+                        <Wallet className="h-5 w-5 text-[#DC2626]" />
+                    </div>
+                    <div>
+                        <span className="text-sm text-[#475569] font-medium">Total Expenses</span>
+                        <p className="text-2xl font-bold text-black">{CEDI} {commaSeparator(data?.total_expenses?.total_sum)}</p>
+                    </div>
                 </div>
-
-            </div>
+            </Card>
             <div>
                 <CustomTable 
                     searchFilter={<ExpensesSearch setFilters={setFilters} refetch={refetch} isLoading={isLoading} />}
