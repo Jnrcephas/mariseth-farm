@@ -33,7 +33,8 @@ import { useFarmManagementFarmerCreate, useFarmManagementFarmerUpdate, useRegion
 import { toast } from "sonner";
 import {  cleanJsonData, getErrorMap, stringToBool } from "@/lib/helpers";
 import { Region } from "@/apis/adminApiSchemas";
-import useGetRegionDistricts, { useAllFarms } from "../utils/hooks";
+import useGetRegionDistricts from "../utils/hooks";
+import { FarmCombobox } from "../utils/FarmCombobox";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
 
@@ -86,8 +87,6 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
     const _regions = _regionsData as any
     const regions = _regions?.results as Region[] || []
     const {districts} = useGetRegionDistricts(regions, Number(form.watch("region")))
-    
-    const {farms: farms, isLoading:isLoadingFarms} = useAllFarms()
 
     const {mutate, isPending} = useFarmManagementFarmerCreate({
         onSuccess: () => {
@@ -443,22 +442,14 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                             name="farm"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Select Farm {isLoadingFarms && <Loader className="animate-spin"/>}</FormLabel>
-                                <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                >
+                                <FormLabel>Select Farm</FormLabel>
                                 <FormControl>
-                                    <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select" />
-                                    </SelectTrigger> 
+                                    <FarmCombobox
+                                        value={field.value}
+                                        onChange={(value) => form.setValue("farm", value)}
+                                        selectedLabel={defaultData?.farm?.name}
+                                    />
                                 </FormControl>
-                                <SelectContent>
-                                    {farms?.map((item, idx) => (
-                                        <SelectItem key={idx} value={String(item?.id)}>{item?.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                                </Select>
                                 <FormMessage />
                             </FormItem>
                             )}

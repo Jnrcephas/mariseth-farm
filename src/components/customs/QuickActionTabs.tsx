@@ -6,11 +6,13 @@ import { useHasAccess } from "@/hooks/auth/useHasAccess";
 import { ActionTabConfig } from "@/lib/actionTabs";
 
 /**
- * Renders a row of tappable "Actions" tabs (Farms / Farmers / Products,
+ * Renders a row of large tappable "Actions" tabs (Farms / Farmers / Products,
  * etc.) used at the top of hub pages, replacing what used to be expandable
- * sidebar sub-menus. Each tab is a real link to its own route, so browser
+ * sidebar sub-menus. Most tabs are a real link to their own route, so browser
  * back/forward, deep-linking, and page-level data fetching all keep working
- * exactly as before — this is purely a navigation UI change.
+ * exactly as before. A tab can also be given an `onClick` instead of an
+ * `href` (e.g. the "Support" tab on the Help page, which opens a modal
+ * rather than navigating anywhere) - see ActionTabConfig in lib/actionTabs.ts.
  */
 export default function QuickActionTabs({ tabs }: { tabs: ActionTabConfig[] }) {
   const pathname = usePathname();
@@ -20,9 +22,9 @@ export default function QuickActionTabs({ tabs }: { tabs: ActionTabConfig[] }) {
   return (
     <div className="mb-8">
       <div className="font-bold text-xl text-black mb-4">Actions</div>
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
         {tabs.map((tab) => (
-          <QuickActionTab key={tab.href} tab={tab} pathname={pathname} />
+          <QuickActionTab key={tab.href ?? tab.label} tab={tab} pathname={pathname} />
         ))}
       </div>
     </div>
@@ -34,17 +36,32 @@ function QuickActionTab({ tab, pathname }: { tab: ActionTabConfig; pathname: str
 
   if (tab.permission && !loading && !hasAccess) return null;
 
-  const isActive = pathname === tab.href || !!pathname?.startsWith(`${tab.href}/`);
+  const isActive = !!tab.href && (pathname === tab.href || !!pathname?.startsWith(`${tab.href}/`));
+
+  const className = `flex items-center rounded-2xl px-8 py-7 text-lg sm:text-xl font-bold text-left transition-colors cursor-pointer ${
+    isActive
+      ? "bg-[#0B3D19] text-white"
+      : "bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1]"
+  }`;
+
+  if (tab.onClick) {
+    return (
+      <button type="button" onClick={tab.onClick} className={className}>
+        {tab.label}
+      </button>
+    );
+  }
+
+  if (tab.external) {
+    return (
+      <a href={tab.href} target="_blank" rel="noopener noreferrer" className={className}>
+        {tab.label}
+      </a>
+    );
+  }
 
   return (
-    <Link
-      href={tab.href}
-      className={`flex items-center justify-center rounded-sm w-[220px] px-6 py-6 text-lg font-bold text-center transition-colors cursor-pointer ${
-        isActive
-          ? "bg-[#0B3D19] text-white"
-          : "bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1]"
-      }`}
-    >
+    <Link href={tab.href as string} className={className}>
       {tab.label}
     </Link>
   );

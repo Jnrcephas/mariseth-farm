@@ -32,7 +32,12 @@ export default function SidebarGroupMenus({children, menusData}:
         }
         <SidebarMenu className="px-2">
             {menusData?.navMain?.filter((item) => item?.hasAccess).map((item) => {
-                const isActive = path.includes(item?.slug)
+                // slug can be a single string (most items) or an array
+                // (e.g. "HR Management" now covers the employee-management,
+                // leave-management, AND training route folders, since those
+                // 3 previously-separate sidebar items got merged into one).
+                const slugs: string[] = Array.isArray(item?.slug) ? item.slug : [item?.slug]
+                const isActive = slugs.some((slug) => path.includes(slug))
                 return (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton

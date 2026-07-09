@@ -1,30 +1,13 @@
-"use client"
-import { useDepartmentRead } from "@/apis/adminApiComponents";
-import { SuspenseLogo } from "@/components/SuspenseLoader";
-import { PageProps } from "@/lib/types";
-import ViewDepartment from "@/modules/EmployeeManagement/Departments/ViewDepartment";
-import { use } from "react";
+// src/app/app/employee-management/departments/page.tsx
+import Departments from "@/modules/EmployeeManagement/Departments";
+import QuickActionTabs from "@/components/customs/QuickActionTabs";
+import { HR_MANAGEMENT_TABS } from "@/lib/actionTabs";
 
-export default function Page({ params }: PageProps){
-    const { id } = use(params);
-    const {data, isPending, refetch} = useDepartmentRead({pathParams: {id: Number(id)}})
+export default function Page(){
     return(
         <div>
-            {isPending ?
-                <div className="bg-[#fff] rounded-lg h-[80vh]">
-                    <div className="flex justify-center items-center h-full w-full">
-                        <SuspenseLogo/>
-                    </div>
-                </div>:
-                <div>
-                    <div className="text-lg">
-                        <span className="text-[#737373]">Departments / </span>{data?.name}
-                    </div>
-                    <div className="bg-[#fff] rounded-lg h-full">
-                        <ViewDepartment defaultData={data as any} refetch={refetch}/>
-                    </div>
-                </div>
-            }
+            <QuickActionTabs tabs={HR_MANAGEMENT_TABS} />
+            <Departments />
         </div>
     )
 }

@@ -2,7 +2,7 @@
 import { useFarmManagementFarmerReassignSmallholderFarmer } from "@/apis/adminApiComponents";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog"
-import { Loader, XCircle } from "lucide-react"
+import { XCircle } from "lucide-react"
 import {
     Form,
     FormControl,
@@ -12,19 +12,12 @@ import {
     FormMessage,
   } from '@/components/ui/form';
 
-  import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from '@/components/ui/select';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { getErrorMap } from "@/lib/helpers";
-import { useAllFarmers } from "../../utils/hooks";
+import { FarmerCombobox } from "../../utils/FarmerCombobox";
 import { reassignFarmerSchema } from "../../utils/validations";
 
 export default function ReassignLeadFarmerModal({
@@ -40,8 +33,6 @@ export default function ReassignLeadFarmerModal({
     })
 {
     const countFarmers = data.length
-
-    const {allFarmers, isLoading: isLoadingFarmers} = useAllFarmers("lead")
 
     const form = useForm<z.infer<typeof reassignFarmerSchema>>({
         resolver: zodResolver(reassignFarmerSchema),
@@ -90,24 +81,15 @@ export default function ReassignLeadFarmerModal({
                                     <FormItem>
                                         <FormLabel>Lead Farmer
                                             <div className='text-red-500'>*</div>
-                                            {isLoadingFarmers && <Loader  className="animate-spin"/>}
                                         </FormLabel>
-                                        <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        required
-                                        >
                                         <FormControl>
-                                            <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select" />
-                                            </SelectTrigger> 
+                                            <FarmerCombobox
+                                                value={field.value}
+                                                onChange={(value) => form.setValue("lead_farmer_id", value)}
+                                                farmerType="lead"
+                                                required
+                                            />
                                         </FormControl>
-                                        <SelectContent>
-                                            {allFarmers?.map((item, idx) =>(
-                                                <SelectItem key={`idx-${idx}`} value={String(item?.id)}>{item?.first_name} {item?.last_name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                     )}

@@ -32,7 +32,9 @@ import { useRouter } from "next/navigation";
 import { useFarmManagementFarmerCreate, useFarmManagementFarmerUpdate, useRegionsList } from "@/apis/adminApiComponents";
 import { toast } from "sonner";
 import { cleanJsonData, getErrorMap, stringToBool } from "@/lib/helpers";
-import useGetRegionDistricts, { useAllFarmers, useAllFarms } from "../utils/hooks";
+import useGetRegionDistricts from "../utils/hooks";
+import { FarmerCombobox } from "../utils/FarmerCombobox";
+import { FarmCombobox } from "../utils/FarmCombobox";
 import { Region } from "@/apis/adminApiSchemas";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
@@ -64,8 +66,6 @@ const getSmallholderFarmerDefaultValues = (defaultData: any) => ({
 
 export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegRequestId}:{isEdit?: boolean; defaultData?: any; farmerRegRequestId?: number}) {
 
-    const {allFarmers, isLoading: isLoadingFarmers} = useAllFarmers("lead")
-
     const router = useRouter()
     const form = useForm<z.infer<typeof smallholderFarmerSchema>>({
         resolver: zodResolver(smallholderFarmerSchema),
@@ -79,8 +79,6 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
     const {data:_regionsData, isLoading: isLoadingRegions} = useRegionsList({})
     const _regions = _regionsData as any
     const regions = _regions?.results as Region[] || []
-
-    const {farms: farms, isLoading:isLoadingFarms} = useAllFarms()
 
     const {districts} = useGetRegionDistricts(regions, Number(form.watch("region")))
     
@@ -425,22 +423,14 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                             name="farm"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Select Farm {isLoadingFarms && <Loader className="animate-spin"/>}</FormLabel>
-                                <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                >
+                                <FormLabel>Select Farm</FormLabel>
                                 <FormControl>
-                                    <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select" />
-                                    </SelectTrigger> 
+                                    <FarmCombobox
+                                        value={field.value}
+                                        onChange={(value) => form.setValue("farm", value)}
+                                        selectedLabel={defaultData?.farm?.name}
+                                    />
                                 </FormControl>
-                                <SelectContent>
-                                    {farms?.map((item, idx) => (
-                                        <SelectItem key={idx} value={String(item?.id)}>{item?.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                                </Select>
                                 <FormMessage />
                             </FormItem>
                             )}
@@ -452,24 +442,16 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                             <FormItem>
                                 <FormLabel>Select Lead Farmer
                                     <div className='text-red-500'>*</div>
-                                    {isLoadingFarmers && <Loader  className="animate-spin"/>}
                                 </FormLabel>
-                                <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                required
-                                >
                                 <FormControl>
-                                    <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select" />
-                                    </SelectTrigger> 
+                                    <FarmerCombobox
+                                        value={field.value}
+                                        onChange={(value) => form.setValue("lead_farmer", value)}
+                                        farmerType="lead"
+                                        selectedLabel={defaultData?.lead_farmer ? `${defaultData.lead_farmer?.first_name} ${defaultData.lead_farmer?.last_name}` : undefined}
+                                        required
+                                    />
                                 </FormControl>
-                                <SelectContent>
-                                    {allFarmers?.map((item, idx) =>(
-                                        <SelectItem key={idx} value={String(item?.id)}>{item?.first_name} {item?.last_name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                                </Select>
                                 <FormMessage />
                             </FormItem>
                             )}

@@ -6,8 +6,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 import { useHelpList } from "@/apis/adminApiComponents";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, LifeBuoy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import AddHelpModal from "./Modals/AddHelpModal";
 import DeleteHelpModal from "./Modals/DeleteHelpModal";
 import { FilterProps } from "./utils/types";
@@ -72,11 +73,21 @@ export default function HelpTable(){
     ];
     return(
         <div className="p-5 pt-4">
-            <div className="mb-2 flex justify-between w-full">
+            <div className="mb-2 flex justify-between w-full items-start">
                 <PageTitle title="Help"/>
-                
                 <Button className="bg-[#4A8D34] font-medium" onClick={() => setAddModal(true)}>Add New Help</Button>
             </div>
+            <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
+                <div className="flex items-center gap-4">
+                    <div className="rounded-full p-2.5 flex items-center justify-center bg-[#D1FAE5]">
+                        <LifeBuoy className="h-5 w-5 text-[#059669]" />
+                    </div>
+                    <div>
+                        <span className="text-sm text-[#475569] font-medium">Total Help Articles</span>
+                        <p className="text-2xl font-bold text-black">{data?.pagination?.total ?? 0}</p>
+                    </div>
+                </div>
+            </Card>
             <div>
                 <CustomTable 
                     searchFilter={<HelpSearch setFilters={setFilters} isLoading={isLoading} refetch={refetch}/>}

@@ -11,8 +11,9 @@ import { EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AddCategoryModal from "./Modals/AddCategoryModal";
 import DeleteCategoryModal from "./Modals/DeleteCategoryModal";
+import { capitalize } from "@/lib/helpers";
 
-export default function Categories({category}:{category: string;}){
+export default function Categories({ category }: { category: string; }) {
     const [addModal, setAddModal] = useState(false)
     const [editModal, setEditModal] = useState(false)
     const [deleteModal, setDeleteModal] = useState(false)
@@ -22,13 +23,13 @@ export default function Categories({category}:{category: string;}){
         page: 1, page_size: PAGE_SIZE, query: category
     })
 
-    const {data, isLoading, refetch} = useCustomTypeList({queryParams:filters})
+    const { data, isLoading, refetch } = useCustomTypeList({ queryParams: filters })
 
-    function handleEditModal(data: any){
+    function handleEditModal(data: any) {
         setSelected(data)
         setEditModal(true)
     }
-    function handleDeleteModal(data: any){
+    function handleDeleteModal(data: any) {
         setSelected(data)
         setDeleteModal(true)
     }
@@ -37,59 +38,44 @@ export default function Categories({category}:{category: string;}){
         setFilters((prev) => ({ ...prev, page }))
     }
     const handleSetPageSize = (pageSize: number) => {
-        setFilters((prev) => ({ ...prev, page_size: pageSize}))
+        setFilters((prev) => ({ ...prev, page_size: pageSize }))
     }
 
-    
+
     const columns: ColumnDef<any>[] = [
         { header: "Name", accessorKey: "name" },
-        // { header: "Category Name", accessorKey: "category_name",  
-        //     cell: (cell) => {
-        //         return (
-        //             <div className="capitalize">{cell.row.original?.category_name?.replaceAll("_", " ")}</div>
-
-        //     )}},
         { header: "Description", accessorKey: "description" },
-        { header: "Action", accessorKey: "action",
+        {
+            header: "Action", accessorKey: "action",
             cell: (tableData) => {
                 return (
-                  <div className="">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild className="cursor-pointer">
-                            <EllipsisVertical className="text-[#4A8D34]"/>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem className="cursor-pointer" onClick={() => handleEditModal(tableData.row.original)}>Edit </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-500 cursor-pointer" onClick={() => handleDeleteModal(tableData.row.original)}>Delete </DropdownMenuItem>
-                        </DropdownMenuContent>
-					</DropdownMenu>
-                  </div>
+                    <div className="">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild className="cursor-pointer">
+                                <EllipsisVertical className="text-[#4A8D34]" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleEditModal(tableData.row.original)}>Edit </DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-500 cursor-pointer" onClick={() => handleDeleteModal(tableData.row.original)}>Delete </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 );
             },
         },
     ];
-    return(
+    return (
         <div className="p-5 pt-4">
             <div className="mb-2 flex justify-between w-full">
-                <PageTitle title="System Categories"/>
-                {/* <Select value={category} onValueChange={handleChangeCategory}>
-                    <SelectTrigger className="w-[300px] bg-white border-gray-200 text-gray-800 flex items-center gap-2">
-                        <SelectValue placeholder="Theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {CategoryTypes.map((item, idx) => (
-                            <SelectItem className="!capitalize" value={item} key={idx}>{capitalize(item?.replaceAll("_", " "))}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select> */}
+                <PageTitle title={capitalize(category?.replaceAll("_", " "))} />
                 <Button className="bg-[#4A8D34] font-medium" onClick={() => setAddModal(true)}>Add New Category</Button>
             </div>
             <div>
-                <CustomTable 
-                    columns={columns} 
-                    data={data?.results || []} 
-                    setPerPage={handleSetPageSize} 
-                    perPage={filters.page_size || PAGE_SIZE} 
+                <CustomTable
+                    columns={columns}
+                    data={data?.results || []}
+                    setPerPage={handleSetPageSize}
+                    perPage={filters.page_size || PAGE_SIZE}
                     isLoading={isLoading}
                     currentPage={filters?.page}
                     count={data?.pagination?.total || 0}
@@ -98,29 +84,29 @@ export default function Categories({category}:{category: string;}){
                 />
 
                 {addModal &&
-                    <AddCategoryModal 
-                        category={category} 
-                        open={addModal} 
+                    <AddCategoryModal
+                        category={category}
+                        open={addModal}
                         setOpen={setAddModal}
-                        refetch={refetch}              
+                        refetch={refetch}
                     />
                 }
                 {editModal &&
-                    <AddCategoryModal 
+                    <AddCategoryModal
                         isEdit
                         defaultData={selected}
-                        category={category} 
-                        open={editModal} 
-                        setOpen={setEditModal} 
-                        refetch={refetch}                
+                        category={category}
+                        open={editModal}
+                        setOpen={setEditModal}
+                        refetch={refetch}
                     />
                 }
                 {deleteModal &&
-                    <DeleteCategoryModal 
-                        open={deleteModal} 
-                        setOpen={setDeleteModal} 
-                        data={selected} 
-                        refetch={refetch}                    
+                    <DeleteCategoryModal
+                        open={deleteModal}
+                        setOpen={setDeleteModal}
+                        data={selected}
+                        refetch={refetch}
                     />
 
                 }

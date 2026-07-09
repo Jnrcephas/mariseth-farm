@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/sheet"
 import { TModal } from "@/modules/FarmManagement/utils/types";
 import { creditSchema } from "../utils/validations";
-import { useAllFarmers } from "@/modules/FarmManagement/utils/hooks";
+import { FarmerCombobox } from "@/modules/FarmManagement/utils/FarmerCombobox";
 import { Textarea } from "@/components/ui/textarea";
 import { cleanJsonData, getErrorMap } from "@/lib/helpers";
 import { useCreditCreate, useCreditUpdate, useCustomTypeList, useInputCreditList } from "@/apis/adminApiComponents";
@@ -48,8 +48,6 @@ export default function AddCreditModal({open, setOpen, defaultData, refetch, isE
         resolver: zodResolver(creditSchema),
         defaultValues: defaultData,
     });
-
-    const {allFarmers} = useAllFarmers("")
 
     const {data:_customTypesData} = useCustomTypeList({queryParams:{page: 1, page_size:100}})
     const customTypes = _customTypesData?.results || []
@@ -123,22 +121,15 @@ export default function AddCreditModal({open, setOpen, defaultData, refetch, isE
                                         <FormLabel>Farmer Name
                                             <div className='text-red-500'>*</div>
                                         </FormLabel>
-                                        <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        required
-                                        >
                                         <FormControl>
-                                            <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select" />
-                                            </SelectTrigger> 
+                                            <FarmerCombobox
+                                                value={field.value}
+                                                onChange={(value) => form.setValue("farmer", value)}
+                                                farmerType=""
+                                                selectedLabel={defaultData?.farmer ? `${defaultData.farmer?.first_name} ${defaultData.farmer?.last_name}` : undefined}
+                                                required
+                                            />
                                         </FormControl>
-                                        <SelectContent>
-                                            {allFarmers?.map((item, idx) =>(
-                                                <SelectItem key={idx} value={String(item?.id)}>{item?.first_name} {item?.last_name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                     )}

@@ -16,7 +16,7 @@ import { Label, LoadingLabel } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import moment from "moment";
-import { useAllFarms } from "@/modules/FarmManagement/utils/hooks";
+import { FarmCombobox } from "@/modules/FarmManagement/utils/FarmCombobox";
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized";
 
 export default function AddInflowForm({defaultData = {}, isEdit}:{defaultData?: any, isEdit?: boolean}){
@@ -39,21 +39,19 @@ export default function AddInflowForm({defaultData = {}, isEdit}:{defaultData?: 
     const {data: _warehouseData, isLoading: isLoadingWarehouse} = useWarehouseList({queryParams: {page: 1, page_size: 100} as any})
     const warehouses = _warehouseData?.results as any[] || []
 
-    const {farms: farms} = useAllFarms()  
-
     const [products, setProducts] = useState([
         {
             id: Date.now(),
             farm: '',
             product: '',
             quantity: '',
-            unit_price: ''
+            unit_price: '',
+            farmCrops: [] as any[]
         }
     ]);
 
     const farmsCrops = (id: number) => {
-        const farm_id = products.find((item: any) => item.id === id)?.farm 
-        return farms.find((item: any) => item.id === Number(farm_id))?.crops || [];
+        return products.find((item: any) => item.id === id)?.farmCrops || [];
     }
 
 
@@ -63,7 +61,8 @@ export default function AddInflowForm({defaultData = {}, isEdit}:{defaultData?: 
         farm: '',
         product: '',
         quantity: '',
-        unit_price: ''
+        unit_price: '',
+        farmCrops: [] as any[]
         };
         setProducts([...products, newProduct]);
     };
@@ -77,6 +76,12 @@ export default function AddInflowForm({defaultData = {}, isEdit}:{defaultData?: 
     const updateProduct = (id: number, field: string, value: string) => {
         setProducts(products.map(product => 
         product.id === id ? { ...product, [field]: value } : product
+        ));
+    };
+
+    const updateProductFarm = (id: number, value: string, crops: any[]) => {
+        setProducts(products.map(product =>
+        product.id === id ? { ...product, farm: value, farmCrops: crops } : product
         ));
     };
 
@@ -276,20 +281,11 @@ export default function AddInflowForm({defaultData = {}, isEdit}:{defaultData?: 
                                             )}
                                             <div className="w-full space-y-3">
                                                 <Label className="text-sm">Farm Name <div className='text-red-500'>*</div></Label>
-                                                <Select
+                                                <FarmCombobox
                                                     required
                                                     value={item.farm}
-                                                    onValueChange={(value) => updateProduct(item.id, 'farm', value)}
-                                                >
-                                                    <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select" />
-                                                    </SelectTrigger> 
-                                                    <SelectContent>
-                                                        {farms?.map((item, idx) => (
-                                                            <SelectItem key={idx} value={String(item?.id)}>{item?.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                    onChange={(value, option) => updateProductFarm(item.id, value, option?.raw?.crops || [])}
+                                                />
                                             </div>
                                             <div className="w-full space-y-3">
                                                 <Label className="text-sm">Product <div className='text-red-500'>*</div></Label>
