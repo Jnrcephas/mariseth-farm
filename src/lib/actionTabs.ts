@@ -53,9 +53,11 @@ export const USER_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "User Roles", href: routeTo.userRoles, permission: "account_management|list_groups_and_roles" },
 ];
 
-// "HR Management" is a single flat sidebar item (see AppSidebar.tsx) that
-// lands on Employee Profiles by default; all of Employee Management, Leave
-// Management, and Training are just tabs on that one hub.
+// Replaces the old separate EMPLOYEE_MANAGEMENT_TABS + LEAVE_MANAGEMENT_TABS.
+// "HR Management" is now a single flat sidebar item (see AppSidebar.tsx)
+// that lands on Employee Profiles by default; all of Employee Management,
+// Leave Management, and Training are now just tabs on that one hub instead
+// of 3 separate sidebar entries.
 export const HR_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "Employee Profiles", href: routeTo.employeeProfiles, permission: "employee|list_employees" },
   { label: "Job Titles", href: routeTo.employeeJobTitles, permission: "hr|list_job_titles" },
@@ -65,8 +67,22 @@ export const HR_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "Training", href: routeTo.training, permission: "training|list_trainings" },
 ];
 
-// "Finance & Accounting" is one sidebar item landing on Expenses by
-// default, with these as tabs.
+// Replaces the old flat Expenses / Waybills / Invoices / Accounting sidebar
+// items. "Finance & Accounting" is now one sidebar item landing on
+// Expenses by default, with these as tabs.
+// "Farm Monitoring" is a new sidebar item on its own (not merged with
+// anything else). PLACEHOLDER: there's no real weather/sensor/alerts
+// backend integration yet - each of these 5 pages renders clearly-marked
+// illustrative content until a real data source (IoT sensors, a weather
+// API, etc.) is wired up. See src/modules/FarmMonitoring/*.
+export const FARM_MONITORING_TABS: ActionTabConfig[] = [
+  { label: "Weather", href: routeTo.farmMonitoringWeather },
+  { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
+  { label: "Soil Health", href: routeTo.farmMonitoringSoilHealth },
+  { label: "Crop Health", href: routeTo.farmMonitoringCropHealth },
+  { label: "Pest & Disease", href: routeTo.farmMonitoringPestDisease },
+];
+
 export const FINANCE_TABS: ActionTabConfig[] = [
   { label: "Expenses", href: routeTo.accountingExpenses, permission: "accounting|list_expenses" },
   { label: "Waybills", href: routeTo.accountingWaybills, permission: "accounting|list_waybills" },

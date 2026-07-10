@@ -1,6 +1,6 @@
 "use client"
 import CustomTable, { IPagination } from "@/components/CustomTable";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Package } from "lucide-react";
 import { useState } from "react";
 import { PAGE_SIZE } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
@@ -12,6 +12,8 @@ import ViewWarehouseCreditModal from "./Modals/ViewWarehouseCreditModal";
 import CreditSearch from "@/modules/CreditManagement/CreditSearch";
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Card } from "@/components/ui/card";
+import PageTitle from "@/components/layouts/PageTitle";
 
 
 export default function WarehouseCreditTable(){
@@ -136,6 +138,18 @@ export default function WarehouseCreditTable(){
     return(
         <AuthorizeAndRenderPage permission="credit|list_credit_fulfill">
             <div className="mt-5">
+                <PageTitle title="Warehouse Credit Approvals" />
+                <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
+                    <div className="flex items-center gap-4">
+                        <div className="rounded-full p-2.5 flex items-center justify-center bg-[#FEF3C7]">
+                            <Package className="h-5 w-5 text-[#D97706]" />
+                        </div>
+                        <div>
+                            <span className="text-sm text-[#475569] font-medium">Total Warehouse Credit Requests</span>
+                            <p className="text-2xl font-bold text-black">{data?.pagination?.total ?? 0}</p>
+                        </div>
+                    </div>
+                </Card>
                 <CustomTable 
                     searchFilter={<CreditSearch setFilters={setFilters} filters={filters} refetch={refetch} isLoading={isLoading} />}
                     columns={columns} 

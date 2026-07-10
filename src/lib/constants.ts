@@ -82,6 +82,11 @@ export const routeTo = {
     
     auditTrails: "/app/audit-trails",
     reportsAndAnalysis: "/app/reports-and-analysis",
+    farmMonitoringWeather: "/app/farm-monitoring/weather",
+    farmMonitoringFarmAlerts: "/app/farm-monitoring/farm-alerts",
+    farmMonitoringSoilHealth: "/app/farm-monitoring/soil-health",
+    farmMonitoringCropHealth: "/app/farm-monitoring/crop-health",
+    farmMonitoringPestDisease: "/app/farm-monitoring/pest-disease",
     help: "/app/help",
     
   }

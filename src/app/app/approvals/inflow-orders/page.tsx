@@ -6,11 +6,6 @@ export default function Page(){
     return(
         <div>
             <QuickActionTabs tabs={APPROVALS_TABS} />
-             <div className="flex justify-between">
-                <div className="font-semibold text-black mb-10">
-                    Inbound Orders
-                </div>
-            </div>
             <InflowApprovals/>
         </div>
     )

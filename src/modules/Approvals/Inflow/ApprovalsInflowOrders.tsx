@@ -1,11 +1,12 @@
 "use client"
 import CustomTable, { IPagination } from "@/components/CustomTable";
-import {  Eye } from "lucide-react";
+import {  Eye, BadgeCheck } from "lucide-react";
 import { useState } from "react";
 import { PAGE_SIZE, routeTo } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
 import { statusBadgeMap } from "@/modules/FarmManagement/utils/constants";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useInflowApprovalsList } from "@/apis/adminApiComponents";
 import { commaSeparator, formatDateReadable } from "@/lib/helpers";
@@ -89,6 +90,17 @@ export default function ApprovalsInflowOrders({completed=false}:{completed?: boo
     ];
     return(
         <div>
+            <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
+                <div className="flex items-center gap-4">
+                    <div className={`rounded-full p-2.5 flex items-center justify-center ${completed ? "bg-[#D1FAE5]" : "bg-[#FEE2E2]"}`}>
+                        <BadgeCheck className={`h-5 w-5 ${completed ? "text-[#059669]" : "text-[#DC2626]"}`} />
+                    </div>
+                    <div>
+                        <span className="text-sm text-[#475569] font-medium">{completed ? "Completed Inbound Approvals" : "Pending Inbound Approvals"}</span>
+                        <p className="text-2xl font-bold text-black">{data?.pagination?.total ?? 0}</p>
+                    </div>
+                </div>
+            </Card>
             <CustomTable 
                 searchFilter={<InflowSearch setFilters={setFilters} filters={filters} refetch={refetch} isLoading={isLoading} />}
                 columns={columns} 
