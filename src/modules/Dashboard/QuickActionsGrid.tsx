@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight, Leaf, ClipboardList, UserCircle, BarChart3 } from "lucide-react"
+import { ArrowRight, Leaf, ClipboardList, UserCircle, Satellite } from "lucide-react"
 import { routeTo } from "@/lib/constants"
 import { useHasAccess } from "@/hooks/auth/useHasAccess"
 
@@ -33,8 +33,8 @@ const QUICK_ACTION_CARDS: QuickActionCardConfig[] = [
   },
   {
     title: "Farm Monitoring",
-    href: routeTo.auditTrails,
-    icon: BarChart3,
+    href: routeTo.farmMonitoringWeather,
+    icon: Satellite,
     bgColor: "#1F2A54",
   },
 ]
@@ -66,14 +66,15 @@ function QuickActionCard({ card }: { card: QuickActionCardConfig }) {
   const { hasAccess: list_employees } = useHasAccess("employee|list_employees")
   const { hasAccess: list_job_titles } = useHasAccess("hr|list_job_titles")
   const { hasAccess: list_departments } = useHasAccess("hr|list_departments")
-  const { hasAccess: list_inflow_history } = useHasAccess("audit_trail|list_inflow_history")
-  const { hasAccess: list_outflow_history } = useHasAccess("audit_trail|list_outflow_history")
 
   const accessByTitle: Record<string, boolean> = {
     "Farm Management": list_farms || list_farmers || list_products,
     "Accounting and Finance": list_expenses || list_waybills || list_invoices,
     "HR Management": list_employees || list_job_titles || list_departments,
-    "Farm Monitoring": list_inflow_history || list_outflow_history,
+    // No dedicated permission exists for Farm Monitoring yet (it's a
+    // placeholder feature - see src/modules/FarmMonitoring/*), so it's
+    // visible to everyone for now, matching the sidebar entry.
+    "Farm Monitoring": true,
   }
 
   if (!accessByTitle[card.title]) return null

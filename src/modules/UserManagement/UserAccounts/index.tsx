@@ -2,10 +2,11 @@
 import CustomTable, { IPagination } from "@/components/CustomTable";
 import { PAGE_SIZE, routeTo } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
-import { CirclePlus, EllipsisVertical } from "lucide-react";
+import { CirclePlus, EllipsisVertical, UserCog } from "lucide-react";
 import { useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useAccountsUsersAdminList } from "@/apis/adminApiComponents";
 import { FilterPropsAdmin } from "../utils/types";
@@ -154,6 +155,17 @@ export default function UserAccounts() {
                     Add New User
                 </Button>
             </div>
+            <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
+                <div className="flex items-center gap-4">
+                    <div className="rounded-full p-2.5 flex items-center justify-center bg-[#EDE9FE]">
+                        <UserCog className="h-5 w-5 text-[#7C3AED]" />
+                    </div>
+                    <div>
+                        <span className="text-sm text-[#475569] font-medium">Total User Accounts</span>
+                        <p className="text-2xl font-bold text-black">{data?.pagination?.total ?? 0}</p>
+                    </div>
+                </div>
+            </Card>
             <CustomTable
                 searchFilter={<UserSearch setFilters={setFilters} refetch={refetch} isLoading={isLoading} />}
                 columns={columns}

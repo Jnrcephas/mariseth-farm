@@ -1,12 +1,13 @@
 "use client"
 import CustomTable, { IPagination } from "@/components/CustomTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { EllipsisVertical, PlusCircle } from "lucide-react";
+import { EllipsisVertical, PlusCircle, CalendarDays } from "lucide-react";
 import { useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLeaveTypeList } from "@/apis/adminApiComponents";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FilterPropsLeaveRequests } from "./utils/types";
 import AddLeaveTypeModal from "./Modals/AddLeaveTypeModal";
@@ -123,6 +124,17 @@ export default function LeaveRequestTypes(){
                     <Button className="" onClick={() => setAddModal(true)}><PlusCircle/> Add Leave Type</Button>
                 }
             </div>
+            <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
+                <div className="flex items-center gap-4">
+                    <div className="rounded-full p-2.5 flex items-center justify-center bg-[#D1FAE5]">
+                        <CalendarDays className="h-5 w-5 text-[#059669]" />
+                    </div>
+                    <div>
+                        <span className="text-sm text-[#475569] font-medium">Total Leave Types</span>
+                        <p className="text-2xl font-bold text-black">{data?.pagination?.total ?? 0}</p>
+                    </div>
+                </div>
+            </Card>
             <div >
             <CustomTable 
                 searchFilter={<LeaveRequestTypeSearch setFilters={setFilters} refetch={refetch} isLoading={isLoading} />}

@@ -8,9 +8,19 @@ export default function MainAuditTrails() {
   return (
     <div>
         <Tabs defaultValue="1" className="w-full mx-auto">
-            <TabsList className="grid w-[400px] grid-cols-2 mx-auto p- h-[36px] bg-[#F1F5F9] border ">
-                <TabsTrigger className="h-[28px] cursor-pointer" value="1">Inbound Audit Trails</TabsTrigger>
-                <TabsTrigger className="h-[28px] cursor-pointer" value="2">Outbound Audit Trials</TabsTrigger>
+            <TabsList className="grid w-full sm:w-[420px] grid-cols-2 h-auto p-1 bg-[#E2E8F0] rounded-full mb-5">
+                <TabsTrigger
+                    className="h-[38px] rounded-full cursor-pointer font-semibold data-[state=active]:bg-[#0B3D19] data-[state=active]:text-white"
+                    value="1"
+                >
+                    Inbound Audit Trails
+                </TabsTrigger>
+                <TabsTrigger
+                    className="h-[38px] rounded-full cursor-pointer font-semibold data-[state=active]:bg-[#0B3D19] data-[state=active]:text-white"
+                    value="2"
+                >
+                    Outbound Audit Trails
+                </TabsTrigger>
             </TabsList>
             <TabsContent value="1">
                 <AuthorizeAndRenderPage permission="audit_trail|list_inflow_history">

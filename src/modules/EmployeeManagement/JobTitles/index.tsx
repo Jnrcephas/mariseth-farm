@@ -2,7 +2,7 @@
 import CustomTable, { IPagination } from "@/components/CustomTable";
 import { PAGE_SIZE, routeTo } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
-import { EllipsisVertical, PlusCircle } from "lucide-react";
+import { EllipsisVertical, PlusCircle, Briefcase } from "lucide-react";
 import { useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import { useJobTitleList } from "@/apis/adminApiComponents";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
 import { FilterPropsEmployees } from "../utils/types";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import JobTitleSearch from "./JobTitleSearch";
 import AddJobTitleModal from "./Modals/AddJobTitleModal";
 import DeleteJobTitleModal from "./Modals/DeleteJobTitleModal";
@@ -118,6 +119,17 @@ export default function JobTitles(){
                 }
                 
             </div>
+            <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
+                <div className="flex items-center gap-4">
+                    <div className="rounded-full p-2.5 flex items-center justify-center bg-[#FEF3C7]">
+                        <Briefcase className="h-5 w-5 text-[#D97706]" />
+                    </div>
+                    <div>
+                        <span className="text-sm text-[#475569] font-medium">Total Job Titles</span>
+                        <p className="text-2xl font-bold text-black">{data?.pagination?.total ?? 0}</p>
+                    </div>
+                </div>
+            </Card>
             <div >
             <CustomTable 
                 searchFilter={<JobTitleSearch setFilters={setFilters} refetch={refetch} isLoading={isLoading} />}
