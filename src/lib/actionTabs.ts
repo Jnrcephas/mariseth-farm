@@ -70,22 +70,27 @@ export const HR_MANAGEMENT_TABS: ActionTabConfig[] = [
 // Replaces the old flat Expenses / Waybills / Invoices / Accounting sidebar
 // items. "Finance & Accounting" is now one sidebar item landing on
 // Expenses by default, with these as tabs.
-// "Farm Monitoring" is a new sidebar item on its own (not merged with
-// anything else). PLACEHOLDER: there's no real weather/sensor/alerts
-// backend integration yet - each of these 5 pages renders clearly-marked
-// illustrative content until a real data source (IoT sensors, a weather
-// API, etc.) is wired up. See src/modules/FarmMonitoring/*.
-export const FARM_MONITORING_TABS: ActionTabConfig[] = [
-  { label: "Weather", href: routeTo.farmMonitoringWeather },
-  { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
-  { label: "Soil Health", href: routeTo.farmMonitoringSoilHealth },
-  { label: "Crop Health", href: routeTo.farmMonitoringCropHealth },
-  { label: "Pest & Disease", href: routeTo.farmMonitoringPestDisease },
-];
-
 export const FINANCE_TABS: ActionTabConfig[] = [
   { label: "Expenses", href: routeTo.accountingExpenses, permission: "accounting|list_expenses" },
   { label: "Waybills", href: routeTo.accountingWaybills, permission: "accounting|list_waybills" },
   { label: "Invoices", href: routeTo.accountingInvoices, permission: "accounting|list_invoices" },
   { label: "Accounting", href: "https://meshsuites.manager.io/businesses", external: true },
+];
+
+// "Farm Monitoring" is a new sidebar item on its own (not merged with
+// anything else). These 5 tabs mirror the SRD's Admin Portal "New Screens"
+// table (Section 8.2) for Farm Monitoring exactly: Satellite Farm View
+// (4.1.1), Geo-Fencing Manager (4.1.2), Alerts Dashboard (aggregate feed
+// across Satellite/Geo-Fence/Weather/Soil & Air Quality), Weather
+// Dashboard (4.2.1), and Soil & Air Quality Dashboard (4.2.2).
+// PLACEHOLDER: there's no real satellite, GPS/geo-fence gateway, weather,
+// or Google Soil & Air Quality API integration yet - each page renders
+// clearly-marked illustrative content until those data sources are wired
+// up in Phase 1 (see SRD Section 11.1). See src/modules/FarmMonitoring/*.
+export const FARM_MONITORING_TABS: ActionTabConfig[] = [
+  { label: "Satellite Farm View", href: routeTo.farmMonitoringSatelliteView },
+  { label: "Geo-Fencing Manager", href: routeTo.farmMonitoringGeoFencing },
+  { label: "Alerts Dashboard", href: routeTo.farmMonitoringAlertsDashboard },
+  { label: "Weather Dashboard", href: routeTo.farmMonitoringWeather },
+  { label: "Soil & Air Quality Dashboard", href: routeTo.farmMonitoringSoilAirQuality },
 ];
