@@ -78,19 +78,17 @@ export const FINANCE_TABS: ActionTabConfig[] = [
 ];
 
 // "Farm Monitoring" is a new sidebar item on its own (not merged with
-// anything else). These 5 tabs mirror the SRD's Admin Portal "New Screens"
-// table (Section 8.2) for Farm Monitoring exactly: Satellite Farm View
-// (4.1.1), Geo-Fencing Manager (4.1.2), Alerts Dashboard (aggregate feed
-// across Satellite/Geo-Fence/Weather/Soil & Air Quality), Weather
-// Dashboard (4.2.1), and Soil & Air Quality Dashboard (4.2.2).
-// PLACEHOLDER: there's no real satellite, GPS/geo-fence gateway, weather,
-// or Google Soil & Air Quality API integration yet - each page renders
-// clearly-marked illustrative content until those data sources are wired
-// up in Phase 1 (see SRD Section 11.1). See src/modules/FarmMonitoring/*.
+// anything else). These 5 tabs mirror the pages actually implemented under
+// src/app/app/farm-monitoring/*: Weather, Farm Alerts, Soil Health,
+// Crop Health, and Pest & Disease.
+// PLACEHOLDER: there's no real satellite, weather, or soil/air-quality API
+// integration yet - each page renders clearly-marked illustrative content
+// until those data sources are wired up in a later phase. See
+// src/modules/FarmMonitoring/*.
 export const FARM_MONITORING_TABS: ActionTabConfig[] = [
-  { label: "Satellite Farm View", href: routeTo.farmMonitoringSatelliteView },
-  { label: "Geo-Fencing Manager", href: routeTo.farmMonitoringGeoFencing },
-  { label: "Alerts Dashboard", href: routeTo.farmMonitoringAlertsDashboard },
   { label: "Weather Dashboard", href: routeTo.farmMonitoringWeather },
-  { label: "Soil & Air Quality Dashboard", href: routeTo.farmMonitoringSoilAirQuality },
+  { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
+  { label: "Soil Health", href: routeTo.farmMonitoringSoilHealth },
+  { label: "Crop Health", href: routeTo.farmMonitoringCropHealth },
+  { label: "Pest & Disease", href: routeTo.farmMonitoringPestDisease },
 ];
