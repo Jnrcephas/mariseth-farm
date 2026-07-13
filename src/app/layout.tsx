@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import 'react-phone-number-input/style.css';
+import "leaflet/dist/leaflet.css"
 import App from "./app";
 import { Inter } from "next/font/google";
 

@@ -87,8 +87,8 @@ export const FINANCE_TABS: ActionTabConfig[] = [
 // src/modules/FarmMonitoring/*.
 export const FARM_MONITORING_TABS: ActionTabConfig[] = [
   { label: "Weather Dashboard", href: routeTo.farmMonitoringWeather },
-  { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
   { label: "Soil Health", href: routeTo.farmMonitoringSoilHealth },
-  { label: "Crop Health", href: routeTo.farmMonitoringCropHealth },
-  { label: "Pest & Disease", href: routeTo.farmMonitoringPestDisease },
+  { label: "Satelite View", href: routeTo.farmMonitoringCropHealth },
+  { label: "Geofencing", href: routeTo.farmMonitoringPestDisease },
+  { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
 ];
