@@ -71,6 +71,7 @@ export const HR_MANAGEMENT_TABS: ActionTabConfig[] = [
 // items. "Finance & Accounting" is now one sidebar item landing on
 // Expenses by default, with these as tabs.
 export const FINANCE_TABS: ActionTabConfig[] = [
+  { label: "Analytics", href: routeTo.accountingAnalytics, permission: "accounting|list_expenses" },
   { label: "Expenses", href: routeTo.accountingExpenses, permission: "accounting|list_expenses" },
   { label: "Waybills", href: routeTo.accountingWaybills, permission: "accounting|list_waybills" },
   { label: "Invoices", href: routeTo.accountingInvoices, permission: "accounting|list_invoices" },
