@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import dynamic from "next/dynamic"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Wallet, FileText, Truck, Receipt } from "lucide-react"
-import { CEDI, PAGE_SIZE } from "@/lib/constants"
+import { CEDI } from "@/lib/constants"
 import { commaSeparator } from "@/lib/helpers"
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized"
 import PageTitle from "@/components/layouts/PageTitle"
@@ -45,6 +44,62 @@ export default function FinancialAnalytics() {
   const totalExpenses = expenses?.total_expenses?.total_sum || 0
   const totalInvoices = invoices?.pagination?.total || 0
   const totalWaybills = waybills?.pagination?.total || 0
+
+  // NOTE: there is currently no dated finance-trend endpoint in the API
+  // (nothing like "monthly expenses" exists in adminApiComponents.ts yet).
+  // Per request, this uses illustrative placeholder numbers so the chart
+  // looks right while the design is being reviewed - same approach as
+  // src/modules/Dashboard/MonthlyRevenueBarChart.tsx. SWAP THIS OUT for
+  // real API data before this ships to real users. Search "monthlyExpenseData"
+  // to find this again once a real endpoint exists.
+  const monthlyExpenseData = [
+    { month: "Jul", expenses: 210 },
+    { month: "Aug", expenses: 380 },
+    { month: "Sep", expenses: 295 },
+    { month: "Oct", expenses: 460 },
+    { month: "Nov", expenses: 330 },
+    { month: "Dec", expenses: 505 },
+    { month: "Jan", expenses: 420 },
+  ]
+  const trendSeries = [{ name: "Expenses", data: monthlyExpenseData.map((d) => d.expenses) }]
+  const trendOptions = {
+    chart: {
+      type: "area",
+      fontFamily: "Inter, sans-serif",
+      toolbar: { show: false },
+      zoom: { enabled: false },
+    },
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth" as const, width: 3, colors: ["#DC2626"] },
+    fill: {
+      type: "gradient",
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.45,
+        opacityTo: 0.05,
+        stops: [0, 90, 100],
+        colorStops: [
+          { offset: 0, color: "#DC2626", opacity: 0.45 },
+          { offset: 100, color: "#DC2626", opacity: 0.02 },
+        ],
+      },
+    },
+    colors: ["#DC2626"],
+    xaxis: {
+      categories: monthlyExpenseData.map((d) => d.month),
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      labels: { style: { colors: "#94A3B8", fontSize: "12px" } },
+    },
+    yaxis: {
+      labels: {
+        formatter: (value: any) => commaSeparator(value),
+        style: { colors: "#94A3B8", fontSize: "12px" },
+      },
+    },
+    grid: { borderColor: "#E2E8F0", strokeDashArray: 4, xaxis: { lines: { show: false } } },
+    tooltip: { y: { formatter: (value: any) => (value ? `${CEDI} ${value.toLocaleString()}` : "No data") } },
+  }
 
   const metrics: MetricConfig[] = [
     {
@@ -147,14 +202,14 @@ export default function FinancialAnalytics() {
               </CardContent>
             </Card>
 
-            <Card className="lg:col-span-2 shadow-none border border-[#E2E8F0] flex items-center justify-center">
-              <CardContent className="text-center py-16">
-                <p className="text-sm text-[#64748B] max-w-sm mx-auto">
-                  Expense/revenue trend charts will appear here once a dated
-                  finance-trend endpoint is available on the API. Showing
-                  made-up trend data would be misleading, so this space is
-                  intentionally left for real data.
-                </p>
+            <Card className="lg:col-span-2 shadow-none border border-[#E2E8F0]">
+              <CardHeader className="pb-0">
+                <CardTitle className="font-semibold text-base text-black">Expense Trend</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {typeof window !== "undefined" && (
+                  <ReactApexChart options={trendOptions as any} series={trendSeries} type="area" height={280} />
+                )}
               </CardContent>
             </Card>
           </div>
