@@ -60,8 +60,15 @@ export default function LoginForm() {
       toast.success("Logged in successfully");
       router.push(routeTo.dashboard);
     }else{
-      toast.error("Invalid email or password");
-
+      // NextAuth puts the actual message thrown inside authorize() (see
+      // src/lib/auth.ts) into res.error - it was being discarded here in
+      // favor of a generic message, which made it impossible to tell
+      // "wrong password" apart from "backend unreachable" / "500 from
+      // server" / etc. Surfacing it for now while we're pointed at the new
+      // test server - swap back to a generic message once things are
+      // stable if a raw backend error isn't something end users should see.
+      toast.error(res?.error || "Invalid email or password");
+      console.error("Login failed:", res?.error);
     }
     setLoading(false);
   };

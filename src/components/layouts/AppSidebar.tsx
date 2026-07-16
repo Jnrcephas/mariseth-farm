@@ -1,5 +1,5 @@
 "use client"
-import { BarChart3, FileSpreadsheet, LifeBuoy, NotebookPen, Satellite, ShoppingBasket, UserCircle } from "lucide-react"
+import { FileSpreadsheet, LifeBuoy, NotebookPen, Satellite, ShoppingBasket, UserCircle } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -109,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Finance & Accounting",
-        url: routeTo.accountingExpenses,
+        url: routeTo.accountingAnalytics,
         slug: "accounting",
         icon: FileSpreadsheet,
         hasAccess: (list_expenses || list_waybills || list_invoices),
@@ -121,13 +121,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: NotebookPen,
         hasAccess: list_inflow_history || list_outflow_history,
       },
-      {
-        title: "Reports and analysis",
-        url: routeTo.reportsAndAnalysis,
-        slug: "reports-and-analysis",
-        icon: BarChart3,
-        hasAccess: list_inflow_history || list_outflow_history,
-      },
+      // Commented out for now per request - re-enable by uncommenting
+      // this object.
+      // {
+      //   title: "Reports and analysis",
+      //   url: routeTo.reportsAndAnalysis,
+      //   slug: "reports-and-analysis",
+      //   icon: BarChart3,
+      //   hasAccess: list_inflow_history || list_outflow_history,
+      // },
 
       {
         title: "System Settings",

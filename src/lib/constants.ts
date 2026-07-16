@@ -64,6 +64,7 @@ export const routeTo = {
     trainingView: "/app/training/view",
     trainingEdit: "/app/training/edit",
 
+    accountingAnalytics: "/app/accounting/analytics",
     accountingExpenses: "/app/accounting/expenses",
     accountingWaybills: "/app/accounting/waybills",
     accountingViewWaybill: "/app/accounting/waybills/view-waybill",
