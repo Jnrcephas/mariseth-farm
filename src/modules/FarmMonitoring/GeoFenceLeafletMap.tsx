@@ -21,9 +21,7 @@ export interface GeoFenceAsset {
   lastSeen: string
 }
 
-// Captures map clicks while in drawing mode and reports each point back up
-// to the parent - this is what actually makes the "Draw Boundary" button
-// work (GEO-01), with no extra drawing-plugin dependency required.
+
 function DrawClickCapture({ onAddDraftPoint }: { onAddDraftPoint: (pt: [number, number]) => void }) {
   useMapEvents({
     click(e) {
