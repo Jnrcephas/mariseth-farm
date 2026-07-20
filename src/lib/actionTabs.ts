@@ -3,23 +3,15 @@ import { routeTo } from "./constants";
 
 export interface ActionTabConfig {
   label: string;
-  // Optional because a tab can instead be given an `onClick` (e.g. a
-  // "Support" tab that opens a modal rather than navigating anywhere).
+
   href?: string;
   permission?: permType;
-  // Opens in a new tab via a plain <a>, instead of a Next.js client-side
-  // <Link> transition. Used for the "Accounting" tab, which points at an
-  // external manager.io URL rather than a route inside this app.
+
   external?: boolean;
-  // If provided, this tab renders as a <button> that runs this instead of
-  // navigating. Used for "Support" on the Help page, since Support is a
-  // modal, not its own route.
+
   onClick?: () => void;
 }
 
-// Each of these mirrors what used to be an expandable sidebar sub-menu.
-// They're now rendered as a row of "Actions" tabs at the top of the relevant
-// hub pages instead, per the new flat-sidebar navigation structure.
 
 export const FARM_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "Farms", href: routeTo.farms, permission: "farm|list_farms" },
@@ -53,11 +45,7 @@ export const USER_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "User Roles", href: routeTo.userRoles, permission: "account_management|list_groups_and_roles" },
 ];
 
-// Replaces the old separate EMPLOYEE_MANAGEMENT_TABS + LEAVE_MANAGEMENT_TABS.
-// "HR Management" is now a single flat sidebar item (see AppSidebar.tsx)
-// that lands on Employee Profiles by default; all of Employee Management,
-// Leave Management, and Training are now just tabs on that one hub instead
-// of 3 separate sidebar entries.
+
 export const HR_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "Employee Profiles", href: routeTo.employeeProfiles, permission: "employee|list_employees" },
   { label: "Job Titles", href: routeTo.employeeJobTitles, permission: "hr|list_job_titles" },
@@ -67,9 +55,7 @@ export const HR_MANAGEMENT_TABS: ActionTabConfig[] = [
   { label: "Training", href: routeTo.training, permission: "training|list_trainings" },
 ];
 
-// Replaces the old flat Expenses / Waybills / Invoices / Accounting sidebar
-// items. "Finance & Accounting" is now one sidebar item landing on
-// Expenses by default, with these as tabs.
+
 export const FINANCE_TABS: ActionTabConfig[] = [
   { label: "Analytics", href: routeTo.accountingAnalytics, permission: "accounting|list_expenses" },
   { label: "Expenses", href: routeTo.accountingExpenses, permission: "accounting|list_expenses" },
@@ -78,14 +64,6 @@ export const FINANCE_TABS: ActionTabConfig[] = [
   { label: "Accounting", href: "https://meshsuites.manager.io/businesses", external: true },
 ];
 
-// "Farm Monitoring" is a new sidebar item on its own (not merged with
-// anything else). These 5 tabs mirror the pages actually implemented under
-// src/app/app/farm-monitoring/*: Weather, Farm Alerts, Soil Health,
-// Crop Health, and Pest & Disease.
-// PLACEHOLDER: there's no real satellite, weather, or soil/air-quality API
-// integration yet - each page renders clearly-marked illustrative content
-// until those data sources are wired up in a later phase. See
-// src/modules/FarmMonitoring/*.
 export const FARM_MONITORING_TABS: ActionTabConfig[] = [
   { label: "Weather Dashboard", href: routeTo.farmMonitoringWeather },
   { label: "Soil Health", href: routeTo.farmMonitoringSoilHealth },
