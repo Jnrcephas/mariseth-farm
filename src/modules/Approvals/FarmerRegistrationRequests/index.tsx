@@ -2,17 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { EllipsisVertical, UserCheck } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import Link from "next/link";
 import { type FarmerRegistrationRequestFilters, useFarmerRegistrationRequests } from "@/apis/farmerRequestApi";
 import CustomTable, { IPagination } from "@/components/CustomTable";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { PAGE_SIZE, routeTo } from "@/lib/constants";
 import { formatDateReadable } from "@/lib/helpers";
 import { statusBadgeMap } from "@/modules/FarmManagement/utils/constants";
+import { cn } from "@/lib/utils";
 import ApproveFarmerRequestModal from "./ApproveFarmerRequestModal";
+import FarmerProfileUpdateRequests from "./FarmerProfileUpdateRequests";
 import FarmerRegistrationRequestSearch from "./FarmerRegistrationRequestSearch";
 import RejectFarmerRequestModal from "./RejectFarmerRequestModal";
 
@@ -36,7 +37,7 @@ function getInitialFilters(): FarmerRegistrationRequestFilters {
   }
 }
 
-export default function FarmerRegistrationRequests() {
+function FarmerRegistrationRequestList() {
   const [filters, setFilters] = useState<FarmerRegistrationRequestFilters>(getInitialFilters);
   const [selected, setSelected] = useState<any>({});
   const [approveModal, setApproveModal] = useState(false);
@@ -153,18 +154,7 @@ export default function FarmerRegistrationRequests() {
   ];
 
   return (
-    <div className="mt-5">
-      <Card className="p-5 shadow-none border border-[#E2E8F0] mb-5 w-full sm:w-fit">
-          <div className="flex items-center gap-4">
-              <div className="rounded-full p-2.5 flex items-center justify-center bg-[#EDE9FE]">
-                  <UserCheck className="h-5 w-5 text-[#7C3AED]" />
-              </div>
-              <div>
-                  <span className="text-sm text-[#475569] font-medium">Total Farmer Registration Requests</span>
-                  <p className="text-2xl font-bold text-black">{data?.pagination?.total ?? 0}</p>
-              </div>
-          </div>
-      </Card>
+    <div>
       <CustomTable
         searchFilter={<FarmerRegistrationRequestSearch setFilters={setFilters} filters={filters} refetch={refetch} isLoading={isLoading} />}
         columns={columns}
@@ -193,6 +183,41 @@ export default function FarmerRegistrationRequests() {
           refetch={refetch}
         />
       )}
+    </div>
+  );
+}
+
+type RequestTab = "registration" | "profile-update";
+
+const REQUEST_TABS: { key: RequestTab; label: string }[] = [
+  { key: "registration", label: "Registration Requests" },
+  { key: "profile-update", label: "Profile Update Requests" },
+];
+
+export default function FarmerRegistrationRequests() {
+  const [activeTab, setActiveTab] = useState<RequestTab>("registration");
+
+  return (
+    <div className="mt-5">
+      <div className="flex items-center gap-3 mb-6">
+        {REQUEST_TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveTab(tab.key)}
+            className={cn(
+              "rounded-sm px-6 py-4 text-base font-bold transition-colors cursor-pointer",
+              activeTab === tab.key
+                ? "bg-[#4A8D34] text-white"
+                : "bg-[#E2E8F0] text-[#64748B] hover:bg-[#CBD5E1]"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "registration" ? <FarmerRegistrationRequestList /> : <FarmerProfileUpdateRequests />}
     </div>
   );
 }

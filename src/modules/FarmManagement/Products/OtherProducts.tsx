@@ -14,8 +14,9 @@ import ViewProductModal from "./Modals/ViewProductModal";
 import { useFarmManagementProductList } from "@/apis/adminApiComponents";
 import OtherProductSearch from "./OtherProductSearch";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
-import { colorPalate } from "@/lib/helpers";
+import { colorPalate, commaSeparator } from "@/lib/helpers";
 import { Badge } from "@/components/ui/badge";
+import { CEDI } from "@/lib/constants";
 
 export default function OtherProductsView(){
     const {hasAccess: update_product} = useHasAccess("product|update_product")
@@ -89,6 +90,16 @@ export default function OtherProductsView(){
                 return(
                     <div>
                         {row?.weight} {row?.weight_metric?.name}
+                    </div>
+                )
+            }
+        },
+        { header: "Price", accessorKey: "price",
+            cell: (_row) => {
+                const price = _row?.row?.original?.price
+                return (
+                    <div>
+                        {price === null || price === undefined || price === "" ? "N/A" : `${CEDI} ${commaSeparator(price)}`}
                     </div>
                 )
             }

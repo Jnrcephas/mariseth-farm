@@ -91,7 +91,39 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: routeTo.inflowApprovals,
         slug: "approvals",
         icon: BadgeCheck,
-        hasAccess: (approve_inflow_order || approve_inflow_delivery_inspection || approve_deny_credit || list_outflow_approvals || list_farmers || list_credit_fulfill),
+        hasAccess: (approve_inflow_order || approve_inflow_delivery_inspection || approve_deny_credit || list_outflow_approvals || list_farmers),
+        items: [
+          {
+            title: "Inbound",
+            url: routeTo.inflowApprovals,
+            slug: "approvals",
+            hasAccess: (approve_inflow_order || approve_inflow_delivery_inspection),
+          },
+          {
+            title: "Outbound",
+            url: routeTo.outflowApprovals,
+            slug: "approvals",
+            hasAccess: list_outflow_approvals,
+          },
+          {
+            title: "Credit Request",
+            url: routeTo.creditRequestApprovals,
+            slug: "approvals",
+            hasAccess: approve_deny_credit,
+          },
+          {
+            title: "Warehouse Credit",
+            url: routeTo.creditWarehouseApprovals,
+            slug: "approvals",
+            hasAccess: list_credit_fulfill,
+          },
+          {
+            title: "Farmer Requests",
+            url: routeTo.farmerRegistrationRequests,
+            slug: "approvals",
+            hasAccess: list_farmers,
+          },
+        ],
       },
       {
         title: "User Management",

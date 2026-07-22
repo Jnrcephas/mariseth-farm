@@ -9,13 +9,16 @@ import OtherProductsView from "./OtherProducts";
 import AddOtherProductsModal from "./Modals/AddOtherProducts";
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
+import { PriceHistoryTab, PriceUpdateTab } from "./Prices";
 import { cn } from "@/lib/utils";
 
-type ProductTab = "crops" | "other"
+type ProductTab = "crops" | "other" | "update-prices" | "price-history"
 
 const PRODUCT_TABS: { key: ProductTab; label: string }[] = [
     { key: "crops", label: "Crops" },
     { key: "other", label: "Other Products" },
+    { key: "update-prices", label: "Update Prices" },
+    { key: "price-history", label: "Price History" },
 ]
 
 export default function Products() {
@@ -76,7 +79,10 @@ export default function Products() {
             }
         </div>
 
-        {activeTab === "crops" ? <CropsView/> : <OtherProductsView/>}
+        {activeTab === "crops" && <CropsView/>}
+        {activeTab === "other" && <OtherProductsView/>}
+        {activeTab === "update-prices" && <PriceUpdateTab/>}
+        {activeTab === "price-history" && <PriceHistoryTab/>}
 
         {addNewCropModal &&
             <AddCropModal

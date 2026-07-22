@@ -37,7 +37,7 @@ export const APPROVALS_TABS: ActionTabConfig[] = [
   { label: "Outbound", href: routeTo.outflowApprovals, permission: "outflow_approvals|list_outflow_approvals" },
   { label: "Credit Request", href: routeTo.creditRequestApprovals, permission: "credit|approve_deny_credit" },
   { label: "Warehouse Credit", href: routeTo.creditWarehouseApprovals, permission: "credit|list_credit_fulfill" },
-  { label: "Farmer Registration Requests", href: routeTo.farmerRegistrationRequests, permission: "farmer|list_farmers" },
+  { label: "Farmer Requests", href: routeTo.farmerRegistrationRequests, permission: "farmer|list_farmers" },
 ];
 
 export const USER_MANAGEMENT_TABS: ActionTabConfig[] = [

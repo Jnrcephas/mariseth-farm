@@ -39,38 +39,38 @@ export default function LoginForm() {
     async function onSubmit(values: z.infer<typeof loginSchema>) {
         setLoading(true);
 
-    const res = await signIn("credentials", {
-      email: values?.email,
-      password: values?.password,
-      redirect: false,
-    });
-    if (res?.status === 200 && res.ok) {
-      const userData = await getSession()
-      
-      const userPermissionResponse = await fetchUserGroupsApi();
-      const userPermission = userPermissionResponse?.data?.results?.[0]?.permissions;
+        const res = await signIn("credentials", {
+        email: values?.email,
+        password: values?.password,
+        redirect: false,
+        });
+        if (res?.status === 200 && res.ok) {
+        const userData = await getSession()
+        
+        const userPermissionResponse = await fetchUserGroupsApi();
+        const userPermission = userPermissionResponse?.data?.results?.[0]?.permissions;
 
-      const permObj: { [key: string]: IPermObj } = {};
-      const permissions = userPermission || []
+        const permObj: { [key: string]: IPermObj } = {};
+        const permissions = userPermission || []
 
-      permissions?.map((perm: IPermObj) => {
-          permObj[`${perm.codename}`] = perm
-      })
-      updateUser({...userData?.user, permissions:permObj} as any)
-      toast.success("Logged in successfully");
-      router.push(routeTo.dashboard);
-    }else{
-      // NextAuth puts the actual message thrown inside authorize() (see
-      // src/lib/auth.ts) into res.error - it was being discarded here in
-      // favor of a generic message, which made it impossible to tell
-      // "wrong password" apart from "backend unreachable" / "500 from
-      // server" / etc. Surfacing it for now while we're pointed at the new
-      // test server - swap back to a generic message once things are
-      // stable if a raw backend error isn't something end users should see.
-      toast.error(res?.error || "Invalid email or password");
-      console.error("Login failed:", res?.error);
-    }
-    setLoading(false);
+        permissions?.map((perm: IPermObj) => {
+            permObj[`${perm.codename}`] = perm
+        })
+        updateUser({...userData?.user, permissions:permObj} as any)
+        toast.success("Logged in successfully");
+        router.push(routeTo.dashboard);
+        }else{
+        // NextAuth puts the actual message thrown inside authorize() (see
+        // src/lib/auth.ts) into res.error - it was being discarded here in
+        // favor of a generic message, which made it impossible to tell
+        // "wrong password" apart from "backend unreachable" / "500 from
+        // server" / etc. Surfacing it for now while we're pointed at the new
+        // test server - swap back to a generic message once things are
+        // stable if a raw backend error isn't something end users should see.
+        toast.error(res?.error || "Invalid email or password");
+        console.error("Login failed:", res?.error);
+        }
+        setLoading(false);
   };
     
 
