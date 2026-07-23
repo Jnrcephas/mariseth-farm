@@ -3,7 +3,7 @@ import { useState } from "react"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Wind, Droplet, FlaskConical, AlertTriangle, TrendingUp } from "lucide-react"
+import { Wind, Droplet, FlaskConical, AlertTriangle, TrendingUp, Search } from "lucide-react"
 import PlaceholderNotice from "./PlaceholderNotice"
 import { MONITORED_FARMS } from "./farmMonitoringData"
 
@@ -57,12 +57,27 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
 
 export default function SoilAirQuality() {
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [search, setSearch] = useState("")
   const thresholdAlerts = FARM_SOIL_AIR.filter((f) => f.recommendation)
+  const filteredFarms = MONITORED_FARMS.filter((f) =>
+    f.name.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div>
       <PageTitle title="Soil & Air Quality Dashboard" />
       <PlaceholderNotice text="Soil and air quality readings shown here are illustrative - no live Google Soil & Air Quality API connection exists yet." />
+
+      <div className="relative mb-5 max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search farms..."
+          className="w-full text-sm border border-[#E2E8F0] rounded-sm pl-9 pr-3 py-2.5 outline-none focus:border-[#4A8D34]"
+        />
+      </div>
 
       {thresholdAlerts.length > 0 && (
         <Card className="p-5 shadow-none border border-[#FCA5A5] bg-[#FEF2F2] mb-5">
@@ -87,7 +102,7 @@ export default function SoilAirQuality() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {MONITORED_FARMS.map((farm) => {
+        {filteredFarms.map((farm) => {
           const s = FARM_SOIL_AIR.find((f) => f.farmId === farm.id)!
           const isExpanded = expandedId === farm.id
           const trendColor = s.aqiCategory === "Good" ? "#059669" : s.aqiCategory === "Moderate" ? "#D97706" : "#DC2626"
@@ -148,6 +163,9 @@ export default function SoilAirQuality() {
             </Card>
           )
         })}
+        {filteredFarms.length === 0 && (
+          <p className="text-sm text-[#64748B] text-center py-10 col-span-full">No farms match your search.</p>
+        )}
       </div>
     </div>
   )
