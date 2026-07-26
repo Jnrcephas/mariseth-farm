@@ -14,8 +14,7 @@ import { useRouter } from "next/navigation";
 import { useFarmManagementProductList } from "@/apis/adminApiComponents";
 import CropsSearch from "./CropsSearch";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
-import { colorPalate, commaSeparator } from "@/lib/helpers";
-import { CEDI } from "@/lib/constants";
+import { colorPalate } from "@/lib/helpers";
 
 export default function CropsView(){
 
@@ -85,16 +84,6 @@ export default function CropsView(){
                 return(
                     <div>
                         {row?.weight} {row?.weight_metric?.name}
-                    </div>
-                )
-            }
-        },
-        { header: "Price", accessorKey: "price",
-            cell: (_row) => {
-                const price = _row?.row?.original?.price
-                return (
-                    <div>
-                        {price === null || price === undefined || price === "" ? "N/A" : `${CEDI} ${commaSeparator(price)}`}
                     </div>
                 )
             }

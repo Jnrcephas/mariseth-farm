@@ -35,6 +35,13 @@ import { toast } from "sonner";
 import { getErrorMap, mapSelectOptions } from "@/lib/helpers";
 import ReactSelect from 'react-select';
 import { selectColorStyles } from "../../utils/constants";
+import FarmBoundaryField, { pointsToGeoJSON, geoJSONToPoints } from "@/components/customs/FarmBoundaryField";
+import { useState } from "react";
+
+// Ghana's approximate centroid - used as the default map center since farm
+// creation doesn't collect precise coordinates elsewhere in this form; the
+// user pans/zooms to find their actual farm before marking boundary points.
+const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
 
 
 
@@ -77,6 +84,14 @@ import { selectColorStyles } from "../../utils/constants";
     
     const {districts} = useGetRegionDistricts(regions, Number(form.watch("region")))
 
+    // "boundary" is a new field the backend added to the farm payload
+    // (GeoJSON Polygon) - farms need one set before they can receive
+    // weather data. See FarmBoundaryField for the draw UI and the
+    // Leaflet[lat,lng] <-> GeoJSON[lng,lat] conversion helpers.
+    const [boundaryPoints, setBoundaryPoints] = useState<[number, number][]>(
+      geoJSONToPoints((defaultData as any)?.boundary)
+    )
+
     const {mutate, isPending} = useFarmManagementFarmCreate({
             onSuccess: () =>{
                 if(refetch) refetch()
@@ -103,6 +118,12 @@ import { selectColorStyles } from "../../utils/constants";
         const crops = values?.crops?.map((item) => item?.value) as number[]
         const livestock = values?.livestock?.map((item) => item?.value) as number[]
 
+        const boundary = pointsToGeoJSON(boundaryPoints)
+        if (!boundary) {
+            toast.error("Mark at least 3 points on the map to set the farm boundary. Without it, this farm won't receive weather data.")
+            return
+        }
+
         const payload = {
             farm_type: "internal",
             name: values?.name,
@@ -113,7 +134,8 @@ import { selectColorStyles } from "../../utils/constants";
             size: Number(values?.size),
             size_metric: Number(values?.size_metric),
             crops: crops,
-            livestock: livestock
+            livestock: livestock,
+            boundary: boundary
         } as any
 
         if(isEdit){
@@ -332,6 +354,14 @@ import { selectColorStyles } from "../../utils/constants";
                                         <FormMessage />
                                         </FormItem>
                                     )} />
+                            </div>
+                            <div className="grid grid-cols-1">
+                                <Label className="capitalize mb-3">Farm Boundary <div className='text-red-500'>*</div></Label>
+                                <FarmBoundaryField
+                                    center={GHANA_CENTER}
+                                    value={boundaryPoints}
+                                    onChange={setBoundaryPoints}
+                                />
                             </div>
                             <div className="flex justify-center pt-4 w-full">
                                 <Button variant="default" type="submit" className="w-full">

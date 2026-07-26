@@ -39,6 +39,10 @@ import { getErrorMap, mapSelectOptions } from "@/lib/helpers";
 import { Region } from "@/apis/adminApiSchemas";
 import useGetRegionDistricts from "../../utils/hooks";
 import { FarmerCombobox } from "../../utils/FarmerCombobox";
+import FarmBoundaryField, { pointsToGeoJSON, geoJSONToPoints } from "@/components/customs/FarmBoundaryField";
+import { useState } from "react";
+
+const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
 
 
 
@@ -83,6 +87,10 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
 
     const {districts} = useGetRegionDistricts(regions, Number(form.watch("region")))
 
+    const [boundaryPoints, setBoundaryPoints] = useState<[number, number][]>(
+      geoJSONToPoints((defaultData as any)?.boundary)
+    )
+
     function farmerFullName(farmer: any){
         return `${farmer?.first_name} ${farmer?.last_name}`
     }
@@ -112,6 +120,13 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
     function onSubmit(values: z.infer<typeof externalFarmSchema>) {
         const crops = values?.crops?.map((item) => item?.value) as number[]
         const livestock = values?.livestock?.map((item) => item?.value) as number[]
+
+        const boundary = pointsToGeoJSON(boundaryPoints)
+        if (!boundary) {
+            toast.error("Mark at least 3 points on the map to set the farm boundary. Without it, this farm won't receive weather data.")
+            return
+        }
+
         const payload = {
             farm_type: "external",
             name: values?.name,
@@ -128,7 +143,8 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
             use_of_fertilizers: [values?.use_of_fertilizers],
             farming_methods: [values?.farming_methods],
             irrigation: values?.irrigation === "yes" ? true : false,
-            has_access_to_market: values?.has_access_to_market === "yes" ? true : false
+            has_access_to_market: values?.has_access_to_market === "yes" ? true : false,
+            boundary: boundary
         } as any
 
         if(isEdit){
@@ -485,6 +501,14 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
                                             )}/>
                                     </div>
                                 </div>
+                            </div>
+                            <div className="grid grid-cols-1">
+                                <Label className="capitalize mb-3">Farm Boundary <div className='text-red-500'>*</div></Label>
+                                <FarmBoundaryField
+                                    center={GHANA_CENTER}
+                                    value={boundaryPoints}
+                                    onChange={setBoundaryPoints}
+                                />
                             </div>
                             <div className="flex justify-center">
                                 <Button type="submit" variant="default" className="w-[544px] cursor-pointer">
