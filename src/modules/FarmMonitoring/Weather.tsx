@@ -1,7 +1,8 @@
 "use client"
+import { useState } from "react"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
-import { CloudSun, Droplets, CloudRain, Wind, AlertTriangle, MapPin, Loader2 } from "lucide-react"
+import { CloudSun, Droplets, CloudRain, Wind, AlertTriangle, MapPin, Loader2, Search } from "lucide-react"
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents"
 import { useFarmWeather } from "@/apis/useFarmWeather"
 
@@ -91,16 +92,31 @@ function FarmWeatherCard({ farm }: { farm: any }) {
 }
 
 export default function Weather() {
+  const [search, setSearch] = useState("")
   const { data: farmsData, isLoading } = useFarmManagementFarmList({
     queryParams: { page: 1, page_size: 100 } as any,
   })
   const farms = (farmsData?.results || []) as any[]
-  const farmsWithBoundary = farms.filter((f) => f.boundary)
-  const farmsWithoutBoundary = farms.filter((f) => !f.boundary)
+  const filteredFarms = farms.filter((f) =>
+    String(f?.name || "").toLowerCase().includes(search.toLowerCase())
+  )
+  const farmsWithBoundary = filteredFarms.filter((f) => f.boundary)
+  const farmsWithoutBoundary = filteredFarms.filter((f) => !f.boundary)
 
   return (
     <div>
       <PageTitle title="Weather Dashboard" />
+
+      <div className="relative mb-5 max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8]" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search farms..."
+          className="w-full text-sm border border-[#E2E8F0] rounded-sm pl-9 pr-3 py-2.5 outline-none focus:border-[#4A8D34]"
+        />
+      </div>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
@@ -130,6 +146,9 @@ export default function Weather() {
 
           {farms.length === 0 && (
             <p className="text-sm text-[#64748B] text-center py-16">No farms found.</p>
+          )}
+          {farms.length > 0 && filteredFarms.length === 0 && (
+            <p className="text-sm text-[#64748B] text-center py-16">No farms match your search.</p>
           )}
         </>
       )}

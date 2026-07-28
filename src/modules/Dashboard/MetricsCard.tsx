@@ -47,7 +47,7 @@ export default function MetricsCard({ data }: { data: any }) {
     },
     {
       label: "Finance",
-      value: "$89,000", // placeholder - no finance endpoint exists yet
+      value: "GHS 0", // placeholder - no finance endpoint exists yet
       icon: LineChart,
       iconBg: "#D1FAE5",
       iconColor: "#059669",

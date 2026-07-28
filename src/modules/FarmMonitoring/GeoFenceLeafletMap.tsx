@@ -1,12 +1,15 @@
 "use client"
-import { MapContainer, TileLayer, Marker, Popup, Polygon, useMapEvents } from "react-leaflet"
+import { useEffect } from "react"
+import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, useMap } from "react-leaflet"
 import L from "leaflet"
 import { MonitoredFarm } from "./farmMonitoringData"
 
-function dotIcon(color: string, size = 26) {
+function dotIcon(color: string, size = 26, label?: string) {
   return L.divIcon({
     className: "",
-    html: `<div style="width:${size}px;height:${size}px;border-radius:9999px;background:${color};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`,
+    html: `<div style="width:${size}px;height:${size}px;border-radius:9999px;background:${color};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:white;font-size:${Math.round(
+      size * 0.42
+    )}px;font-weight:700;font-family:sans-serif;">${label ?? ""}</div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   })
@@ -21,15 +24,13 @@ export interface GeoFenceAsset {
   lastSeen: string
 }
 
-// Captures map clicks while in drawing mode and reports each point back up
-// to the parent - this is what actually makes the "Draw Boundary" button
-// work (GEO-01), with no extra drawing-plugin dependency required.
-function DrawClickCapture({ onAddDraftPoint }: { onAddDraftPoint: (pt: [number, number]) => void }) {
-  useMapEvents({
-    click(e) {
-      onAddDraftPoint([e.latlng.lat, e.latlng.lng])
-    },
-  })
+// Pans to whichever coordinate was most recently entered in the form, so
+// the admin can visually confirm each point lands where they expect.
+function FlyToLatest({ point }: { point: [number, number] | null }) {
+  const map = useMap()
+  useEffect(() => {
+    if (point) map.flyTo(point, Math.max(map.getZoom(), 16), { duration: 0.6 })
+  }, [point, map])
   return null
 }
 
@@ -37,18 +38,15 @@ export default function GeoFenceLeafletMap({
   farm,
   assets,
   boundary,
-  isDrawing,
   draftPoints,
-  onAddDraftPoint,
 }: {
   farm: MonitoredFarm
   assets: GeoFenceAsset[]
   boundary: [number, number][] | null
-  isDrawing: boolean
   draftPoints: [number, number][]
-  onAddDraftPoint: (pt: [number, number]) => void
 }) {
   const center: [number, number] = [farm.latLng.lat, farm.latLng.lng]
+  const latestDraftPoint = draftPoints.length > 0 ? draftPoints[draftPoints.length - 1] : null
 
   return (
     <MapContainer center={center} zoom={16} scrollWheelZoom style={{ height: "100%", width: "100%" }} key={farm.id}>
@@ -57,10 +55,10 @@ export default function GeoFenceLeafletMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {isDrawing && <DrawClickCapture onAddDraftPoint={onAddDraftPoint} />}
+      <FlyToLatest point={latestDraftPoint} />
 
-      {/* saved boundary - this farm's own shape, hidden while re-drawing */}
-      {!isDrawing && boundary && (
+      {/* saved boundary - hidden while re-entering a new one */}
+      {draftPoints.length === 0 && boundary && (
         <Polygon
           positions={boundary}
           pathOptions={{ color: "#4A8D34", weight: 2, fillColor: "#4A8D34", fillOpacity: 0.15, dashArray: "6 4" }}
@@ -74,15 +72,18 @@ export default function GeoFenceLeafletMap({
         </Polygon>
       )}
 
-      {/* in-progress draft shape while drawing */}
-      {isDrawing && draftPoints.length > 0 && (
-        <Polygon
+      {/* live preview of coordinates entered so far */}
+      {draftPoints.length >= 2 && (
+        <Polyline
           positions={draftPoints}
-          pathOptions={{ color: "#F59E0B", weight: 2, fillColor: "#F59E0B", fillOpacity: 0.15, dashArray: "4 3" }}
+          pathOptions={{ color: "#F59E0B", weight: 3, dashArray: "4 3" }}
         />
       )}
-      {isDrawing &&
-        draftPoints.map((pt, i) => <Marker key={i} position={pt} icon={dotIcon("#F59E0B", 12)} />)}
+      {draftPoints.map((pt, i) => (
+        <Marker key={i} position={pt} icon={dotIcon(i === 0 ? "#4A8D34" : "#F59E0B", 24, String(i + 1))}>
+          <Popup>Point {i + 1}: {pt[0].toFixed(5)}, {pt[1].toFixed(5)}</Popup>
+        </Marker>
+      ))}
 
       <Marker position={center} icon={dotIcon("#EA580C", 34)}>
         <Popup>
@@ -93,7 +94,7 @@ export default function GeoFenceLeafletMap({
         </Popup>
       </Marker>
 
-      {!isDrawing &&
+      {draftPoints.length === 0 &&
         assets.map((a) => (
           <Marker key={a.id} position={[a.lat, a.lng]} icon={dotIcon("#64748B")}>
             <Popup>
