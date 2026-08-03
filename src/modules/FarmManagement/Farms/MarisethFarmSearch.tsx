@@ -223,3 +223,4 @@ export default function MarisethFarmSearch({setFilters, filters, isLoading}:TSea
         </div>
     )
 }
+

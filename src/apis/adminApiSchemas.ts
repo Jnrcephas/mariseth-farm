@@ -2077,3 +2077,5 @@ export type FullWarehouse = {
   date_modified?: string;
   products: ProductWarehouse[];
 };
+
+

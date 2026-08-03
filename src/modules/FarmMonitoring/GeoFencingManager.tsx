@@ -1,63 +1,45 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import dynamic from "next/dynamic"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Search, MapPinPlus, Check, X, Eraser, Users2, Building2, Trash2 } from "lucide-react"
+import { Search, MapPinPlus, Check, X, Eraser, Users2, Building2, Trash2, Loader2 } from "lucide-react"
 import PlaceholderNotice from "./PlaceholderNotice"
 import FullscreenMapPanel from "./FullscreenMapPanel"
-import { MONITORED_FARMS } from "./farmMonitoringData"
 import type { GeoFenceAsset } from "./GeoFenceLeafletMap"
+import { useFarmManagementFarmList, useFarmManagementFarmUpdate } from "@/apis/adminApiComponents"
+import type * as Schemas from "@/apis/adminApiSchemas"
+import {
+  type GeoJSONPolygon,
+  type LatLngPoint,
+  pointsToGeoJSONPolygon,
+  geoJSONPolygonToPoints,
+  centroidOfPoints,
+  DEFAULT_MAP_CENTER,
+} from "@/lib/geo/boundary"
 
 // Leaflet touches `window`, which doesn't exist during Next.js server
 // rendering, so the map must be loaded client-side only.
 const GeoFenceLeafletMap = dynamic(() => import("./GeoFenceLeafletMap"), { ssr: false })
 
-// PLACEHOLDER: illustrative fence configuration - swap for real GeoFence /
-// GeoFenceEvent records (GEO-01..GEO-06) once persistence exists. Each
-// farm below has its OWN hand-set boundary shape.
-interface FenceConfig {
-  farmId: number
-  assets: number
-  recipients: string[]
-  boundary: [number, number][] | null
+// The generated client types (Schemas.FullFarm) haven't been regenerated
+// to include `boundary` yet, even though the backend now accepts/returns
+// it (GeoJSON Polygon). Extend locally so the rest of this file is fully
+// typed; delete this extension once you regenerate the API client and
+// `boundary` shows up on Schemas.FullFarm natively.
+type FarmWithBoundary = Schemas.FullFarm & { boundary?: GeoJSONPolygon | null }
+
+// PLACEHOLDER: real farms have no tracked-asset/recipient data yet (no
+// IoT/GPS feed, no notification-recipient config exists on the backend).
+// This is unrelated to the boundary fix - it's illustrative only, seeded
+// deterministically off farm.id so the UI doesn't look empty. Swap for a
+// real feed once GEO-02 (asset tracking) exists.
+function getPlaceholderAssetCount(farmId: number): number {
+  return farmId % 4 === 0 ? 0 : (farmId % 3) + 1
 }
 
-const INITIAL_FENCES: FenceConfig[] = [
-  {
-    farmId: 1,
-    assets: 3,
-    recipients: ["Field Officer - Kumbungu"],
-    boundary: [
-      [9.5525, -0.8735], [9.5522, -0.8665], [9.5495, -0.8645],
-      [9.5468, -0.8672], [9.5470, -0.8722], [9.5498, -0.8748],
-    ],
-  },
-  {
-    farmId: 2,
-    assets: 1,
-    recipients: ["Field Officer - Sawla-Tuna-Kalba"],
-    boundary: [
-      [9.0325, -2.4065], [9.0318, -2.3995], [9.0275, -2.4000], [9.0282, -2.4070],
-    ],
-  },
-  { farmId: 3, assets: 0, recipients: [], boundary: null },
-  {
-    farmId: 4,
-    assets: 2,
-    recipients: ["Field Officer - Kumbungu", "Farm Manager"],
-    boundary: [
-      [9.5805, -0.8345], [9.5798, -0.8280], [9.5760, -0.8265],
-      [9.5748, -0.8320], [9.5775, -0.8360],
-    ],
-  },
-  { farmId: 5, assets: 0, recipients: [], boundary: null },
-]
-
-// PLACEHOLDER: illustrative tracked-asset positions - swap for real GPS
-// device coordinates once GEO-02 exists.
 function getAssetsForFarm(farmId: number, assetCount: number, center: { lat: number; lng: number }): GeoFenceAsset[] {
   const offsets = [
     { dLat: 0.0025, dLng: -0.002 }, { dLat: -0.002, dLng: 0.003 }, { dLat: 0.0015, dLng: 0.0032 },
@@ -80,14 +62,37 @@ const CLOSE_LOOP_TOLERANCE = 0.00005
 
 export default function GeoFencingManager() {
   const [search, setSearch] = useState("")
-  const [selectedFarmId, setSelectedFarmId] = useState(MONITORED_FARMS[0].id)
-  const [fences, setFences] = useState<FenceConfig[]>(INITIAL_FENCES)
+  const [selectedFarmId, setSelectedFarmId] = useState<number | null>(null)
   const [isEntering, setIsEntering] = useState(false)
-  const [draftPoints, setDraftPoints] = useState<[number, number][]>([])
+  const [draftPoints, setDraftPoints] = useState<LatLngPoint[]>([])
   const [latInput, setLatInput] = useState("")
   const [lngInput, setLngInput] = useState("")
   const [entryError, setEntryError] = useState<string | null>(null)
   const [closedMessage, setClosedMessage] = useState<string | null>(null)
+
+  // NOTE: page_size: 100 mirrors what Weather Dashboard currently does, but
+  // your farm list has 9,249 records across 93 pages - so this only shows
+  // the first page of real farms, not all of them. That matches Weather
+  // Dashboard's current behavior exactly (so the two pages stay in sync),
+  // but if you want every farm searchable here, this needs to move to
+  // server-side search/pagination via FilterPropsFarms + MarisethFarmSearch,
+  // the same pattern MarisethFarms.tsx already uses. Happy to wire that
+  // next if you want it - didn't want to assume that's in scope here.
+  const { data, isLoading, isError, refetch } = useFarmManagementFarmList({
+    queryParams: { page: 1, page_size: 100 },
+  })
+
+  const farms = (data?.results ?? []) as FarmWithBoundary[]
+
+  const { mutate: updateFarm, isPending: isSavingBoundary } = useFarmManagementFarmUpdate()
+
+  // Select the first farm once real data arrives (there's no hardcoded
+  // MONITORED_FARMS[0] to default to anymore).
+  useEffect(() => {
+    if (selectedFarmId === null && farms.length > 0) {
+      setSelectedFarmId(farms[0].id ?? null)
+    }
+  }, [farms, selectedFarmId])
 
   // Leaving a farm mid-entry discards the in-progress draft for that farm.
   useEffect(() => {
@@ -97,13 +102,25 @@ export default function GeoFencingManager() {
     setClosedMessage(null)
   }, [selectedFarmId])
 
-  const filteredFarms = MONITORED_FARMS.filter((f) =>
-    f.name.toLowerCase().includes(search.toLowerCase())
+  const filteredFarms = useMemo(
+    () =>
+      farms.filter((f) => (f.name ?? f.farm_id ?? "").toLowerCase().includes(search.toLowerCase())),
+    [farms, search]
   )
 
-  const selectedFarm = MONITORED_FARMS.find((f) => f.id === selectedFarmId) ?? MONITORED_FARMS[0]
-  const selectedFence = fences.find((f) => f.farmId === selectedFarmId)!
-  const assets = getAssetsForFarm(selectedFarm.id, selectedFence.assets, selectedFarm.latLng)
+  const selectedFarm = farms.find((f) => f.id === selectedFarmId) ?? null
+  const selectedFarmName = selectedFarm?.name ?? selectedFarm?.farm_id ?? "Unnamed farm"
+  const selectedBoundaryPoints = useMemo(
+    () => geoJSONPolygonToPoints(selectedFarm?.boundary),
+    [selectedFarm]
+  )
+  const selectedCenter = useMemo(
+    () => centroidOfPoints(selectedBoundaryPoints) ?? DEFAULT_MAP_CENTER,
+    [selectedBoundaryPoints]
+  )
+
+  const placeholderAssetCount = selectedFarm ? getPlaceholderAssetCount(selectedFarm.id ?? 0) : 0
+  const assets = selectedFarm ? getAssetsForFarm(selectedFarm.id ?? 0, placeholderAssetCount, selectedCenter) : []
 
   function startEntering() {
     setIsEntering(true)
@@ -130,17 +147,41 @@ export default function GeoFencingManager() {
     setClosedMessage(null)
   }
 
-  function saveBoundary(points: [number, number][]) {
-    setFences((prev) =>
-      prev.map((f) => (f.farmId === selectedFarmId ? { ...f, boundary: points } : f))
+  function saveBoundary(points: LatLngPoint[]) {
+    if (!selectedFarm?.id) return
+    const polygon = pointsToGeoJSONPolygon(points)
+    if (!polygon) return
+
+    updateFarm(
+      {
+        pathParams: { id: selectedFarm.id },
+        // `boundary` isn't in the generated RequestBodies.Farm type yet -
+        // see the FarmWithBoundary note above. Remove the cast once the
+        // client is regenerated from the updated schema.
+        body: { boundary: polygon } as any,
+      },
+      {
+        onSuccess: () => {
+          // Weather Dashboard reads farm.boundary via its own
+          // useFarmManagementFarmList call, so refetching this page's farm
+          // list is enough to make Geofencing reflect the save immediately;
+          // Weather Dashboard will pick it up on its own next
+          // fetch/refetch/mount.
+          refetch()
+          setIsEntering(false)
+          setDraftPoints([])
+          setLatInput("")
+          setLngInput("")
+        },
+        onError: () => {
+          setEntryError("Couldn't save this boundary - please try again.")
+        },
+      }
     )
-    setIsEntering(false)
-    setDraftPoints([])
-    setLatInput("")
-    setLngInput("")
   }
 
   function handleAddPoint() {
+    if (!selectedFarm) return
     setEntryError(null)
     const lat = Number(latInput)
     const lng = Number(lngInput)
@@ -155,12 +196,18 @@ export default function GeoFencingManager() {
     }
 
     // Flag (but don't block) a point that's suspiciously far from the
-    // farm's known location - most likely a typo, not a real 50km walk.
-    const distFromFarm = Math.hypot(lat - selectedFarm.latLng.lat, lng - selectedFarm.latLng.lng)
-    if (distFromFarm > 0.2) {
-      setEntryError(
-        "That point is quite far from this farm's location - double check the coordinates before continuing. You can still add it if it's correct."
-      )
+    // farm's current working area - most likely a typo, not a real 50km
+    // walk. Only meaningful once we have prior points/center to compare
+    // against; with zero real farm coordinates on unconfigured farms,
+    // this just compares to the running centroid of points entered so far.
+    const runningCenter = centroidOfPoints(draftPoints)
+    if (runningCenter) {
+      const distFromCenter = Math.hypot(lat - runningCenter.lat, lng - runningCenter.lng)
+      if (distFromCenter > 0.2) {
+        setEntryError(
+          "That point is quite far from the others you've entered - double check the coordinates before continuing. You can still add it if it's correct."
+        )
+      }
     }
 
     // Closing the loop: if this point matches Point 1 and we already have
@@ -189,10 +236,33 @@ export default function GeoFencingManager() {
     setClosedMessage(`Boundary saved with ${draftPoints.length} points.`)
   }
 
+  if (isLoading) {
+    return (
+      <div>
+        <PageTitle title="Geo-Fencing Manager" />
+        <div className="flex items-center justify-center h-64 text-[#64748B] gap-2 text-sm">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading farms...
+        </div>
+      </div>
+    )
+  }
+
+  if (isError || farms.length === 0) {
+    return (
+      <div>
+        <PageTitle title="Geo-Fencing Manager" />
+        <div className="flex items-center justify-center h-64 text-[#64748B] text-sm">
+          {isError ? "Couldn't load farms. Please try again." : "No farms found."}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <PageTitle title="Geo-Fencing Manager" />
-      <PlaceholderNotice text="Boundary shapes and asset tracking are illustrative and stored only for this session - no live persistence layer is connected yet. The map and coordinate entry are fully functional (free OpenStreetMap tiles) so you can preview the real interaction." />
+      <PlaceholderNotice text="Boundaries you draw here are saved to the farm's real record and will show up on the Weather Dashboard. Asset tracking (the dots on the map) is still illustrative - no live GPS/IoT feed is connected yet." />
 
       <div className="flex flex-col lg:flex-row gap-5">
         {/* Left: farm / fence list */}
@@ -210,39 +280,36 @@ export default function GeoFencingManager() {
 
           <div className="flex flex-col gap-3 max-h-[640px] overflow-y-auto pr-1">
             {filteredFarms.map((farm) => {
-              const fence = fences.find((f) => f.farmId === farm.id)!
               const isSelected = farm.id === selectedFarmId
+              const hasBoundary = !!farm.boundary
+              const assetCount = getPlaceholderAssetCount(farm.id ?? 0)
               return (
                 <Card
                   key={farm.id}
                   className={`p-4 shadow-none cursor-pointer transition-colors ${
                     isSelected ? "border-[#4A8D34] bg-[#F0FDF4]" : "border-[#E2E8F0] hover:border-[#CBD5E1]"
                   }`}
-                  onClick={() => setSelectedFarmId(farm.id)}
+                  onClick={() => setSelectedFarmId(farm.id ?? null)}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Building2 className="h-4 w-4 text-[#4A8D34] shrink-0" />
-                    <p className="text-sm font-semibold text-black truncate">{farm.name}</p>
+                    <p className="text-sm font-semibold text-black truncate">{farm.name ?? farm.farm_id}</p>
                   </div>
-                  <p className="text-xs text-[#64748B] mb-3">{farm.district}</p>
+                  <p className="text-xs text-[#64748B] mb-3">{farm.district?.name}</p>
 
                   <div className="flex items-end justify-between">
                     <div className="flex gap-4">
                       <div>
-                        <p className="text-sm font-bold text-black">{fence.assets}</p>
+                        <p className="text-sm font-bold text-black">{assetCount}</p>
                         <p className="text-[10px] text-[#94A3B8]">Assets</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-black">{fence.recipients.length}</p>
-                        <p className="text-[10px] text-[#94A3B8]">Recipients</p>
                       </div>
                     </div>
                     <Badge
                       className={`border-0 shrink-0 ${
-                        fence.boundary ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-[#FEF9C3] text-[#CA8A04]"
+                        hasBoundary ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-[#FEF9C3] text-[#CA8A04]"
                       }`}
                     >
-                      {fence.boundary ? "Configured" : "Unconfigured"}
+                      {hasBoundary ? "Configured" : "Unconfigured"}
                     </Badge>
                   </div>
                 </Card>
@@ -256,10 +323,10 @@ export default function GeoFencingManager() {
           {!isEntering ? (
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <p className="text-sm font-semibold text-black">{selectedFarm.name}</p>
+                <p className="text-sm font-semibold text-black">{selectedFarmName}</p>
                 <p className="text-xs text-[#64748B]">
-                  {selectedFence.boundary
-                    ? `Boundary configured with ${selectedFence.boundary.length} points.`
+                  {selectedBoundaryPoints.length > 0
+                    ? `Boundary configured with ${selectedBoundaryPoints.length} points.`
                     : "No boundary set for this farm yet."}
                 </p>
               </div>
@@ -268,14 +335,14 @@ export default function GeoFencingManager() {
                 className="bg-[#4A8D34] hover:bg-[#3f7a2c] text-white cursor-pointer rounded-sm px-5 py-2.5 text-sm font-bold"
               >
                 <MapPinPlus className="h-4 w-4" />
-                {selectedFence.boundary ? "Re-enter Boundary Coordinates" : "Enter Boundary Coordinates"}
+                {selectedBoundaryPoints.length > 0 ? "Re-enter Boundary Coordinates" : "Enter Boundary Coordinates"}
               </Button>
             </div>
           ) : (
             <Card className="p-5 shadow-none border border-[#E2E8F0]">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-sm font-semibold text-black">
-                  Enter boundary points for {selectedFarm.name}
+                  Enter boundary points for {selectedFarmName}
                 </p>
                 <Badge className="bg-[#FEF9C3] text-[#CA8A04] border-0">{draftPoints.length} points added</Badge>
               </div>
@@ -310,6 +377,7 @@ export default function GeoFencingManager() {
                 </div>
                 <Button
                   onClick={handleAddPoint}
+                  disabled={isSavingBoundary}
                   className="bg-[#4A8D34] hover:bg-[#3f7a2c] text-white cursor-pointer rounded-sm px-5 py-2.5 text-sm font-bold"
                 >
                   Add Point
@@ -318,6 +386,7 @@ export default function GeoFencingManager() {
 
               {entryError && <p className="text-xs text-[#DC2626] mb-3">{entryError}</p>}
               {closedMessage && <p className="text-xs text-[#16A34A] mb-3">{closedMessage}</p>}
+              {isSavingBoundary && <p className="text-xs text-[#64748B] mb-3">Saving boundary...</p>}
 
               {draftPoints.length > 0 && (
                 <div className="flex flex-col gap-1.5 mb-4 max-h-40 overflow-y-auto pr-1">
@@ -355,7 +424,7 @@ export default function GeoFencingManager() {
                 <button
                   type="button"
                   onClick={finishWithoutClosing}
-                  disabled={draftPoints.length < 3}
+                  disabled={draftPoints.length < 3 || isSavingBoundary}
                   className="flex items-center gap-1.5 bg-[#4A8D34] rounded-sm px-3 py-2 text-xs font-medium text-white cursor-pointer hover:bg-[#3f7a2c] disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
                 >
                   <Check className="h-3.5 w-3.5" />
@@ -365,20 +434,20 @@ export default function GeoFencingManager() {
             </Card>
           )}
 
-          <FullscreenMapPanel title={`${selectedFarm.name} - Boundary`}>
+          <FullscreenMapPanel title={`${selectedFarmName} - Boundary`}>
             {(isFullscreen) => (
               <div className={isFullscreen ? "relative w-screen h-screen" : "relative rounded-2xl overflow-hidden border border-[#E2E8F0] h-[520px]"}>
                 <GeoFenceLeafletMap
-                  farm={selectedFarm}
+                  farm={{ id: selectedFarm?.id ?? 0, name: selectedFarmName, latLng: selectedCenter }}
                   assets={assets}
-                  boundary={selectedFence.boundary}
+                  boundary={selectedBoundaryPoints.length > 0 ? selectedBoundaryPoints : null}
                   draftPoints={draftPoints}
                 />
 
                 {!isEntering && (
                   <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white rounded-full shadow px-3 py-1.5 flex items-center gap-1.5 text-xs font-medium text-black z-[1000]">
                     <Users2 className="h-3.5 w-3.5 text-[#4A8D34]" />
-                    {selectedFence.assets} asset{selectedFence.assets === 1 ? "" : "s"} tracked
+                    {placeholderAssetCount} asset{placeholderAssetCount === 1 ? "" : "s"} tracked
                   </div>
                 )}
               </div>

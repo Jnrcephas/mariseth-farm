@@ -54,3 +54,5 @@ export default function ViewMarisethFarm({open, setOpen, data}:TViewFarmModal){
         </Sheet>
     )
 }
+
+

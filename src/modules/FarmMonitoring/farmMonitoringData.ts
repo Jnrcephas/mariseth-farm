@@ -33,3 +33,4 @@ export const HEALTH_STYLES: Record<HealthStatus, { label: string; dot: string; b
   watch: { label: "Watch", dot: "#EAB308", bg: "#FEF9C3", fg: "#CA8A04", badge: "bg-[#FEF9C3] text-[#CA8A04]" },
   alert: { label: "Alert", dot: "#EF4444", bg: "#FEE2E2", fg: "#DC2626", badge: "bg-[#FEE2E2] text-[#DC2626]" },
 }
+

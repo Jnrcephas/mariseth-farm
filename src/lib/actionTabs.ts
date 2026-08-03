@@ -93,3 +93,5 @@ export const FARM_MONITORING_TABS: ActionTabConfig[] = [
   { label: "Geofencing", href: routeTo.farmMonitoringPestDisease },
   { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
 ];
+
+
