@@ -116,3 +116,6 @@ const hasQueryParams = (
   if (operation.variables === skipToken) return false;
   return "variables" in operation && "queryParams" in operation.variables;
 };
+
+
+

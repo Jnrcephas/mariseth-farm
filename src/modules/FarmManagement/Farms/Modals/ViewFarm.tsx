@@ -66,3 +66,5 @@ export default function ViewFarm({open, setOpen, data}:TViewFarmModal){
         </Dialog>
     )
 }
+
+

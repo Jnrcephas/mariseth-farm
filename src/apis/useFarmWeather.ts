@@ -81,8 +81,4 @@ export const useFarmWeather = <TData = FarmWeatherResponse,>(
   });
 };
 
-// OpenWeather-style readings come back in Kelvin - convert for display.
-export const kelvinToCelsius = (kelvin: number) => kelvin - 273.15;
 
-// wind_speed comes back in m/s - convert for display.
-export const mpsToKph = (mps: number) => mps * 3.6;

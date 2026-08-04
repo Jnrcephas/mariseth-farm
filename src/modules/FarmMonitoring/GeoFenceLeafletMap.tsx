@@ -2,7 +2,16 @@
 import { useEffect } from "react"
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, useMap } from "react-leaflet"
 import L from "leaflet"
-import { MonitoredFarm } from "./farmMonitoringData"
+
+// Only the fields this map actually reads (center point, id for the
+// MapContainer `key`, name for popup text) - not the full illustrative
+// MonitoredFarm shape (leadFarmer/health/ndvi/etc), which real farms
+// don't have anyway.
+export interface MapFarm {
+  id: number | string
+  name: string
+  latLng: { lat: number; lng: number }
+}
 
 function dotIcon(color: string, size = 26, label?: string) {
   return L.divIcon({
@@ -40,7 +49,7 @@ export default function GeoFenceLeafletMap({
   boundary,
   draftPoints,
 }: {
-  farm: MonitoredFarm
+  farm: MapFarm
   assets: GeoFenceAsset[]
   boundary: [number, number][] | null
   draftPoints: [number, number][]

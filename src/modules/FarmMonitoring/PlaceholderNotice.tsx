@@ -16,3 +16,6 @@ export default function PlaceholderNotice({ text }: { text: string }) {
     </div>
   )
 }
+
+
+
