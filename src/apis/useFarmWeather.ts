@@ -3,31 +3,52 @@ import { adminApiFetch } from "./adminApiFetcher";
 import { useAdminApiContext, AdminApiContext } from "./adminApiContext";
 
 // NOTE: this hook is hand-written rather than generated, because the
-// weather endpoint (GET /api/v1/weather/{farm_id}) isn't in openapi.json
-// yet. Once the backend adds it to the OpenAPI spec and the client is
-// regenerated (see openapi-codegen.config.ts), this can be deleted in
-// favor of the generated equivalent - just make sure to update the one
-// call site (src/modules/FarmMonitoring/Weather.tsx) to match.
+// weather endpoint isn't in openapi.json yet. Once the backend adds it to
+// the OpenAPI spec and the client is regenerated (see
+// openapi-codegen.config.ts), this can be deleted in favor of the generated
+// equivalent - just make sure to update the one call site
+// (src/modules/FarmMonitoring/Weather.tsx) to match.
+//
+// GET /api/v1/agro-monitoring/{farm_id}/weather - real payload confirmed by
+// backend, raw OpenWeather-style reading (temps in Kelvin, wind in m/s).
 
-export interface FarmWeatherResponse {
-  farm_id: number;
-  location?: { name?: string; region?: string };
-  current: {
-    temperature_c: number;
-    condition: string;
-    humidity: number;
-    wind_kph: number;
-    rainfall_mm: number;
-  };
-  alerts?: Array<{ headline: string; severity: string }>;
-  last_updated: string;
+export interface FarmWeatherCondition {
+  id: number;
+  main: string;
+  description: string;
+  icon: string;
 }
 
-// The backend requires a farm to have a `boundary` (GeoJSON Polygon) set
-// before it can return weather for it - see the farm creation payload's
-// new `boundary` field. This error shape lets the UI distinguish "no
-// boundary set" from a generic failure so it can prompt the user to set
-// one, rather than just showing a blank error.
+export interface FarmWeatherResponse {
+  id: number;
+  date_created: string;
+  date_modified: string;
+  date_deleted: string | null;
+  is_active: boolean;
+  provider: string | null;
+  hour_key: string;
+  lat: number;
+  lon: number;
+  sunrise: string | null;
+  sunset: string | null;
+  temp: number;
+  temp_max: number;
+  temp_min: number;
+  pressure: number;
+  humidity: number;
+  dew_point: number | null;
+  uvi: number | null;
+  clouds: number;
+  visibility: number | null;
+  wind_speed: number;
+  wind_deg: number;
+  wind_gust: number | null;
+  weather: FarmWeatherCondition[];
+  created_by: number | null;
+  deleted_by: number | null;
+  farm: number | null;
+}
+
 export type FarmWeatherError =
   | { status: 400 | 404; payload: { boundary?: string[]; detail?: string } }
   | { status: "unknown"; payload: string };
@@ -41,7 +62,7 @@ export const fetchFarmWeather = (
   signal?: AbortSignal,
 ) =>
   adminApiFetch<FarmWeatherResponse, FarmWeatherError, undefined, {}, {}, { farm_id: number | string }>(
-    { url: "/weather/{farm_id}", method: "get", ...variables, signal },
+    { url: "/agro-monitoring/{farm_id}/weather", method: "get", ...variables, signal },
   );
 
 export const useFarmWeather = <TData = FarmWeatherResponse,>(
@@ -59,3 +80,9 @@ export const useFarmWeather = <TData = FarmWeatherResponse,>(
     ...options,
   });
 };
+
+// OpenWeather-style readings come back in Kelvin - convert for display.
+export const kelvinToCelsius = (kelvin: number) => kelvin - 273.15;
+
+// wind_speed comes back in m/s - convert for display.
+export const mpsToKph = (mps: number) => mps * 3.6;

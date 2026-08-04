@@ -2,14 +2,14 @@
 import { useState } from "react"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
-import { CloudSun, Droplets, CloudRain, Wind, AlertTriangle, MapPin, Loader2, Search } from "lucide-react"
+import { CloudSun, Droplets, Cloud, Wind, MapPin, Loader2, Search } from "lucide-react"
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents"
-import { useFarmWeather } from "@/apis/useFarmWeather"
+import { useFarmWeather, kelvinToCelsius, mpsToKph } from "@/apis/useFarmWeather"
 
 const MINI_STATS = [
   { key: "temperature" as const, label: "Temp", icon: CloudSun, bg: "#FEF3C7", fg: "#D97706" },
   { key: "humidity" as const, label: "Humidity", icon: Droplets, bg: "#CFFAFE", fg: "#0891B2" },
-  { key: "rainfall" as const, label: "Rain (24h)", icon: CloudRain, bg: "#DBEAFE", fg: "#2563EB" },
+  { key: "clouds" as const, label: "Cloud Cover", icon: Cloud, bg: "#DBEAFE", fg: "#2563EB" },
   { key: "wind" as const, label: "Wind", icon: Wind, bg: "#D1FAE5", fg: "#059669" },
 ]
 
@@ -53,19 +53,18 @@ function FarmWeatherCard({ farm }: { farm: any }) {
     )
   }
 
-  const severeAlert = data.alerts?.[0]
+  const condition = data.weather?.[0]
   const stats = {
-    temperature: `${Math.round(data.current.temperature_c)}°C`,
-    humidity: `${data.current.humidity}%`,
-    rainfall: `${data.current.rainfall_mm}mm`,
-    wind: `${Math.round(data.current.wind_kph)} km/h`,
+    temperature: `${Math.round(kelvinToCelsius(data.temp))}°C`,
+    humidity: `${Math.round(data.humidity)}%`,
+    clouds: `${Math.round(data.clouds)}%`,
+    wind: `${Math.round(mpsToKph(data.wind_speed))} km/h`,
   }
 
   return (
     <Card className="p-5 shadow-none border border-[#E2E8F0]">
       <div className="flex items-center justify-between mb-1">
         <p className="text-sm font-semibold text-black truncate pr-2">{farm.name}</p>
-        {severeAlert && <span className="h-2 w-2 rounded-full bg-[#DC2626] shrink-0" />}
       </div>
       <p className="text-xs text-[#64748B] mb-4">{farm?.district?.name || farm?.district}</p>
       <div className="grid grid-cols-2 gap-3">
@@ -81,10 +80,10 @@ function FarmWeatherCard({ farm }: { farm: any }) {
           </div>
         ))}
       </div>
-      {severeAlert && (
-        <div className="mt-3 flex items-center gap-2 bg-[#FEF2F2] rounded-lg px-3 py-2">
-          <AlertTriangle className="h-3.5 w-3.5 text-[#DC2626] shrink-0" />
-          <span className="text-xs text-[#7F1D1D]">{severeAlert.headline}</span>
+      {condition && (
+        <div className="mt-3 flex items-center gap-2 bg-[#F8FAFC] rounded-lg px-3 py-2">
+          <CloudSun className="h-3.5 w-3.5 text-[#64748B] shrink-0" />
+          <span className="text-xs text-[#334155] capitalize">{condition.description}</span>
         </div>
       )}
     </Card>

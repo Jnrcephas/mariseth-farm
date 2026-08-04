@@ -8,6 +8,7 @@ export const statusBadgeMap = {
   overdue: "danger",
   dismissal: "danger",
   declined: "danger",
+  rejected: "danger",
   absent: "danger",
   
   other: "dark",
