@@ -3,18 +3,17 @@ import { useState } from "react"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Droplet, Thermometer, Loader2, Search, MapPin, ChevronLeft, ChevronRight } from "lucide-react"
+import { Droplet, Thermometer, Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents"
 import { useFarmSoilQuality } from "@/apis/useFarmSoilQuality"
 import { kelvinToCelsius } from "@/apis/useFarmWeather"
-import { formatDateReadable } from "@/lib/helpers"
+import { formatDateReadable, cleanJsonData } from "@/lib/helpers"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
 
 // Farms are fetched a page at a time (server-side search + pagination) rather
 // than all at once, because each card below fires its own soil_quality
 // request - pulling in e.g. 100 farms client-side used to mean ~100
-// simultaneous requests on page load, the vast majority 404ing for farms
-// with no boundary/reading yet. Keeping the page small keeps that bounded.
+// simultaneous requests on page load. Keeping the page small keeps that bounded.
 const FARMS_PAGE_SIZE = 12
 
 const MINI_STATS = [
@@ -23,22 +22,10 @@ const MINI_STATS = [
   { key: "subsoil" as const, label: "Subsoil Temp (10cm)", icon: Thermometer, bg: "#FEE2E2", fg: "#DC2626" },
 ]
 
-function NoBoundaryCard({ farm }: { farm: any }) {
-  return (
-    <Card className="p-5 shadow-none border border-[#E2E8F0]">
-      <div className="flex items-center justify-between mb-1">
-        <p className="text-sm font-semibold text-black truncate pr-2">{farm.name}</p>
-      </div>
-      <p className="text-xs text-[#64748B] mb-4">{farm?.district?.name || farm?.district}</p>
-      <div className="flex items-start gap-2 bg-[#FFFBEB] rounded-lg p-3">
-        <MapPin className="h-4 w-4 text-[#D97706] shrink-0 mt-0.5" />
-        <p className="text-xs text-[#92400E]">
-          No boundary set for this farm yet. Edit the farm and mark its boundary on the map to start receiving soil quality data.
-        </p>
-      </div>
-    </Card>
-  )
-}
+// NOTE: soil quality is resolved purely off the farm id server-side (backend
+// confirmed - it does not require a boundary to be set), so every farm is
+// fetched here. Boundary is only relevant to the Geofencing/asset-tracking
+// feature, not to weather/soil data.
 
 function FarmSoilQualityCard({ farm }: { farm: any }) {
   const { data, isLoading, error } = useFarmSoilQuality({
@@ -101,7 +88,11 @@ export default function SoilAirQuality() {
   const debouncedSearch = useDebouncedValue(search, 300)
 
   const { data: farmsData, isLoading, isPlaceholderData } = useFarmManagementFarmList({
-    queryParams: { page, page_size: FARMS_PAGE_SIZE, query: debouncedSearch || undefined } as any,
+    // URLSearchParams stringifies `undefined` as the literal text "undefined",
+    // so an empty `query` key must be stripped out entirely rather than set
+    // to undefined - otherwise the backend searches for the literal string
+    // "undefined" and returns no farms.
+    queryParams: cleanJsonData({ page, page_size: FARMS_PAGE_SIZE, query: debouncedSearch }) as any,
     // Keep the previous page's farms on screen while the next page loads,
     // instead of unmounting every card (and re-firing every soil_quality
     // request) on each pagination/search change.
@@ -109,8 +100,6 @@ export default function SoilAirQuality() {
   } as any)
 
   const farms = (farmsData?.results || []) as any[]
-  const farmsWithBoundary = farms.filter((f) => f.boundary)
-  const farmsWithoutBoundary = farms.filter((f) => !f.boundary)
   const pagination = farmsData?.pagination
 
   const handleSearchChange = (value: string) => {
@@ -139,23 +128,9 @@ export default function SoilAirQuality() {
         </div>
       ) : (
         <>
-          {farmsWithoutBoundary.length > 0 && (
-            <Card className="p-4 shadow-none border border-[#FDE68A] bg-[#FFFBEB] mb-5">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[#D97706] shrink-0" />
-                <span className="text-sm text-[#92400E]">
-                  {farmsWithoutBoundary.length} farm{farmsWithoutBoundary.length !== 1 ? "s" : ""} without a boundary set won&apos;t show soil quality until one is added.
-                </span>
-              </div>
-            </Card>
-          )}
-
           <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 transition-opacity ${isPlaceholderData ? "opacity-60" : ""}`}>
-            {farmsWithBoundary.map((farm) => (
+            {farms.map((farm) => (
               <FarmSoilQualityCard key={farm.id} farm={farm} />
-            ))}
-            {farmsWithoutBoundary.map((farm) => (
-              <NoBoundaryCard key={farm.id} farm={farm} />
             ))}
           </div>
 
@@ -195,3 +170,20 @@ export default function SoilAirQuality() {
     </div>
   )
 }
+
+
+// curl -X PUT "http://13.140.140.177:8000/api/v1/farm-management/farm/9259" \
+//   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg4NDY0MDAwLCJpYXQiOjE3ODU4NzIwMDAsImp0aSI6ImI1YWE2MzFjNmQ2NzQwNWE5OGU1OTEzNGIxODE3NmEzIiwidXNlcl9pZCI6MTE2fQ.g7zZI89lIvQWmQhXF6E_ox9_ZXu_tFYRDZLg18JVIfA" \
+//   -H "Content-Type: application/json" \
+//   -d '{
+//     "boundary": {
+//       "type": "Polygon",
+//       "coordinates": [[
+//         [-2.6100, 7.4400],
+//         [-2.5900, 7.4400],
+//         [-2.5900, 7.4600],
+//         [-2.6100, 7.4600],
+//         [-2.6100, 7.4400]
+//       ]]
+//     }
+//   }'

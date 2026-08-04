@@ -92,7 +92,7 @@ export const FARM_MONITORING_TABS: ActionTabConfig[] = [
   { label: "Soil Health", href: routeTo.farmMonitoringSoilHealth },
   { label: "Satelite View", href: routeTo.farmMonitoringCropHealth },
   { label: "Geofencing", href: routeTo.farmMonitoringPestDisease },
-  { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
+  // { label: "Farm Alerts", href: routeTo.farmMonitoringFarmAlerts },
 ];
 
 
