@@ -3,10 +3,11 @@ import { useState } from "react"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CloudSun, Droplets, Cloud, Wind, MapPin, Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { CloudSun, Droplets, Cloud, Wind, Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents"
 import { useFarmWeather, kelvinToCelsius, mpsToKph } from "@/apis/useFarmWeather"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { cleanJsonData } from "@/lib/helpers"
 
 // Farms are fetched a page at a time (server-side search + pagination) rather
 // than all at once, because each card below fires its own weather request -
@@ -21,22 +22,10 @@ const MINI_STATS = [
   { key: "wind" as const, label: "Wind", icon: Wind, bg: "#D1FAE5", fg: "#059669" },
 ]
 
-function NoBoundaryCard({ farm }: { farm: any }) {
-  return (
-    <Card className="p-5 shadow-none border border-[#E2E8F0]">
-      <div className="flex items-center justify-between mb-1">
-        <p className="text-sm font-semibold text-black truncate pr-2">{farm.name}</p>
-      </div>
-      <p className="text-xs text-[#64748B] mb-4">{farm?.district?.name || farm?.district}</p>
-      <div className="flex items-start gap-2 bg-[#FFFBEB] rounded-lg p-3">
-        <MapPin className="h-4 w-4 text-[#D97706] shrink-0 mt-0.5" />
-        <p className="text-xs text-[#92400E]">
-          No boundary set for this farm yet. Edit the farm and mark its boundary on the map to start receiving weather data.
-        </p>
-      </div>
-    </Card>
-  )
-}
+// NOTE: weather is resolved purely off the farm id server-side (backend
+// confirmed - it does not require a boundary to be set), so every farm is
+// fetched here. Boundary is only relevant to the Geofencing/asset-tracking
+// feature, not to weather/soil data.
 
 function FarmWeatherCard({ farm }: { farm: any }) {
   const { data, isLoading, error } = useFarmWeather({
@@ -104,7 +93,11 @@ export default function Weather() {
   const debouncedSearch = useDebouncedValue(search, 300)
 
   const { data: farmsData, isLoading, isPlaceholderData } = useFarmManagementFarmList({
-    queryParams: { page, page_size: FARMS_PAGE_SIZE, query: debouncedSearch || undefined } as any,
+    // URLSearchParams stringifies `undefined` as the literal text "undefined",
+    // so an empty `query` key must be stripped out entirely rather than set
+    // to undefined - otherwise the backend searches for the literal string
+    // "undefined" and returns no farms.
+    queryParams: cleanJsonData({ page, page_size: FARMS_PAGE_SIZE, query: debouncedSearch }) as any,
     // Keep the previous page's farms on screen while the next page loads,
     // instead of unmounting every card (and re-firing every weather
     // request) on each pagination/search change.
@@ -112,8 +105,6 @@ export default function Weather() {
   } as any)
 
   const farms = (farmsData?.results || []) as any[]
-  const farmsWithBoundary = farms.filter((f) => f.boundary)
-  const farmsWithoutBoundary = farms.filter((f) => !f.boundary)
   const pagination = farmsData?.pagination
 
   const handleSearchChange = (value: string) => {
@@ -142,23 +133,9 @@ export default function Weather() {
         </div>
       ) : (
         <>
-          {farmsWithoutBoundary.length > 0 && (
-            <Card className="p-4 shadow-none border border-[#FDE68A] bg-[#FFFBEB] mb-5">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[#D97706] shrink-0" />
-                <span className="text-sm text-[#92400E]">
-                  {farmsWithoutBoundary.length} farm{farmsWithoutBoundary.length !== 1 ? "s" : ""} without a boundary set won&apos;t show weather until one is added.
-                </span>
-              </div>
-            </Card>
-          )}
-
           <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 transition-opacity ${isPlaceholderData ? "opacity-60" : ""}`}>
-            {farmsWithBoundary.map((farm) => (
+            {farms.map((farm) => (
               <FarmWeatherCard key={farm.id} farm={farm} />
-            ))}
-            {farmsWithoutBoundary.map((farm) => (
-              <NoBoundaryCard key={farm.id} farm={farm} />
             ))}
           </div>
 
