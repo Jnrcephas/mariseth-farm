@@ -53,6 +53,10 @@ export type FarmWeatherError =
   | { status: 400 | 404; payload: { boundary?: string[]; detail?: string } }
   | { status: "unknown"; payload: string };
 
+// The API returns raw OpenWeather-style units (Kelvin, m/s) - convert for display.
+export const kelvinToCelsius = (kelvin: number) => kelvin - 273.15;
+export const mpsToKph = (metersPerSecond: number) => metersPerSecond * 3.6;
+
 type FarmWeatherVariables = {
   pathParams: { farm_id: number | string };
 } & AdminApiContext["fetcherOptions"];
@@ -80,5 +84,3 @@ export const useFarmWeather = <TData = FarmWeatherResponse,>(
     ...options,
   });
 };
-
-
