@@ -46,6 +46,7 @@ export const APPROVALS_TABS: ActionTabConfig[] = [
   { label: "Credit Request", href: routeTo.creditRequestApprovals, permission: "credit|approve_deny_credit" },
   { label: "Warehouse Credit", href: routeTo.creditWarehouseApprovals, permission: "credit|list_credit_fulfill" },
   { label: "Farmer Registration Requests", href: routeTo.farmerRegistrationRequests, permission: "farmer|list_farmers" },
+  { label: "Harvest Requests", href: routeTo.harvestRequestApprovals, permission: "farmer|list_farmers" },
 ];
 
 export const USER_MANAGEMENT_TABS: ActionTabConfig[] = [

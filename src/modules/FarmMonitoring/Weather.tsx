@@ -2,14 +2,22 @@
 import { useState } from "react"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
-import { CloudSun, Droplets, CloudRain, Wind, AlertTriangle, MapPin, Loader2, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { CloudSun, Droplets, Cloud, Wind, MapPin, Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents"
-import { useFarmWeather } from "@/apis/useFarmWeather"
+import { useFarmWeather, kelvinToCelsius, mpsToKph } from "@/apis/useFarmWeather"
+import { useDebouncedValue } from "@/hooks/use-debounced-value"
+
+// Farms are fetched a page at a time (server-side search + pagination) rather
+// than all at once, because each card below fires its own weather request -
+// pulling in e.g. 100 farms client-side used to mean ~100 simultaneous
+// requests on page load. Keeping the page small keeps that bounded.
+const FARMS_PAGE_SIZE = 12
 
 const MINI_STATS = [
   { key: "temperature" as const, label: "Temp", icon: CloudSun, bg: "#FEF3C7", fg: "#D97706" },
   { key: "humidity" as const, label: "Humidity", icon: Droplets, bg: "#CFFAFE", fg: "#0891B2" },
-  { key: "rainfall" as const, label: "Rain (24h)", icon: CloudRain, bg: "#DBEAFE", fg: "#2563EB" },
+  { key: "clouds" as const, label: "Cloud Cover", icon: Cloud, bg: "#DBEAFE", fg: "#2563EB" },
   { key: "wind" as const, label: "Wind", icon: Wind, bg: "#D1FAE5", fg: "#059669" },
 ]
 
@@ -53,19 +61,18 @@ function FarmWeatherCard({ farm }: { farm: any }) {
     )
   }
 
-  const severeAlert = data.alerts?.[0]
+  const condition = data.weather?.[0]
   const stats = {
-    temperature: `${Math.round(data.current.temperature_c)}°C`,
-    humidity: `${data.current.humidity}%`,
-    rainfall: `${data.current.rainfall_mm}mm`,
-    wind: `${Math.round(data.current.wind_kph)} km/h`,
+    temperature: `${Math.round(kelvinToCelsius(data.temp))}°C`,
+    humidity: `${Math.round(data.humidity)}%`,
+    clouds: `${Math.round(data.clouds)}%`,
+    wind: `${Math.round(mpsToKph(data.wind_speed))} km/h`,
   }
 
   return (
     <Card className="p-5 shadow-none border border-[#E2E8F0]">
       <div className="flex items-center justify-between mb-1">
         <p className="text-sm font-semibold text-black truncate pr-2">{farm.name}</p>
-        {severeAlert && <span className="h-2 w-2 rounded-full bg-[#DC2626] shrink-0" />}
       </div>
       <p className="text-xs text-[#64748B] mb-4">{farm?.district?.name || farm?.district}</p>
       <div className="grid grid-cols-2 gap-3">
@@ -81,10 +88,10 @@ function FarmWeatherCard({ farm }: { farm: any }) {
           </div>
         ))}
       </div>
-      {severeAlert && (
-        <div className="mt-3 flex items-center gap-2 bg-[#FEF2F2] rounded-lg px-3 py-2">
-          <AlertTriangle className="h-3.5 w-3.5 text-[#DC2626] shrink-0" />
-          <span className="text-xs text-[#7F1D1D]">{severeAlert.headline}</span>
+      {condition && (
+        <div className="mt-3 flex items-center gap-2 bg-[#F8FAFC] rounded-lg px-3 py-2">
+          <CloudSun className="h-3.5 w-3.5 text-[#64748B] shrink-0" />
+          <span className="text-xs text-[#334155] capitalize">{condition.description}</span>
         </div>
       )}
     </Card>
@@ -93,15 +100,26 @@ function FarmWeatherCard({ farm }: { farm: any }) {
 
 export default function Weather() {
   const [search, setSearch] = useState("")
-  const { data: farmsData, isLoading } = useFarmManagementFarmList({
-    queryParams: { page: 1, page_size: 100 } as any,
-  })
+  const [page, setPage] = useState(1)
+  const debouncedSearch = useDebouncedValue(search, 300)
+
+  const { data: farmsData, isLoading, isPlaceholderData } = useFarmManagementFarmList({
+    queryParams: { page, page_size: FARMS_PAGE_SIZE, query: debouncedSearch || undefined } as any,
+    // Keep the previous page's farms on screen while the next page loads,
+    // instead of unmounting every card (and re-firing every weather
+    // request) on each pagination/search change.
+    placeholderData: (prev: any) => prev,
+  } as any)
+
   const farms = (farmsData?.results || []) as any[]
-  const filteredFarms = farms.filter((f) =>
-    String(f?.name || "").toLowerCase().includes(search.toLowerCase())
-  )
-  const farmsWithBoundary = filteredFarms.filter((f) => f.boundary)
-  const farmsWithoutBoundary = filteredFarms.filter((f) => !f.boundary)
+  const farmsWithBoundary = farms.filter((f) => f.boundary)
+  const farmsWithoutBoundary = farms.filter((f) => !f.boundary)
+  const pagination = farmsData?.pagination
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    setPage(1)
+  }
 
   return (
     <div>
@@ -112,7 +130,7 @@ export default function Weather() {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Search farms..."
           className="w-full text-sm border border-[#E2E8F0] rounded-sm pl-9 pr-3 py-2.5 outline-none focus:border-[#4A8D34]"
         />
@@ -135,7 +153,7 @@ export default function Weather() {
             </Card>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 transition-opacity ${isPlaceholderData ? "opacity-60" : ""}`}>
             {farmsWithBoundary.map((farm) => (
               <FarmWeatherCard key={farm.id} farm={farm} />
             ))}
@@ -145,14 +163,38 @@ export default function Weather() {
           </div>
 
           {farms.length === 0 && (
-            <p className="text-sm text-[#64748B] text-center py-16">No farms found.</p>
+            <p className="text-sm text-[#64748B] text-center py-16">
+              {search ? "No farms match your search." : "No farms found."}
+            </p>
           )}
-          {farms.length > 0 && filteredFarms.length === 0 && (
-            <p className="text-sm text-[#64748B] text-center py-16">No farms match your search.</p>
+
+          {farms.length > 0 && (
+            <div className="flex items-center justify-between mt-6">
+              <p className="text-xs text-[#64748B]">
+                Page {pagination?.page || page} of {pagination?.pages || 1} · {pagination?.total ?? farms.length} farms
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  className="border"
+                  disabled={!pagination?.has_previous || isPlaceholderData}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  <ChevronLeft className="h-4 w-4" /> Previous
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="border"
+                  disabled={!pagination?.has_next || isPlaceholderData}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           )}
         </>
       )}
     </div>
   )
 }
-
