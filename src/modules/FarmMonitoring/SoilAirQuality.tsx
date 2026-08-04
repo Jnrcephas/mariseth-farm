@@ -2,17 +2,43 @@
 import { useState } from "react"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
-import { Droplet, Thermometer, Loader2, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Droplet, Thermometer, Loader2, Search, MapPin, ChevronLeft, ChevronRight } from "lucide-react"
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents"
 import { useFarmSoilQuality } from "@/apis/useFarmSoilQuality"
 import { kelvinToCelsius } from "@/apis/useFarmWeather"
 import { formatDateReadable } from "@/lib/helpers"
+import { useDebouncedValue } from "@/hooks/use-debounced-value"
+
+// Farms are fetched a page at a time (server-side search + pagination) rather
+// than all at once, because each card below fires its own soil_quality
+// request - pulling in e.g. 100 farms client-side used to mean ~100
+// simultaneous requests on page load, the vast majority 404ing for farms
+// with no boundary/reading yet. Keeping the page small keeps that bounded.
+const FARMS_PAGE_SIZE = 12
 
 const MINI_STATS = [
   { key: "moisture" as const, label: "Soil Moisture", icon: Droplet, bg: "#CFFAFE", fg: "#0891B2" },
   { key: "topsoil" as const, label: "Topsoil Temp", icon: Thermometer, bg: "#FEF3C7", fg: "#D97706" },
   { key: "subsoil" as const, label: "Subsoil Temp (10cm)", icon: Thermometer, bg: "#FEE2E2", fg: "#DC2626" },
 ]
+
+function NoBoundaryCard({ farm }: { farm: any }) {
+  return (
+    <Card className="p-5 shadow-none border border-[#E2E8F0]">
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-sm font-semibold text-black truncate pr-2">{farm.name}</p>
+      </div>
+      <p className="text-xs text-[#64748B] mb-4">{farm?.district?.name || farm?.district}</p>
+      <div className="flex items-start gap-2 bg-[#FFFBEB] rounded-lg p-3">
+        <MapPin className="h-4 w-4 text-[#D97706] shrink-0 mt-0.5" />
+        <p className="text-xs text-[#92400E]">
+          No boundary set for this farm yet. Edit the farm and mark its boundary on the map to start receiving soil quality data.
+        </p>
+      </div>
+    </Card>
+  )
+}
 
 function FarmSoilQualityCard({ farm }: { farm: any }) {
   const { data, isLoading, error } = useFarmSoilQuality({
@@ -71,13 +97,26 @@ function FarmSoilQualityCard({ farm }: { farm: any }) {
 
 export default function SoilAirQuality() {
   const [search, setSearch] = useState("")
-  const { data: farmsData, isLoading } = useFarmManagementFarmList({
-    queryParams: { page: 1, page_size: 100 } as any,
-  })
+  const [page, setPage] = useState(1)
+  const debouncedSearch = useDebouncedValue(search, 300)
+
+  const { data: farmsData, isLoading, isPlaceholderData } = useFarmManagementFarmList({
+    queryParams: { page, page_size: FARMS_PAGE_SIZE, query: debouncedSearch || undefined } as any,
+    // Keep the previous page's farms on screen while the next page loads,
+    // instead of unmounting every card (and re-firing every soil_quality
+    // request) on each pagination/search change.
+    placeholderData: (prev: any) => prev,
+  } as any)
+
   const farms = (farmsData?.results || []) as any[]
-  const filteredFarms = farms.filter((f) =>
-    String(f?.name || "").toLowerCase().includes(search.toLowerCase())
-  )
+  const farmsWithBoundary = farms.filter((f) => f.boundary)
+  const farmsWithoutBoundary = farms.filter((f) => !f.boundary)
+  const pagination = farmsData?.pagination
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    setPage(1)
+  }
 
   return (
     <div>
@@ -88,7 +127,7 @@ export default function SoilAirQuality() {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Search farms..."
           className="w-full text-sm border border-[#E2E8F0] rounded-sm pl-9 pr-3 py-2.5 outline-none focus:border-[#4A8D34]"
         />
@@ -100,17 +139,56 @@ export default function SoilAirQuality() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredFarms.map((farm) => (
+          {farmsWithoutBoundary.length > 0 && (
+            <Card className="p-4 shadow-none border border-[#FDE68A] bg-[#FFFBEB] mb-5">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-[#D97706] shrink-0" />
+                <span className="text-sm text-[#92400E]">
+                  {farmsWithoutBoundary.length} farm{farmsWithoutBoundary.length !== 1 ? "s" : ""} without a boundary set won&apos;t show soil quality until one is added.
+                </span>
+              </div>
+            </Card>
+          )}
+
+          <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 transition-opacity ${isPlaceholderData ? "opacity-60" : ""}`}>
+            {farmsWithBoundary.map((farm) => (
               <FarmSoilQualityCard key={farm.id} farm={farm} />
+            ))}
+            {farmsWithoutBoundary.map((farm) => (
+              <NoBoundaryCard key={farm.id} farm={farm} />
             ))}
           </div>
 
           {farms.length === 0 && (
-            <p className="text-sm text-[#64748B] text-center py-16">No farms found.</p>
+            <p className="text-sm text-[#64748B] text-center py-16">
+              {search ? "No farms match your search." : "No farms found."}
+            </p>
           )}
-          {farms.length > 0 && filteredFarms.length === 0 && (
-            <p className="text-sm text-[#64748B] text-center py-16">No farms match your search.</p>
+
+          {farms.length > 0 && (
+            <div className="flex items-center justify-between mt-6">
+              <p className="text-xs text-[#64748B]">
+                Page {pagination?.page || page} of {pagination?.pages || 1} · {pagination?.total ?? farms.length} farms
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  className="border"
+                  disabled={!pagination?.has_previous || isPlaceholderData}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  <ChevronLeft className="h-4 w-4" /> Previous
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="border"
+                  disabled={!pagination?.has_next || isPlaceholderData}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           )}
         </>
       )}
