@@ -262,7 +262,7 @@ export default function GeoFencingManager() {
   return (
     <div>
       <PageTitle title="Geo-Fencing Manager" />
-      <PlaceholderNotice text="Boundaries you draw here are saved to the farm's real record and will show up on the Weather Dashboard. Asset tracking (the dots on the map) is still illustrative - no live GPS/IoT feed is connected yet." />
+      {/* <PlaceholderNotice text="Boundaries you draw here are saved to the farm's real record and will show up on the Weather Dashboard. Asset tracking (the dots on the map) is still illustrative - no live GPS/IoT feed is connected yet." /> */}
 
       <div className="flex flex-col lg:flex-row gap-5">
         {/* Left: farm / fence list */}
@@ -281,7 +281,10 @@ export default function GeoFencingManager() {
           <div className="flex flex-col gap-3 max-h-[640px] overflow-y-auto pr-1">
             {filteredFarms.map((farm) => {
               const isSelected = farm.id === selectedFarmId
-              const hasBoundary = !!farm.boundary
+              // farm.boundary can be `{}` (truthy but empty) for farms that
+              // don't actually have a polygon set yet, so `!!farm.boundary`
+              // alone isn't enough - check it actually has coordinates.
+              const hasBoundary = !!farm.boundary?.coordinates?.[0]?.length
               const assetCount = getPlaceholderAssetCount(farm.id ?? 0)
               return (
                 <Card
