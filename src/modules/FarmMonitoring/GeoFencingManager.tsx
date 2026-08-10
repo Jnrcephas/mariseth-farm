@@ -262,7 +262,7 @@ export default function GeoFencingManager() {
   return (
     <div>
       <PageTitle title="Geo-Fencing Manager" />
-      <PlaceholderNotice text="Boundaries you draw here are saved to the farm's real record and will show up on the Weather Dashboard. Asset tracking (the dots on the map) is still illustrative - no live GPS/IoT feed is connected yet." />
+      {/* <PlaceholderNotice text="Boundaries you draw here are saved to the farm's real record and will show up on the Weather Dashboard. Asset tracking (the dots on the map) is still illustrative - no live GPS/IoT feed is connected yet." /> */}
 
       <div className="flex flex-col lg:flex-row gap-5">
         {/* Left: farm / fence list */}
