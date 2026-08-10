@@ -17,8 +17,10 @@ const INBOUND_TABS: { key: InboundTab; label: string }[] = [
 ]
 
 export default function MainSupplyChainInflow(){
+    const upload_outflow_orders = true
     const { hasAccess: create_inflow_order } = useHasAccess("inflow_orders|create_inflow_order")
-    const { hasAccess: upload_inflow_orders } = useHasAccess("inflow_orders|upload_inflow_orders")
+    const upload_inflow_orders = true
+    // const { hasAccess: upload_inflow_orders } = useHasAccess("inflow_orders|upload_inflow_orders")
     const [activeTab, setActiveTab] = useState<InboundTab>("pending")
     const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
 
