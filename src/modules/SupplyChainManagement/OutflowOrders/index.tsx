@@ -1,12 +1,13 @@
 "use client"
 import { useState } from "react"
-import { CirclePlus } from "lucide-react"
+import { CirclePlus, UploadCloud } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { routeTo } from "@/lib/constants"
 import { useHasAccess } from "@/hooks/auth/useHasAccess"
 import { cn } from "@/lib/utils"
 import SupplyChainOutflowOrders from "./SupplyChainOutflowOrders"
+import BulkUploadModal from "../BulkUploadModal"
 
 type OutboundTab = "pending" | "completed"
 
@@ -17,7 +18,9 @@ const OUTBOUND_TABS: { key: OutboundTab; label: string }[] = [
 
 export default function MainSupplyChainOutflow(){
     const { hasAccess: create_outflow_order } = useHasAccess("outflow_orders|create_outflow_order")
+    const { hasAccess: upload_outflow_orders } = useHasAccess("outflow_orders|upload_outflow_orders")
     const [activeTab, setActiveTab] = useState<OutboundTab>("pending")
+    const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
 
     return(
         <div className="mt-10">
@@ -42,17 +45,33 @@ export default function MainSupplyChainOutflow(){
                     ))}
                 </div>
 
-                {create_outflow_order && (
-                    <Link href={routeTo.outflowOrdersAdd}>
-                        <Button className="bg-[#4A8D34] hover:bg-[#3f7a2c] text-white cursor-pointer rounded-sm px-6 py-4 text-base font-bold">
-                            <CirclePlus />
-                            Add New Outbound Order
+                <div className="flex items-center gap-3">
+                    {upload_outflow_orders && (
+                        <Button
+                            variant="outline"
+                            className="border-[#4A8D34] text-[#4A8D34] cursor-pointer rounded-sm px-6 py-4 text-base font-bold"
+                            onClick={() => setBulkUploadOpen(true)}
+                        >
+                            <UploadCloud />
+                            Bulk Upload
                         </Button>
-                    </Link>
-                )}
+                    )}
+                    {create_outflow_order && (
+                        <Link href={routeTo.outflowOrdersAdd}>
+                            <Button className="bg-[#4A8D34] hover:bg-[#3f7a2c] text-white cursor-pointer rounded-sm px-6 py-4 text-base font-bold">
+                                <CirclePlus />
+                                Add New Outbound Order
+                            </Button>
+                        </Link>
+                    )}
+                </div>
             </div>
 
             <SupplyChainOutflowOrders completed={activeTab === "completed"}/>
+
+            {upload_outflow_orders && (
+                <BulkUploadModal open={bulkUploadOpen} setOpen={setBulkUploadOpen} type="outflow" />
+            )}
         </div>
     )
 }
