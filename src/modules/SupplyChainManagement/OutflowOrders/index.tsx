@@ -18,7 +18,8 @@ const OUTBOUND_TABS: { key: OutboundTab; label: string }[] = [
 
 export default function MainSupplyChainOutflow(){
     const { hasAccess: create_outflow_order } = useHasAccess("outflow_orders|create_outflow_order")
-    const { hasAccess: upload_outflow_orders } = useHasAccess("outflow_orders|upload_outflow_orders")
+    // const { hasAccess: upload_outflow_orders } = useHasAccess("outflow_orders|upload_outflow_orders")
+    const upload_outflow_orders = true
     const [activeTab, setActiveTab] = useState<OutboundTab>("pending")
     const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
 
