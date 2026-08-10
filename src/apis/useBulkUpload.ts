@@ -69,8 +69,8 @@ const uploadInflowBulk = (variables: BulkUploadVariables, signal?: AbortSignal) 
     {
       url: "/inflow/bulk-upload",
       method: "post",
-      headers: { "Content-Type": "multipart/form-data" },
       ...variables,
+      headers: { ...variables.headers, "Content-Type": "multipart/form-data" },
       signal,
     }
   );
@@ -80,8 +80,8 @@ const uploadOutflowBulk = (variables: BulkUploadVariables, signal?: AbortSignal)
     {
       url: "/outflow/bulk-upload",
       method: "post",
-      headers: { "Content-Type": "multipart/form-data" },
       ...variables,
+      headers: { ...variables.headers, "Content-Type": "multipart/form-data" },
       signal,
     }
   );
