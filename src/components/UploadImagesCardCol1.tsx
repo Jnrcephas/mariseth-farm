@@ -26,7 +26,7 @@ export default function UploadImagesCardCol1({handleImageSelect, id, title}:{han
   useEffect(()=>{
     const images = uploadedImages?.map((item) => item?.base64)
     handleImageSelect(id, images)
-  },[uploadedImages])
+  },[uploadedImages, handleImageSelect, id])
 
 
   const convertToBase64 = (file: File): Promise<string> => {
@@ -55,7 +55,7 @@ export default function UploadImagesCardCol1({handleImageSelect, id, title}:{han
     return true
   }
 
-  const processFiles = async (files: FileList) => {
+  const processFiles = useCallback(async (files: FileList) => {
     setIsUploading(true)
     const validFiles = Array.from(files).filter(validateFile)
 
@@ -73,8 +73,6 @@ export default function UploadImagesCardCol1({handleImageSelect, id, title}:{han
           preview,
         })
 
-        
-        
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error)
         alert(`Error processing file: ${file.name}`)
@@ -83,7 +81,7 @@ export default function UploadImagesCardCol1({handleImageSelect, id, title}:{han
 
     setUploadedImages((prev: any) => [...prev, ...newImages])
     setIsUploading(false)
-  }
+  }, [])
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -93,7 +91,7 @@ export default function UploadImagesCardCol1({handleImageSelect, id, title}:{han
     if (files.length > 0) {
       processFiles(files)
     }
-  }, [])
+  }, [processFiles])
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()

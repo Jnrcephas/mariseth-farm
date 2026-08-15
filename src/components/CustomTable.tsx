@@ -195,7 +195,8 @@ function CustomTable({
 				setInternalRowSelection(validSelection);
 			}
 		}
-	}, [data, enableRowSelection]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [data, enableRowSelection, onRowSelectionChange, rowSelection, selectedRows]);
 
 	// Handle row selection changes with validation
 	const handleRowSelectionChange = (updaterOrValue: any) => {
@@ -327,9 +328,10 @@ function CustomTable({
 	};
 
 	// Get pagination range with ellipsis
+	const pageCount = table.getPageCount();
 	const paginationRange = useMemo(() => {
-		return getPaginationRange(currentPage, table.getPageCount());
-	}, [currentPage, table.getPageCount()]);
+		return getPaginationRange(currentPage, pageCount);
+	}, [currentPage, pageCount]);
 
 	return (
 		<div className="flex flex-col gap-5">

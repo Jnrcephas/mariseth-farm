@@ -34,7 +34,7 @@ export default function RecordPaymentModal({open, setOpen, defaultData, refetch}
         if(payment_type === "full"){
             form.setValue("amount_paid", defaultData?.amount_due || 0);
         }
-    }, [payment_type]);
+    }, [payment_type, defaultData?.amount_due, form]);
 
     const {mutate, isPending} = useOutflowRecordPayment({
         onSuccess: () =>{

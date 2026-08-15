@@ -7,7 +7,7 @@ import {
 import { useWebSocketMethods } from "@/contexts/WebsocketContext"
 import { Bell, DownloadCloud, Trash2 } from "lucide-react"
 import { IWssResponseProps } from "./utils/types"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useUserStore } from "@/app/providers/user-store-provider"
 import moment from "moment"
 import { downloadCSV, formatText } from "@/lib/helpers"
@@ -23,27 +23,9 @@ export default function Notifications(){
 
     useEffect(() =>{
         if(notifications.length > 0) setNewNotifications(notifications)
-    },[readyState])
+    },[readyState, notifications])
 
-    useEffect(() =>{
-        getNotification(message)
-    },[message])
-
-    function handleDeleteNoti(idx: number){
-        const updatedNotis = notifications.filter(item => item.id != idx);
-        setNewNotifications(updatedNotis)
-        setUserNotifications(updatedNotis)
-    }
-
-    function handleClearAllNotifications(){
-        setUserNotifications([])
-        setNewNotifications([])
-        setOpenNotification(false)
-        
-    }
-
-    function getNotification(response:IWssResponseProps){
-       
+    const getNotification = useCallback((response: IWssResponseProps) => {
         if(response?.message_type === "export_notification"){
             if(response?.message?.results){
                 const notiNo = newNotifications.length + 1
@@ -59,6 +41,23 @@ export default function Notifications(){
                 setOpenNotification(true)
             }
         }
+    }, [newNotifications, notifications, setUserNotifications])
+
+    useEffect(() =>{
+        getNotification(message)
+    },[message, getNotification])
+
+    function handleDeleteNoti(idx: number){
+        const updatedNotis = notifications.filter(item => item.id != idx);
+        setNewNotifications(updatedNotis)
+        setUserNotifications(updatedNotis)
+    }
+
+    function handleClearAllNotifications(){
+        setUserNotifications([])
+        setNewNotifications([])
+        setOpenNotification(false)
+        
     }
 
     const  getNofiMenu = ({notiType, data, export_type, dateTime}:{
@@ -124,22 +123,6 @@ export default function Notifications(){
                             No messages available
                         </div>
                     }
-                    
-                    {/* <div className="flex items-start gap-2 flex-1 border-b border-default-50 ">
-                        <div className="flex-1 flex flex-col gap-0.5 mb-2">
-                            <div className="text-sm  text-gray-500  dark:group-hover:text-default-800  font-normal   truncate">
-                            Your farms export is ready
-                            </div>
-                            <div className="justify-between flex items-center gap-2">
-                            <div className="flex hover:text-blue-500 hover:underline gap-1 items-center cursor-pointer text-xs text-default-600  dark:group-hover:text-default-700 font-normal line-clamp-1  ">
-                                <DownloadCloud size={15}/> Click to download
-                            </div>
-                            <div className=" text-default-400 dark:group-hover:text-default-500  text-xs"> 
-                                2 days ago
-                            </div>
-                            </div>
-                        </div>
-                    </div> */}
                 </div>
                 
               </div>

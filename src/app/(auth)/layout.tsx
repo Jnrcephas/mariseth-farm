@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getAuthSession } from "@/lib/auth";
 import { routeTo } from "@/lib/constants";
 import { redirect } from "next/navigation";
