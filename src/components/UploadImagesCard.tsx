@@ -16,7 +16,6 @@ export interface UploadedImage {
 }
 
 export default function UploadImagesCard({uploadedImages, setUploadedImages}:{uploadedImages: UploadedImage[]; setUploadedImages: (image: any)=> void}) {
-//   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -47,7 +46,7 @@ export default function UploadImagesCard({uploadedImages, setUploadedImages}:{up
     return true
   }
 
-  const processFiles = async (files: FileList) => {
+  const processFiles = useCallback(async (files: FileList) => {
     setIsUploading(true)
     const validFiles = Array.from(files).filter(validateFile)
 
@@ -72,7 +71,7 @@ export default function UploadImagesCard({uploadedImages, setUploadedImages}:{up
 
     setUploadedImages((prev: any) => [...prev, ...newImages])
     setIsUploading(false)
-  }
+  }, [setUploadedImages])
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -82,7 +81,7 @@ export default function UploadImagesCard({uploadedImages, setUploadedImages}:{up
     if (files.length > 0) {
       processFiles(files)
     }
-  }, [])
+  }, [processFiles])
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()

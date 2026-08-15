@@ -46,7 +46,7 @@ export default function UploadDocsCard({uploadedImages, setUploadedImages, multi
     return true
   }
 
-  const processFiles = async (files: FileList) => {
+  const processFiles = useCallback(async (files: FileList) => {
     setIsUploading(true)
     const validFiles = Array.from(files).filter(validateFile)
 
@@ -74,7 +74,7 @@ export default function UploadDocsCard({uploadedImages, setUploadedImages, multi
       setUploadedImages(() => newImages)
     }
     setIsUploading(false)
-  }
+  }, [multi, setUploadedImages])
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -84,7 +84,7 @@ export default function UploadDocsCard({uploadedImages, setUploadedImages, multi
     if (files.length > 0) {
       processFiles(files)
     }
-  }, [])
+  }, [processFiles])
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()

@@ -2,7 +2,6 @@
 import Categories from "./Categories"
 import { CategoryTypes } from "./utils/constants"
 import { capitalize } from "@/lib/helpers"
-import PageTitle from "@/components/layouts/PageTitle"
 import { useState } from "react"
 import { Tags } from "lucide-react"
 
