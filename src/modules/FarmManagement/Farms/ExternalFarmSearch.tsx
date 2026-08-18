@@ -17,20 +17,20 @@ import { Download, Search } from "lucide-react";
 import { landOwnershipTypes } from "../utils/constants";
 import { toast } from "sonner";
 
-export default function ExternalFarmSearch({setFilters, filters, isLoading}:TSearchProps){
+export default function ExternalFarmSearch({ setFilters, filters, isLoading }: TSearchProps) {
 
     const form = useForm<z.infer<typeof searchFarmSchema>>({
         resolver: zodResolver(searchFarmSchema),
         defaultValues: {}
     });
 
-    const {data:_regionsData} = useRegionsList({})
+    const { data: _regionsData } = useRegionsList({})
     const _regions = _regionsData as any
     const regions = _regions?.results as Region[] || []
-        
-    const {districts} = useGetRegionDistricts(regions, Number(form.watch("region")))
 
-    const {data: _productsData} = useFarmManagementProductList({queryParams:{type: "crop", page: 1, page_size: 50}})
+    const { districts } = useGetRegionDistricts(regions, Number(form.watch("region")))
+
+    const { data: _productsData } = useFarmManagementProductList({ queryParams: { type: "crop", page: 1, page_size: 50 } })
     const crops = _productsData?.results || []
 
     function onSubmit(values: z.infer<typeof searchFarmSchema>) {
@@ -38,11 +38,11 @@ export default function ExternalFarmSearch({setFilters, filters, isLoading}:TSea
         setFilters((prev: any) => ({ ...prev, ...queryParams, export: false }))
     }
 
-    function handleRest(){
+    function handleRest() {
         form.reset({
             query: "",
             crop_type: "",
-            land_ownership: "",            
+            land_ownership: "",
             region: "",
             district: "",
         })
@@ -51,9 +51,9 @@ export default function ExternalFarmSearch({setFilters, filters, isLoading}:TSea
         })
     }
 
-    function handleExport(){
+    function handleExport() {
         setFilters((prev: any) => ({ ...prev, export: true }))
-        toast.info("Exporting data, you will be notified once the export is ready.",{position: "top-center"})
+        toast.info("Exporting data, you will be notified once the export is ready.", { position: "top-center" })
         debounce(() => setFilters((prev: any) => ({ ...prev, export: false })), 1000)()
     }
 
@@ -61,51 +61,51 @@ export default function ExternalFarmSearch({setFilters, filters, isLoading}:TSea
         <div className="px-5 pt-5 py-2">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 border rounded-xl p-5">
-                     <div className="grid grid-cols-1">
-                            <FormField
-                                control={form.control}
-                                name="query"
-                                render={({ field }) => (
+                    <div className="grid grid-cols-1">
+                        <FormField
+                            control={form.control}
+                            name="query"
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
                                         <div className="relative">
-                                            <Search className="absolute mt-2 mx-2 text-[#4A8D34]"/>
+                                            <Search className="absolute mt-2 mx-2 text-[#4A8D34]" />
                                             <Input className="px-10" placeholder="Search with farm name or ID" {...field} />
                                         </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                                )}
-                            />
-                        </div>
+                            )}
+                        />
+                    </div>
                     <div className="grid grid-cols-12 gap-3">
-                       
+
                         <div className="col-span-2">
                             <FormField
                                 control={form.control}
                                 name="crop_type"
                                 render={({ field }) => (
-                                <FormItem className="relative">
-                                    <FormLabel className="text-green-700">Crop Type </FormLabel>
-                                    <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    >
-                                    <FormControl>
-                                        <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {crops?.map((item, idx) => (
-                                            <SelectItem key={idx} value={String(item.id)}>
-                                                {item.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
+                                    <FormItem className="relative">
+                                        <FormLabel className="text-green-700">Crop Type </FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {crops?.map((item, idx) => (
+                                                    <SelectItem key={idx} value={String(item.id)}>
+                                                        {item.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
                             />
 
@@ -115,57 +115,57 @@ export default function ExternalFarmSearch({setFilters, filters, isLoading}:TSea
                                 control={form.control}
                                 name="land_ownership"
                                 render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-green-700">Land Ownership</FormLabel>
-                                    <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    >
-                                    <FormControl>
-                                        <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {landOwnershipTypes?.map((item, idx) => (
-                                            <SelectItem key={idx} className="capitalize" value={item}>
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
+                                    <FormItem>
+                                        <FormLabel className="text-green-700">Land Ownership</FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {landOwnershipTypes?.map((item, idx) => (
+                                                    <SelectItem key={idx} className="capitalize" value={item}>
+                                                        {item}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
                             />
                         </div>
-                        
+
                         <div className="col-span-2">
                             <FormField
                                 control={form.control}
                                 name="region"
                                 render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-green-700">Region </FormLabel>
-                                    <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    >
-                                    <FormControl>
-                                        <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {regions?.map((item, idx) => (
-                                            <SelectItem key={idx} value={String(item.id)}>
-                                                {item.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
+                                    <FormItem>
+                                        <FormLabel className="text-green-700">Region </FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {regions?.map((item, idx) => (
+                                                    <SelectItem key={idx} value={String(item.id)}>
+                                                        {item.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
                             />
                         </div>
@@ -174,50 +174,64 @@ export default function ExternalFarmSearch({setFilters, filters, isLoading}:TSea
                                 control={form.control}
                                 name="district"
                                 render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-green-700">District</FormLabel>
-                                    <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    >
-                                    <FormControl>
-                                        <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {districts?.map((item, idx) => (
-                                            <SelectItem key={idx} value={String(item.id)}>
-                                                {item.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
+                                    <FormItem>
+                                        <FormLabel className="text-green-700">District</FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {districts?.map((item, idx) => (
+                                                    <SelectItem key={idx} value={String(item.id)}>
+                                                        {item.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
                             />
                         </div>
-                        <div className="col-span-2"/>
-                        <div className="col-span-2 mt-5">
-                            <div className="flex justify-end gap-2">
-                                <Button type="button" className="border" variant="ghost" onClick={() => handleRest()}>
+                        <div className="col-span-2" />
+                        <div className="col-span-4 mt-5">
+                            <div className="flex justify-end gap-2 whitespace-nowrap">
+                                <Button
+                                    type="button"
+                                    className="border"
+                                    variant="ghost"
+                                    onClick={handleRest}
+                                >
                                     Reset
                                 </Button>
-                                <Button type="button" className="border border-green-700 text-green-700" variant="outline" onClick={() => handleExport()}>
+
+                                <Button
+                                    type="button"
+                                    className="border border-green-700 text-green-700"
+                                    variant="outline"
+                                    onClick={handleExport}
+                                >
                                     <LoadingLabel isLoading={isLoading && Boolean(filters?.export)}>
-                                        <Download className="me-1"/>Download Report
+                                        <Download className="me-1" />
+                                        Download Report
                                     </LoadingLabel>
                                 </Button>
+
                                 <Button type="submit">
                                     <LoadingLabel isLoading={isLoading && !Boolean(filters?.export)}>
-                                        <Search className="me-1"/> Search
+                                        <Search className="me-1" />
+                                        Search
                                     </LoadingLabel>
                                 </Button>
                             </div>
                         </div>
                     </div>
-                    
+
                 </form>
             </Form>
         </div>

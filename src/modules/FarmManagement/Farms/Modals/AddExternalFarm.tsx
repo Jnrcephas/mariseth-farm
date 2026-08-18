@@ -140,7 +140,7 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
             farming_methods: [values?.farming_methods],
             irrigation: values?.irrigation === "yes" ? true : false,
             has_access_to_market: values?.has_access_to_market === "yes" ? true : false,
-            boundary: boundary
+            ...(boundary ? { boundary } : {})
         } as any
 
         if(isEdit){
@@ -211,7 +211,7 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
                                     name="location"
                                     render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Farm Location(GPS Coordinates if available) <div className='text-red-500'>*</div></FormLabel>
+                                        <FormLabel>Farm Location(GPS Coordinates if available) </FormLabel>
                                         <FormControl>
                                         <Input placeholder="Enter First Location" {...field} />
                                         </FormControl>
