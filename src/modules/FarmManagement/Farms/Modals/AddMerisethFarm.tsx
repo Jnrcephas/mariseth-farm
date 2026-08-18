@@ -1,7 +1,5 @@
-import {
-    DialogPoweredByFooter,
-  } from "@/components/ui/dialog"
-import { TAddFarmModal} from "../../utils/types";
+
+import { TAddFarmModal } from "../../utils/types";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -10,23 +8,28 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-  } from '@/components/ui/form';
-  import { Input } from '@/components/ui/input';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
-  import {
+import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-  } from '@/components/ui/select';
+} from '@/components/ui/select';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { internalFarmSchema } from "../../utils/validations";
 import { Label, LoadingLabel } from "@/components/ui/label";
 import { Loader, XCircle } from "lucide-react";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import {
+    Dialog,
+    DialogContent,
+    DialogPoweredByFooter,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import { useCustomTypeList, useFarmManagementFarmCreate, useFarmManagementFarmUpdate, useFarmManagementProductList, useRegionsList } from "@/apis/adminApiComponents";
 import { Region } from "@/apis/adminApiSchemas";
 import useGetRegionDistricts from "../../utils/hooks";
@@ -45,7 +48,7 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
 
 
 
-  export default function AddMerisethFarmModal({open, setOpen, defaultData, isEdit, refetch}:TAddFarmModal){
+export default function AddMerisethFarmModal({ open, setOpen, defaultData, isEdit, refetch }: TAddFarmModal) {
 
     const modalTitle = isEdit ? "Edit Meriseth Farm" : "Register New Meriseth Farm";
     const submitTitle = isEdit ? "Update Farm" : "Register Farm";
@@ -55,74 +58,72 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
 
     const form = useForm<z.infer<typeof internalFarmSchema>>({
         resolver: zodResolver(internalFarmSchema),
-        defaultValues: {...defaultData, 
-            crops: defaultCrops, 
+        defaultValues: {
+            ...defaultData,
+            crops: defaultCrops,
             livestock: defaultLivestock,
             region: String(defaultData?.region?.id),
             district: String(defaultData?.district?.id),
             size: String(defaultData?.size),
-            size_metric: String(defaultData?.size_metric?.id)}
+            size_metric: String(defaultData?.size_metric?.id)
+        }
     });
 
-    const {data:_customTypesData, isLoading: isLoadingTypes} = useCustomTypeList({queryParams:{page: 1, page_size: 50}})
+    const { data: _customTypesData, isLoading: isLoadingTypes } = useCustomTypeList({ queryParams: { page: 1, page_size: 50 } })
     const customTypes = _customTypesData?.results || []
 
     const size_metrics = customTypes?.filter((item) => item?.category_name === "size_metric")
     const farm_types = customTypes?.filter((item) => item?.category_name === "farm_types")
 
-    const {data: _productsData} = useFarmManagementProductList({queryParams:{type: "crop", page: 1, page_size: 50}})
+    const { data: _productsData } = useFarmManagementProductList({ queryParams: { type: "crop", page: 1, page_size: 50 } })
     const crops = _productsData?.results || []
-    
-    const {data: _productsData2} = useFarmManagementProductList({queryParams:{type: "other", page: 1, page_size: 50}})
+
+    const { data: _productsData2 } = useFarmManagementProductList({ queryParams: { type: "other", page: 1, page_size: 50 } })
     const livestock = _productsData2?.results || []
 
-    
 
-    const {data:_regionsData, isLoading: isLoadingRegions} = useRegionsList({})
+
+    const { data: _regionsData, isLoading: isLoadingRegions } = useRegionsList({})
     const _regions = _regionsData as any
     const regions = _regions?.results as Region[] || []
-    
-    const {districts} = useGetRegionDistricts(regions, Number(form.watch("region")))
+
+    const { districts } = useGetRegionDistricts(regions, Number(form.watch("region")))
 
     // "boundary" is a new field the backend added to the farm payload
     // (GeoJSON Polygon) - farms need one set before they can receive
     // weather data. See FarmBoundaryField for the draw UI and the
     // Leaflet[lat,lng] <-> GeoJSON[lng,lat] conversion helpers.
     const [boundaryPoints, setBoundaryPoints] = useState<[number, number][]>(
-      geoJSONToPoints((defaultData as any)?.boundary)
+        geoJSONToPoints((defaultData as any)?.boundary)
     )
 
-    const {mutate, isPending} = useFarmManagementFarmCreate({
-            onSuccess: () =>{
-                if(refetch) refetch()
-                setOpen(false)
-                toast.success("Farm Added Successfully")
-            },
-            onError: (errors: any) =>{
-                toast.error(getErrorMap(errors));
-            }
-        })
-    
-        const {mutate: updateMutate, isPending: isUpdating} = useFarmManagementFarmUpdate({
-            onSuccess: () =>{
-                if(refetch) refetch()
-                setOpen(false)
-                toast.success("Farm Updated Successfully")
-            },
-            onError: (errors: any) =>{
-                toast.error(getErrorMap(errors));
-            }
-        })
+    const { mutate, isPending } = useFarmManagementFarmCreate({
+        onSuccess: () => {
+            if (refetch) refetch()
+            setOpen(false)
+            toast.success("Farm Added Successfully")
+        },
+        onError: (errors: any) => {
+            toast.error(getErrorMap(errors));
+        }
+    })
+
+    const { mutate: updateMutate, isPending: isUpdating } = useFarmManagementFarmUpdate({
+        onSuccess: () => {
+            if (refetch) refetch()
+            setOpen(false)
+            toast.success("Farm Updated Successfully")
+        },
+        onError: (errors: any) => {
+            toast.error(getErrorMap(errors));
+        }
+    })
 
     function onSubmit(values: z.infer<typeof internalFarmSchema>) {
         const crops = values?.crops?.map((item) => item?.value) as number[]
         const livestock = values?.livestock?.map((item) => item?.value) as number[]
 
         const boundary = pointsToGeoJSON(boundaryPoints)
-        if (!boundary) {
-            toast.error("Mark at least 3 points on the map to set the farm boundary. Without it, this farm won't receive weather data.")
-            return
-        }
 
         const payload = {
             farm_type: "internal",
@@ -135,33 +136,36 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
             size_metric: Number(values?.size_metric),
             crops: crops,
             livestock: livestock,
-            boundary: boundary
+            ...(boundary ? { boundary } : {})
         } as any
 
-        if(isEdit){
+        if (isEdit) {
             updateMutate({
                 body: payload,
                 pathParams: {
                     id: defaultData?.id
                 }
             })
-        }else{
+        } else {
             mutate({
                 body: payload
             })
         }
-        
+
     }
 
-    return(
-        <Sheet open={open}>
-            <SheetContent className="md:max-w-[600px] md:max-h-[690px] text-[#334155] rounded-lg mt-4">
-                <SheetTitle className="mt-5 flex justify-between px-5">
+    return (
+        <Dialog open={open}>
+            <DialogContent className="sm:max-w-[850px] max-h-[90vh] p-0 text-[#334155] overflow-hidden flex flex-col">
+                <DialogTitle className="mt-5 flex justify-between px-5">
                     <div className="font-medium text-[#0F172A]">{modalTitle}</div>
-                    <XCircle className="text-red-500 cursor-pointer" onClick={() => setOpen(false)}/>
-                </SheetTitle>
-                <hr/>
-                <div className="px-5">
+                    <XCircle
+                        className="text-red-500 cursor-pointer"
+                        onClick={() => setOpen(false)}
+                    />
+                </DialogTitle>
+                <hr />
+                <div className="p-5 overflow-y-auto flex-1 min-h-0">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -169,54 +173,56 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
                                     control={form.control}
                                     name="name"
                                     render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Farm Name <div className='text-red-500'>*</div></FormLabel>
-                                        <FormControl>
-                                        <Input placeholder="Enter Farm Name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
+                                        <FormItem>
+                                            <FormLabel>Farm Name <div className='text-red-500'>*</div></FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter Farm Name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
                                     )}
                                 />
                                 <FormField
                                     control={form.control}
                                     name="type"
                                     render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Type of Farm {isLoadingTypes && <Loader className="animate-spin"/>}<div className='text-red-500'>*</div></FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
-                                        <FormControl>
-                                            <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {farm_types?.map((item, idx) =>(
-                                                <SelectItem key={`ty-${idx}`} value={item?.name}>{item.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
+                                        <FormItem>
+                                            <FormLabel>Type of Farm {isLoadingTypes && <Loader className="animate-spin" />}<div className='text-red-500'>*</div></FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {farm_types?.map((item, idx) => (
+                                                        <SelectItem key={`ty-${idx}`} value={item?.name}>{item.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
                                     )}
                                 />
                             </div>
                             <div className="grid grid-cols-1 gap-5">
-                                
+
                                 <FormField
                                     control={form.control}
                                     name="location"
                                     render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>First Location(GPS Coordinates if available) <div className='text-red-500'>*</div></FormLabel>
-                                        <FormControl>
-                                        <Input placeholder="Enter First Location" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
+                                        <FormItem>
+                                            <FormLabel>
+                                                First Location (GPS Coordinates if available)
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter First Location" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
                                     )}
                                 />
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -224,139 +230,139 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
                                         control={form.control}
                                         name="region"
                                         render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Region {isLoadingRegions && <Loader className="animate-spin"/>}<div className='text-red-500'>*</div></FormLabel>
-                                            <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            >
-                                            <FormControl>
-                                                <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {regions?.map((item, idx) => (
-                                                    <SelectItem key={idx} value={String(item.id)}>
-                                                        {item.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
+                                            <FormItem>
+                                                <FormLabel>Region {isLoadingRegions && <Loader className="animate-spin" />}<div className='text-red-500'>*</div></FormLabel>
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {regions?.map((item, idx) => (
+                                                            <SelectItem key={idx} value={String(item.id)}>
+                                                                {item.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
                                         )}
                                     />
-                                
+
                                     <FormField
                                         control={form.control}
                                         name="district"
                                         render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>District<div className='text-red-500'>*</div></FormLabel>
-                                            <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            >
-                                            <FormControl>
-                                                <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {districts?.map((item, idx) => (
-                                                    <SelectItem key={idx} value={String(item.id)}>
-                                                        {item.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
+                                            <FormItem>
+                                                <FormLabel>District<div className='text-red-500'>*</div></FormLabel>
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {districts?.map((item, idx) => (
+                                                            <SelectItem key={idx} value={String(item.id)}>
+                                                                {item.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
                                         )}
                                     />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <FormField
-                                        control={form.control}
-                                        name="size"
-                                        render={({ field }) => (
+                                <FormField
+                                    control={form.control}
+                                    name="size"
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Total Land Size <div className='text-red-500'>*</div></FormLabel>
                                             <FormControl>
-                                            <Input placeholder="Enter Farm Size" {...field} type="number"/>
+                                                <Input placeholder="Enter Farm Size" {...field} type="number" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
+                                    )}
+                                />
+                                <div className="mt-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="size_metric"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <RadioGroup
+                                                    className="flex flex-row w-full gap-x-6 mt-4"
+                                                    required
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                >
+                                                    {size_metrics?.map((item, idx) => (
+                                                        <div key={`sm-${idx}`} className="flex items-center space-x-2">
+                                                            <RadioGroupItem value={String(item?.id)} id={item?.name} />
+                                                            <Label htmlFor={item?.name} className="capitalize cursor-pointer">{item?.name}</Label>
+                                                        </div>
+                                                    ))}
+                                                </RadioGroup>
+                                                <FormMessage />
+                                            </FormItem>
                                         )}
                                     />
-                                    <div className="mt-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="size_metric"
-                                            render={({ field }) => (
-                                                    <FormItem>
-                                                    <RadioGroup 
-                                                        className="flex flex-row w-full gap-x-6 mt-4"
-                                                        required
-                                                        onValueChange={field.onChange}
-                                                        defaultValue={field.value}
-                                                    >
-                                                        {size_metrics?.map((item, idx) =>(
-                                                            <div key={`sm-${idx}`} className="flex items-center space-x-2">
-                                                                <RadioGroupItem value={String(item?.id)} id={item?.name} />
-                                                                <Label htmlFor={item?.name} className="capitalize cursor-pointer">{item?.name}</Label>
-                                                            </div>
-                                                        ))}
-                                                    </RadioGroup> 
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1">
-                                <Label  className="capitalize mb-3">Main Crops Grown<div className='text-red-500'>*</div></Label>
+                                <Label className="capitalize mb-3">Main Crops Grown<div className='text-red-500'>*</div></Label>
                                 <FormField
                                     control={form.control}
                                     name="crops"
                                     render={({ field }) => (
-                                         <FormItem className="w-full">
-                                        <ReactSelect
-                                            {...field}
-                                            closeMenuOnSelect={false}
-                                            isMulti
-                                            // defaultValue={assignColorsToOptions(defaultCrops)}
-                                            options={mapSelectOptions(crops)}
-                                            styles={selectColorStyles}
-                                            required
-                                        />
-                                        <FormMessage />
+                                        <FormItem className="w-full">
+                                            <ReactSelect
+                                                {...field}
+                                                closeMenuOnSelect={false}
+                                                isMulti
+                                                // defaultValue={assignColorsToOptions(defaultCrops)}
+                                                options={mapSelectOptions(crops)}
+                                                styles={selectColorStyles}
+                                                required
+                                            />
+                                            <FormMessage />
                                         </FormItem>
                                     )} />
                             </div>
                             <div className="grid grid-cols-1">
-                                <Label  className="capitalize mb-3">Other Product</Label>
+                                <Label className="capitalize mb-3">Other Product</Label>
                                 <FormField
                                     control={form.control}
                                     name="livestock"
                                     render={({ field }) => (
-                                         <FormItem className="w-full">
-                                        <ReactSelect
-                                            {...field}
-                                            closeMenuOnSelect={false}
-                                            isMulti
-                                            // defaultValue={assignColorsToOptions(defaultLivestock)}
-                                            options={mapSelectOptions(livestock)}
-                                            styles={selectColorStyles}
-                                        />
-                                        <FormMessage />
+                                        <FormItem className="w-full">
+                                            <ReactSelect
+                                                {...field}
+                                                closeMenuOnSelect={false}
+                                                isMulti
+                                                // defaultValue={assignColorsToOptions(defaultLivestock)}
+                                                options={mapSelectOptions(livestock)}
+                                                styles={selectColorStyles}
+                                            />
+                                            <FormMessage />
                                         </FormItem>
                                     )} />
                             </div>
                             <div className="grid grid-cols-1">
-                                <Label className="capitalize mb-3">Farm Boundary <div className='text-red-500'>*</div></Label>
+                                <Label className="capitalize mb-3">Farm Boundary </Label>
                                 <FarmBoundaryField
                                     center={GHANA_CENTER}
                                     value={boundaryPoints}
@@ -371,11 +377,9 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
                         </form>
                     </Form>
                 </div>
-                <DialogPoweredByFooter/>
-            </SheetContent>
-            
-        </Sheet>
+                <DialogPoweredByFooter />
+            </DialogContent>
+        </Dialog>
     )
-  }
+}
 
-  

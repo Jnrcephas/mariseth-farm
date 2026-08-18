@@ -117,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: "Audit Trails",
         url: routeTo.auditTrails,
-        slug: "report",
+        slug: "audit-trails",
         icon: NotebookPen,
         hasAccess: list_inflow_history || list_outflow_history,
       },
