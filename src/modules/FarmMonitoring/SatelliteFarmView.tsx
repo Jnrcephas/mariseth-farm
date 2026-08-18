@@ -1,16 +1,32 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import dynamic from "next/dynamic"
 import PageTitle from "@/components/layouts/PageTitle"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Search, Loader2, MapPin, ChevronLeft, ChevronRight, Cloud, CalendarDays } from "lucide-react"
+import { Search, Loader2, MapPin, ChevronLeft, ChevronRight, Cloud, CalendarDays, Satellite, LayoutGrid, AlertTriangle } from "lucide-react"
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
 import { cleanJsonData, formatDateReadable } from "@/lib/helpers"
 import { FarmSatelliteImage, SatelliteImageIndex, useFarmSatelliteImages } from "@/apis/useFarmSateliteImages"
+import { geoJSONPolygonToPoints, centroidOfPoints, DEFAULT_MAP_CENTER, type GeoJSONPolygon } from "@/lib/geo/boundary"
+import FullscreenMapPanel from "./FullscreenMapPanel"
+
+// Leaflet touches `window`, so it must be loaded client-side only - same
+// pattern GeoFencingManager uses for GeoFenceLeafletMap.
+const SatelliteLiveMap = dynamic(() => import("./SatelliteLiveMap"), { ssr: false })
+
+// The generated client types haven't been regenerated to include `boundary`
+// on the farm-list response yet, even though the backend now returns it
+// (see the identical note in GeoFencingManager.tsx). Extend locally.
+type FarmWithBoundary = { id: number; name?: string | null; boundary?: GeoJSONPolygon | null; district?: any }
 
 
 const FARMS_PAGE_SIZE = 12
+
+// Above this, a provider capture is treated as "too clouded to be useful"
+// and a banner nudges the user toward the Live Map tab instead.
+const HIGH_CLOUD_COVERAGE_THRESHOLD = 80
 
 
 const INDEX_OPTIONS: { key: SatelliteImageIndex; label: string }[] = [
@@ -24,7 +40,13 @@ const INDEX_OPTIONS: { key: SatelliteImageIndex; label: string }[] = [
   { key: "ndwi", label: "NDWI" },
 ]
 
-function FarmSatelliteImagery({ farmId }: { farmId: number }) {
+function FarmSatelliteImagery({
+  farmId,
+  onSwitchToLiveMap,
+}: {
+  farmId: number
+  onSwitchToLiveMap: () => void
+}) {
   const { data: images, isLoading, error } = useFarmSatelliteImages({ pathParams: { farm_id: farmId } })
   const [selectedImageId, setSelectedImageId] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<SatelliteImageIndex>("truecolor")
@@ -71,9 +93,31 @@ function FarmSatelliteImagery({ farmId }: { farmId: number }) {
   const availableIndexes = INDEX_OPTIONS.filter((opt) => !!selectedImage.image_urls?.[opt.key])
   const activeIndex = availableIndexes.some((opt) => opt.key === selectedIndex) ? selectedIndex : "truecolor"
   const imageUrl = selectedImage.image_urls?.[activeIndex]
+  const isHeavilyClouded = selectedImage.cloud_coverage >= HIGH_CLOUD_COVERAGE_THRESHOLD
 
   return (
     <div className="flex flex-col gap-4">
+      {isHeavilyClouded && (
+        <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-[#FDE68A] bg-[#FFFBEB] px-4 py-3">
+          <div className="flex items-start gap-2.5">
+            <AlertTriangle className="h-4 w-4 text-[#D97706] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#92400E]">
+              This capture is {Math.round(selectedImage.cloud_coverage)}% cloud cover, so it may not show
+              much useful detail. Try the Live Map view instead for a clear, always-available image of
+              this farm.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onSwitchToLiveMap}
+            className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-white bg-[#D97706] hover:bg-[#B45309] rounded-full px-3 py-1.5 cursor-pointer transition-colors"
+          >
+            <Satellite className="h-3.5 w-3.5" />
+            Switch to Live Map
+          </button>
+        </div>
+      )}
+
       <div className="relative rounded-2xl overflow-hidden border border-[#E2E8F0] bg-black h-[420px] flex items-center justify-center">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -139,10 +183,17 @@ function FarmSatelliteImagery({ farmId }: { farmId: number }) {
   )
 }
 
+type ViewMode = "provider" | "live_map"
+
 export default function SatelliteFarmView() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [selectedFarmId, setSelectedFarmId] = useState<number | null>(null)
+  // Defaults to the Live Map: the provider imagery backend is currently
+  // unreliable (missing boundaries -> 400s, and even successful captures
+  // are frequently 100% cloud-covered), so the always-available live map
+  // is the safer first view. Users can still switch to Provider Imagery.
+  const [viewMode, setViewMode] = useState<ViewMode>("live_map")
   const debouncedSearch = useDebouncedValue(search, 300)
 
   const { data: farmsData, isLoading } = useFarmManagementFarmList({
@@ -150,9 +201,18 @@ export default function SatelliteFarmView() {
     placeholderData: (prev: any) => prev,
   } as any)
 
-  const farms = (farmsData?.results || []) as any[]
+  const farms = (farmsData?.results || []) as FarmWithBoundary[]
   const pagination = farmsData?.pagination
   const selectedFarm = farms.find((f) => f.id === selectedFarmId)
+
+  const selectedBoundaryPoints = useMemo(
+    () => geoJSONPolygonToPoints(selectedFarm?.boundary),
+    [selectedFarm]
+  )
+  const selectedCenter = useMemo(
+    () => centroidOfPoints(selectedBoundaryPoints) ?? DEFAULT_MAP_CENTER,
+    [selectedBoundaryPoints]
+  )
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
@@ -243,8 +303,67 @@ export default function SatelliteFarmView() {
             </div>
           ) : (
             <div>
-              <p className="text-sm font-semibold text-black mb-3">{selectedFarm.name}</p>
-              <FarmSatelliteImagery farmId={selectedFarm.id} />
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                <p className="text-sm font-semibold text-black">{selectedFarm.name}</p>
+
+                {/* Temporary: provider imagery backend is unreliable, so a
+                    free, always-available live satellite map (Esri World
+                    Imagery, no API key) is offered as an alternate view for
+                    stakeholder demos. Provider imagery view is left in place
+                    unchanged. */}
+                <div className="flex items-center gap-1 bg-[#F1F5F9] rounded-full p-1">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("provider")}
+                    className={`flex items-center gap-1.5 text-xs font-medium rounded-full px-3 py-1.5 transition-colors cursor-pointer ${
+                      viewMode === "provider" ? "bg-white text-black shadow-sm" : "text-[#64748B]"
+                    }`}
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                    Provider Imagery
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("live_map")}
+                    className={`flex items-center gap-1.5 text-xs font-medium rounded-full px-3 py-1.5 transition-colors cursor-pointer ${
+                      viewMode === "live_map" ? "bg-white text-black shadow-sm" : "text-[#64748B]"
+                    }`}
+                  >
+                    <Satellite className="h-3.5 w-3.5" />
+                    Live Map
+                  </button>
+                </div>
+              </div>
+
+              {viewMode === "provider" ? (
+                <FarmSatelliteImagery
+                  farmId={selectedFarm.id}
+                  onSwitchToLiveMap={() => setViewMode("live_map")}
+                />
+              ) : (
+                <FullscreenMapPanel title={`${selectedFarm.name} - Live Satellite Map`}>
+                  {(isFullscreen) => (
+                    <div
+                      className={
+                        isFullscreen
+                          ? "relative w-screen h-screen"
+                          : "relative rounded-2xl overflow-hidden border border-[#E2E8F0] h-[500px]"
+                      }
+                    >
+                      <SatelliteLiveMap
+                        farmName={selectedFarm.name ?? "Farm"}
+                        center={selectedCenter}
+                        boundary={selectedBoundaryPoints.length > 0 ? selectedBoundaryPoints : null}
+                      />
+                      {selectedBoundaryPoints.length === 0 && (
+                        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/95 rounded-full shadow px-3 py-1.5 text-xs font-medium text-[#CA8A04] z-[1000]">
+                          No boundary set - showing an approximate location
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </FullscreenMapPanel>
+              )}
             </div>
           )}
         </div>
