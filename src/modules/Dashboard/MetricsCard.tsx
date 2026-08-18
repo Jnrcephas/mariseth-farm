@@ -46,8 +46,8 @@ export default function MetricsCard({ data }: { data: any }) {
       trend: { direction: "up", label: "1.3% Up from past week" },
     },
     {
-      label: "Finance",
-      value: "GHS 0", // placeholder - no finance endpoint exists yet
+      label: "Farms",
+      value: (data?.farms || 0).toLocaleString(),
       icon: LineChart,
       iconBg: "#D1FAE5",
       iconColor: "#059669",

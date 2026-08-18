@@ -122,10 +122,6 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
         const livestock = values?.livestock?.map((item) => item?.value) as number[]
 
         const boundary = pointsToGeoJSON(boundaryPoints)
-        if (!boundary) {
-            toast.error("Mark at least 3 points on the map to set the farm boundary. Without it, this farm won't receive weather data.")
-            return
-        }
 
         const payload = {
             farm_type: "external",
@@ -503,7 +499,7 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
                                 </div>
                             </div>
                             <div className="grid grid-cols-1">
-                                <Label className="capitalize mb-3">Farm Boundary <div className='text-red-500'>*</div></Label>
+                                <Label className="capitalize mb-3">Farm Boundary</Label>
                                 <FarmBoundaryField
                                     center={GHANA_CENTER}
                                     value={boundaryPoints}
@@ -524,6 +520,3 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
         </Dialog>
     )
   }
-
-
-  

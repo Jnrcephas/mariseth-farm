@@ -45,6 +45,62 @@ export default function FinancialAnalytics() {
   const totalInvoices = invoices?.pagination?.total || 0
   const totalWaybills = waybills?.pagination?.total || 0
 
+  // NOTE: there is currently no revenue/finance endpoint in the API
+  // (see src/apis/adminApiComponents.ts - no such hook exists yet). Per request,
+  // this uses illustrative placeholder numbers so the chart looks right while
+  // the design is being reviewed. SWAP THIS OUT for real API data before this
+  // ships to real users - a chart showing made-up revenue figures to an actual
+  // farm manager would be actively misleading. Search for "monthlyRevenueData"
+  // to find this again once a real endpoint exists.
+  const monthlyRevenueData = [
+    { month: "Jul", revenue: 140 },
+    { month: "Aug", revenue: 430 },
+    { month: "Sep", revenue: 320 },
+    { month: "Oct", revenue: 690 },
+    { month: "Nov", revenue: 395 },
+    { month: "Dec", revenue: 590 },
+    { month: "Jan", revenue: 660 },
+  ]
+  const revenueSeries = [{ name: "Revenue", data: monthlyRevenueData.map((d) => d.revenue) }]
+  const revenueOptions = {
+    chart: {
+      type: "area",
+      fontFamily: "Inter, sans-serif",
+      toolbar: { show: false },
+      zoom: { enabled: false },
+    },
+    dataLabels: { enabled: false },
+    stroke: { curve: "smooth" as const, width: 3, colors: ["#4A8D34"] },
+    fill: {
+      type: "gradient",
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.45,
+        opacityTo: 0.05,
+        stops: [0, 90, 100],
+        colorStops: [
+          { offset: 0, color: "#4A8D34", opacity: 0.45 },
+          { offset: 100, color: "#4A8D34", opacity: 0.02 },
+        ],
+      },
+    },
+    colors: ["#4A8D34"],
+    xaxis: {
+      categories: monthlyRevenueData.map((d) => d.month),
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      labels: { style: { colors: "#94A3B8", fontSize: "12px" } },
+    },
+    yaxis: {
+      labels: {
+        formatter: (value: any) => commaSeparator(value),
+        style: { colors: "#94A3B8", fontSize: "12px" },
+      },
+    },
+    grid: { borderColor: "#E2E8F0", strokeDashArray: 4, xaxis: { lines: { show: false } } },
+    tooltip: { y: { formatter: (value: any) => (value ? `GHS ${value.toLocaleString()}` : "No data") } },
+  }
+
   // NOTE: there is currently no dated finance-trend endpoint in the API
   // (nothing like "monthly expenses" exists in adminApiComponents.ts yet).
   // Per request, this uses illustrative placeholder numbers so the chart
@@ -132,18 +188,6 @@ export default function FinancialAnalytics() {
     },
   ]
 
-  // Real record-mix breakdown across the 3 finance record types - built
-  // from the same counts as the cards above, not invented data.
-  const mixSeries = [totalExpenses > 0 ? 1 : 0, totalInvoices, totalWaybills].map((v) => v || 0)
-  const mixLabels = ["Expenses", "Invoices", "Waybills"]
-  const mixOptions = {
-    chart: { fontFamily: "Inter, sans-serif" },
-    labels: mixLabels,
-    colors: ["#DC2626", "#2563EB", "#059669"],
-    legend: { position: "bottom" as const },
-    dataLabels: { enabled: false },
-  }
-
   return (
     <AuthorizeAndRenderPage permission="accounting|list_expenses">
       <PageTitle title="Financial Analytics" />
@@ -193,11 +237,11 @@ export default function FinancialAnalytics() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <Card className="lg:col-span-1 shadow-none border border-[#E2E8F0]">
               <CardHeader className="pb-0">
-                <CardTitle className="font-semibold text-base text-black">Record Mix</CardTitle>
+                <CardTitle className="font-semibold text-base text-black">Monthly Revenue</CardTitle>
               </CardHeader>
               <CardContent>
-                {typeof window !== "undefined" && !isLoading && (
-                  <ReactApexChart options={mixOptions as any} series={mixSeries} type="donut" height={280} />
+                {typeof window !== "undefined" && (
+                  <ReactApexChart options={revenueOptions as any} series={revenueSeries} type="area" height={280} />
                 )}
               </CardContent>
             </Card>
