@@ -5846,6 +5846,281 @@ export const useDashboardFarmerAnalysis = <
   });
 };
 
+export type DashboardTotalFarmsError = Fetcher.ErrorWrapper<{
+  status: 403;
+  payload: {
+    detail?: string;
+  };
+}>;
+
+export type DashboardTotalFarmsResponse = {
+  total_farms?: number;
+};
+
+export type DashboardTotalFarmsVariables = AdminApiContext["fetcherOptions"];
+
+/**
+ * Retrieves the total count of active farms belonging to the caller's organization.
+ */
+export const fetchDashboardTotalFarms = (
+  variables: DashboardTotalFarmsVariables,
+  signal?: AbortSignal,
+) =>
+  adminApiFetch<
+    DashboardTotalFarmsResponse,
+    DashboardTotalFarmsError,
+    undefined,
+    {},
+    {},
+    {}
+  >({ url: "/dashboard/total-farms", method: "get", ...variables, signal });
+
+/**
+ * Retrieves the total count of active farms belonging to the caller's organization.
+ */
+export function dashboardTotalFarmsQuery(
+  variables: DashboardTotalFarmsVariables,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<DashboardTotalFarmsResponse>;
+};
+
+export function dashboardTotalFarmsQuery(
+  variables: DashboardTotalFarmsVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<DashboardTotalFarmsResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function dashboardTotalFarmsQuery(
+  variables: DashboardTotalFarmsVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/dashboard/total-farms",
+      operationId: "dashboardTotalFarms",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) =>
+            fetchDashboardTotalFarms(variables, signal),
+  };
+}
+
+/**
+ * Retrieves the total count of active farms belonging to the caller's organization.
+ */
+export const useSuspenseDashboardTotalFarms = <
+  TData = DashboardTotalFarmsResponse,
+>(
+  variables: DashboardTotalFarmsVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      DashboardTotalFarmsResponse,
+      DashboardTotalFarmsError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useSuspenseQuery<
+    DashboardTotalFarmsResponse,
+    DashboardTotalFarmsError,
+    TData
+  >({
+    ...dashboardTotalFarmsQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+/**
+ * Retrieves the total count of active farms belonging to the caller's organization.
+ */
+export const useDashboardTotalFarms = <TData = DashboardTotalFarmsResponse>(
+  variables: DashboardTotalFarmsVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      DashboardTotalFarmsResponse,
+      DashboardTotalFarmsError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useQuery<
+    DashboardTotalFarmsResponse,
+    DashboardTotalFarmsError,
+    TData
+  >({
+    ...dashboardTotalFarmsQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+export type DashboardFarmTrendsError = Fetcher.ErrorWrapper<
+  | {
+      status: 400;
+      payload: {
+        error?: string;
+      };
+    }
+  | {
+      status: 403;
+      payload: {
+        detail?: string;
+      };
+    }
+>;
+
+export type DashboardFarmTrendsResponse = {
+  year?: number;
+  trend?: {
+    month?: string;
+    count?: number;
+  }[];
+};
+
+export type DashboardFarmTrendsQueryParams = {
+  /**
+   * Calendar year to break down by month. Defaults to the current year.
+   */
+  year?: number;
+};
+
+export type DashboardFarmTrendsVariables = {
+  queryParams?: DashboardFarmTrendsQueryParams;
+} & AdminApiContext["fetcherOptions"];
+
+/**
+ * Retrieves the monthly breakdown of farms created during a given calendar
+ * year, scoped to the caller's organization. Returns one entry per calendar
+ * month (Jan-Dec), even for months with zero farms created.
+ */
+export const fetchDashboardFarmTrends = (
+  variables: DashboardFarmTrendsVariables,
+  signal?: AbortSignal,
+) =>
+  adminApiFetch<
+    DashboardFarmTrendsResponse,
+    DashboardFarmTrendsError,
+    undefined,
+    {},
+    DashboardFarmTrendsQueryParams,
+    {}
+  >({ url: "/dashboard/farm-trends", method: "get", ...variables, signal });
+
+/**
+ * Retrieves the monthly breakdown of farms created during a given calendar
+ * year, scoped to the caller's organization. Returns one entry per calendar
+ * month (Jan-Dec), even for months with zero farms created.
+ */
+export function dashboardFarmTrendsQuery(
+  variables: DashboardFarmTrendsVariables,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<DashboardFarmTrendsResponse>;
+};
+
+export function dashboardFarmTrendsQuery(
+  variables: DashboardFarmTrendsVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<DashboardFarmTrendsResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function dashboardFarmTrendsQuery(
+  variables: DashboardFarmTrendsVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/dashboard/farm-trends",
+      operationId: "dashboardFarmTrends",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) =>
+            fetchDashboardFarmTrends(variables, signal),
+  };
+}
+
+/**
+ * Retrieves the monthly breakdown of farms created during a given calendar
+ * year, scoped to the caller's organization. Returns one entry per calendar
+ * month (Jan-Dec), even for months with zero farms created.
+ */
+export const useSuspenseDashboardFarmTrends = <
+  TData = DashboardFarmTrendsResponse,
+>(
+  variables: DashboardFarmTrendsVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      DashboardFarmTrendsResponse,
+      DashboardFarmTrendsError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useSuspenseQuery<
+    DashboardFarmTrendsResponse,
+    DashboardFarmTrendsError,
+    TData
+  >({
+    ...dashboardFarmTrendsQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+/**
+ * Retrieves the monthly breakdown of farms created during a given calendar
+ * year, scoped to the caller's organization. Returns one entry per calendar
+ * month (Jan-Dec), even for months with zero farms created.
+ */
+export const useDashboardFarmTrends = <TData = DashboardFarmTrendsResponse>(
+  variables: DashboardFarmTrendsVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      DashboardFarmTrendsResponse,
+      DashboardFarmTrendsError,
+      TData
+    >,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useQuery<
+    DashboardFarmTrendsResponse,
+    DashboardFarmTrendsError,
+    TData
+  >({
+    ...dashboardFarmTrendsQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
 export type DepartmentListError = Fetcher.ErrorWrapper<undefined>;
 
 export type DepartmentListResponse = Schemas.Department[];
@@ -15931,6 +16206,16 @@ export type QueryOperation =
       path: "/dashboard/farmer-analysis";
       operationId: "dashboardFarmerAnalysis";
       variables: DashboardFarmerAnalysisVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/dashboard/total-farms";
+      operationId: "dashboardTotalFarms";
+      variables: DashboardTotalFarmsVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/dashboard/farm-trends";
+      operationId: "dashboardFarmTrends";
+      variables: DashboardFarmTrendsVariables | reactQuery.SkipToken;
     }
   | {
       path: "/department";
