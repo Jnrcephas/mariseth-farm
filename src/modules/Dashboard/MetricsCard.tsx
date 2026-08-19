@@ -27,7 +27,7 @@ export default function MetricsCard({ data, totalFarms }: { data: any; totalFarm
       icon: UserRound,
       iconBg: "#EDE9FE",
       iconColor: "#7C3AED",
-      trend: { direction: "up", label: "8.5% Up from yesterday" },
+      // trend: { direction: "up", label: "8.5% Up from yesterday" },
     },
     {
       label: "Smallholder Farmers",
@@ -35,7 +35,7 @@ export default function MetricsCard({ data, totalFarms }: { data: any; totalFarm
       icon: Users,
       iconBg: "#CFFAFE",
       iconColor: "#0891B2",
-      trend: { direction: "down", label: "4.3% Down from yesterday" },
+      // trend: { direction: "down", label: "4.3% Down from yesterday" },
     },
     {
       label: "Active Warehouses",
@@ -43,7 +43,7 @@ export default function MetricsCard({ data, totalFarms }: { data: any; totalFarm
       icon: Package,
       iconBg: "#FEF3C7",
       iconColor: "#D97706",
-      trend: { direction: "up", label: "1.3% Up from past week" },
+      // trend: { direction: "up", label: "1.3% Up from past week" },
     },
     {
       label: "Farms",
@@ -51,7 +51,7 @@ export default function MetricsCard({ data, totalFarms }: { data: any; totalFarm
       icon: LineChart,
       iconBg: "#D1FAE5",
       iconColor: "#059669",
-      trend: { direction: "down", label: "4.3% Down from yesterday" },
+      // trend: { direction: "down", label: "4.3% Down from yesterday" },
     },
   ]
 
