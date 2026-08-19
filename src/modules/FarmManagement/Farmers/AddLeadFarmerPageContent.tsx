@@ -1,7 +1,7 @@
 "use client";
 
 import { useFarmerRegistrationRequestRead } from "@/apis/farmerRequestApi";
-import { SuspenseLogo } from "@/components/SuspenseLoader";
+import { Loader } from "lucide-react";
 import AddLeadFarmer from "./AddLeadFarmer";
 
 export default function AddLeadFarmerPageContent({
@@ -9,25 +9,26 @@ export default function AddLeadFarmerPageContent({
 }: {
   farmerRegRequestId?: number;
 }) {
-  const { data, isPending } = useFarmerRegistrationRequestRead(
+  const hasRegRequest = Boolean(farmerRegRequestId);
+
+
+  const { data, isFetching } = useFarmerRegistrationRequestRead(
     {
       pathParams: { id: Number(farmerRegRequestId) },
     },
-    { enabled: Boolean(farmerRegRequestId) },
+    { enabled: hasRegRequest },
   );
 
-  if (isPending) {
-    return (
-      <div className="bg-[#fff] rounded-lg h-[80vh]">
-        <div className="flex justify-center items-center h-full w-full">
-          <SuspenseLogo />
-        </div>
-      </div>
-    );
-  }
+  const isLoadingRegRequest = hasRegRequest && isFetching;
 
   return (
     <div className="bg-[#fff] rounded-lg h-full">
+      {isLoadingRegRequest && (
+        <div className="flex items-center gap-2 px-5 pt-4 text-sm text-muted-foreground">
+          <Loader className="h-4 w-4 animate-spin" />
+          Loading pre-filled request data...
+        </div>
+      )}
       <AddLeadFarmer defaultData={data || {}} farmerRegRequestId={farmerRegRequestId} />
     </div>
   );
