@@ -12,14 +12,14 @@ interface MetricCardConfig {
   trend?: { direction: "up" | "down"; label: string }
 }
 
-export default function MetricsCard({ data }: { data: any }) {
-  // NOTE: `trend` values and the "Finance" card below are illustrative
-  // placeholders for design review - there is no trend/delta field or
-  // finance endpoint in the dashboard analysis API yet (checked
-  // src/apis/adminApiComponents.ts). SWAP THESE OUT for real numbers once
-  // that data exists; showing made-up percentages/revenue to a real user
-  // would be misleading. The 3 count values (Lead Farmers, Smallholder
-  // Farmers, Active Warehouses) below ARE real, wired to the API.
+export default function MetricsCard({ data, totalFarms }: { data: any; totalFarms?: number }) {
+  // NOTE: `trend` values are still illustrative placeholders for design
+  // review - there is no trend/delta field in the dashboard analysis or
+  // total-farms APIs yet (checked src/apis/adminApiComponents.ts). SWAP
+  // THESE OUT for real numbers once that data exists; showing made-up
+  // percentages to a real user would be misleading. The 4 count values
+  // (Lead Farmers, Smallholder Farmers, Active Warehouses, Farms) below
+  // ARE real, wired to the API.
   const metrics: MetricCardConfig[] = [
     {
       label: "Lead Farmers",
@@ -47,7 +47,7 @@ export default function MetricsCard({ data }: { data: any }) {
     },
     {
       label: "Farms",
-      value: (data?.farms || 0).toLocaleString(),
+      value: (totalFarms || 0).toLocaleString(),
       icon: LineChart,
       iconBg: "#D1FAE5",
       iconColor: "#059669",

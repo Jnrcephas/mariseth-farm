@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Calendar } from "lucide-react";
 import FarmersDistributionChart from "./FarmersDistributionChart";
 import MonthlyRevenueBarChart from "./MonthlyRevenueBarChart";
-import { useDashboardFarmerAnalysis } from "@/apis/adminApiComponents";
+import { useDashboardFarmerAnalysis, useDashboardTotalFarms } from "@/apis/adminApiComponents";
 import SuspenseWrapper from "@/components/SuspenseWrapper";
 import { reportDuration } from "./utils/constants";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +17,7 @@ export default function MainDashboard(){
     const [dateFilter, setDateFilter] = useState<any>({label: "All Time"})
 
     const {data, isLoading} = useDashboardFarmerAnalysis({queryParams: dateFilter as any})
+    const {data: totalFarmsData} = useDashboardTotalFarms({})
 
     function handleFilter(dateFilter: any){
         if(dateFilter?.value){
@@ -69,7 +70,7 @@ export default function MainDashboard(){
                     </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <MetricsCard data={data}/>
+                <MetricsCard data={data} totalFarms={totalFarmsData?.total_farms}/>
                 <QuickActionsGrid />
                 <SuspenseWrapper isLoading={isLoading}
                     skeleton={
