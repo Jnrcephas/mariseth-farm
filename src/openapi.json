@@ -4275,6 +4275,428 @@
         ]
       },
       "parameters": []
+    },
+    "/manager-accounting/sales-invoices": {
+      "get": {
+        "operationId": "managerAccountingSalesInvoicesList",
+        "summary": "List sales invoices",
+        "description": "Retrieves sales invoices live from Manager.io. Requires `manager_accounting|list_sales_invoices` permission. Read-only proxy - responses come straight from Manager.io and nothing is stored in our database.",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Offset for pagination",
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "type": "integer"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Field to sort by",
+            "type": "string"
+          },
+          {
+            "name": "sortByDesc",
+            "in": "query",
+            "description": "Sort descending",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List sales invoices",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "business": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "skip": {
+                  "type": "integer"
+                },
+                "pageSize": {
+                  "type": "integer"
+                },
+                "totalRecords": {
+                  "type": "integer"
+                },
+                "salesInvoices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "issueDate": {
+                        "type": "string"
+                      },
+                      "reference": {
+                        "type": "string"
+                      },
+                      "customer": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "invoiceAmount": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "costOfSales": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "balanceDue": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Manager.io unreachable or returned an error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "detail": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Manager Accounting"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "parameters": []
+    },
+    "/manager-accounting/payments": {
+      "get": {
+        "operationId": "managerAccountingPaymentsList",
+        "summary": "List payments",
+        "description": "Retrieves payments live from Manager.io. Requires `manager_accounting|list_payments` permission. Read-only proxy - responses come straight from Manager.io and nothing is stored in our database.",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Offset for pagination",
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "type": "integer"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Field to sort by",
+            "type": "string"
+          },
+          {
+            "name": "sortByDesc",
+            "in": "query",
+            "description": "Sort descending",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List payments",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "business": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "skip": {
+                  "type": "integer"
+                },
+                "pageSize": {
+                  "type": "integer"
+                },
+                "totalRecords": {
+                  "type": "integer"
+                },
+                "payments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      },
+                      "paidFrom": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "payee": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Manager.io unreachable or returned an error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "detail": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Manager Accounting"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "parameters": []
+    },
+    "/manager-accounting/receipts": {
+      "get": {
+        "operationId": "managerAccountingReceiptsList",
+        "summary": "List receipts",
+        "description": "Retrieves receipts live from Manager.io. Requires `manager_accounting|list_receipts` permission. Read-only proxy - responses come straight from Manager.io and nothing is stored in our database.",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "description": "Offset for pagination",
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "type": "integer"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Field to sort by",
+            "type": "string"
+          },
+          {
+            "name": "sortByDesc",
+            "in": "query",
+            "description": "Sort descending",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List receipts",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "business": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "skip": {
+                  "type": "integer"
+                },
+                "pageSize": {
+                  "type": "integer"
+                },
+                "totalRecords": {
+                  "type": "integer"
+                },
+                "receipts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      },
+                      "reference": {
+                        "type": "string"
+                      },
+                      "receivedIn": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "paidBy": {
+                        "type": "string"
+                      },
+                      "costOfSales": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "amount": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Manager.io unreachable or returned an error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "detail": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Manager Accounting"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "parameters": []
     }
   },
   "definitions": {
