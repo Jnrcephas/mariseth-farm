@@ -32,6 +32,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { hasAccess: list_invoices } = useHasAccess("accounting|list_invoices")
   const { hasAccess: list_waybills } = useHasAccess("accounting|list_waybills")
   const { hasAccess: list_expenses } = useHasAccess("accounting|list_expenses")
+  const { hasAccess: list_sales_invoices } = useHasAccess("manager_accounting|list_sales_invoices")
+  const { hasAccess: list_manager_payments } = useHasAccess("manager_accounting|list_payments")
+  const { hasAccess: list_manager_receipts } = useHasAccess("manager_accounting|list_receipts")
   const { hasAccess: list_departments } = useHasAccess("hr|list_departments")
   const { hasAccess: list_job_titles } = useHasAccess("hr|list_job_titles")
   const { hasAccess: list_employees } = useHasAccess("employee|list_employees")
@@ -112,7 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: routeTo.accountingAnalytics,
         slug: "accounting",
         icon: FileSpreadsheet,
-        hasAccess: (list_expenses || list_waybills || list_invoices),
+        hasAccess: (list_expenses || list_waybills || list_invoices || list_sales_invoices || list_manager_payments || list_manager_receipts),
       },
       {
         title: "Audit Trails",

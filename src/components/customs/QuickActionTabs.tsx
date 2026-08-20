@@ -30,9 +30,9 @@ export default function QuickActionTabs({ tabs }: { tabs: ActionTabConfig[] }) {
         width keeps every tab the same size it would be in a full row,
         regardless of how many are actually rendered.
       */}
-      <div className="flex flex-wrap items-stretch gap-4">
+      <div className="flex flex-wrap items-stretch gap-3">
         {tabs.map((tab) => (
-          <div key={tab.href ?? tab.label} className="w-full sm:w-[calc(50%-0.5rem)] lg:w-[220px]">
+          <div key={tab.href ?? tab.label} className="w-full sm:w-[calc(50%-0.375rem)] lg:w-[190px]">
             <QuickActionTab tab={tab} pathname={pathname} />
           </div>
         ))}

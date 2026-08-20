@@ -76,6 +76,7 @@ export const FINANCE_TABS: ActionTabConfig[] = [
   { label: "Expenses", href: routeTo.accountingExpenses, permission: "accounting|list_expenses" },
   { label: "Waybills", href: routeTo.accountingWaybills, permission: "accounting|list_waybills" },
   { label: "Invoices", href: routeTo.accountingInvoices, permission: "accounting|list_invoices" },
+  { label: "Manager Accounting", href: routeTo.accountingManagerAccounting, permission: "manager_accounting|list_sales_invoices" },
   { label: "Accounting", href: "https://meshsuites.manager.io/businesses", external: true },
 ];
 

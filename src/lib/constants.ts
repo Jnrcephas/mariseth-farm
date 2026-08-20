@@ -71,6 +71,7 @@ export const routeTo = {
     accountingViewWaybill: "/app/accounting/waybills/view-waybill",
     accountingInvoices: "/app/accounting/invoices",
     accountingViewInvoice: "/app/accounting/invoices/view-invoice",
+    accountingManagerAccounting: "/app/accounting/manager-accounting",
 
 
     systemSettings: "/app/system-settings",

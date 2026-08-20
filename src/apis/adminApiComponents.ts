@@ -6121,6 +6121,458 @@ export const useDashboardFarmTrends = <TData = DashboardFarmTrendsResponse>(
   });
 };
 
+
+export type ManagerAccountingSalesInvoicesListError = Fetcher.ErrorWrapper<
+  | {
+      status: 502;
+      payload: {
+        error?: string;
+      };
+    }
+  | {
+      status: 403;
+      payload: {
+        detail?: string;
+      };
+    }
+>;
+
+export type ManagerAccountingSalesInvoicesListResponse = {
+  business?: {
+    name?: string;
+  };
+  skip?: number;
+  pageSize?: number;
+  totalRecords?: number;
+  salesInvoices?: {
+    key?: string;
+    issueDate?: string;
+    reference?: string | null;
+    customer?: string;
+    description?: string;
+    invoiceAmount?: { value?: number; currency?: string };
+    costOfSales?: { value?: number; currency?: string } | null;
+    balanceDue?: { value?: number; currency?: string };
+    status?: string;
+  }[];
+};
+
+export type ManagerAccountingSalesInvoicesListQueryParams = {
+  /**
+   * Offset for pagination
+   */
+  skip?: number;
+  /**
+   * Page size
+   */
+  pageSize?: number;
+  /**
+   * Field to sort by
+   */
+  sortBy?: string;
+  /**
+   * Sort descending
+   */
+  sortByDesc?: boolean;
+};
+
+export type ManagerAccountingSalesInvoicesListVariables = {
+  queryParams?: ManagerAccountingSalesInvoicesListQueryParams;
+} & AdminApiContext["fetcherOptions"];
+
+/**
+ * Retrieves sales invoices live from Manager.io (read-only, not stored in our database).
+ * Read-only proxy to Manager.io - nothing is stored in our database.
+ */
+export const fetchManagerAccountingSalesInvoicesList = (
+  variables: ManagerAccountingSalesInvoicesListVariables,
+  signal?: AbortSignal,
+) =>
+  adminApiFetch<
+    ManagerAccountingSalesInvoicesListResponse,
+    ManagerAccountingSalesInvoicesListError,
+    undefined,
+    {},
+    ManagerAccountingSalesInvoicesListQueryParams,
+    {}
+  >({ url: "/manager-accounting/sales-invoices", method: "get", ...variables, signal });
+
+/**
+ * Retrieves sales invoices live from Manager.io (read-only, not stored in our database).
+ */
+export function managerAccountingSalesInvoicesListQuery(
+  variables: ManagerAccountingSalesInvoicesListVariables,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<ManagerAccountingSalesInvoicesListResponse>;
+};
+
+export function managerAccountingSalesInvoicesListQuery(
+  variables: ManagerAccountingSalesInvoicesListVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<ManagerAccountingSalesInvoicesListResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function managerAccountingSalesInvoicesListQuery(
+  variables: ManagerAccountingSalesInvoicesListVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/manager-accounting/sales-invoices",
+      operationId: "managerAccountingSalesInvoicesList",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) =>
+            fetchManagerAccountingSalesInvoicesList(variables, signal),
+  };
+}
+
+/**
+ * Retrieves sales invoices live from Manager.io (read-only, not stored in our database).
+ */
+export const useSuspenseManagerAccountingSalesInvoicesList = <TData = ManagerAccountingSalesInvoicesListResponse>(
+  variables: ManagerAccountingSalesInvoicesListVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ManagerAccountingSalesInvoicesListResponse, ManagerAccountingSalesInvoicesListError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useSuspenseQuery<ManagerAccountingSalesInvoicesListResponse, ManagerAccountingSalesInvoicesListError, TData>({
+    ...managerAccountingSalesInvoicesListQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+/**
+ * Retrieves sales invoices live from Manager.io (read-only, not stored in our database).
+ */
+export const useManagerAccountingSalesInvoicesList = <TData = ManagerAccountingSalesInvoicesListResponse>(
+  variables: ManagerAccountingSalesInvoicesListVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ManagerAccountingSalesInvoicesListResponse, ManagerAccountingSalesInvoicesListError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useQuery<ManagerAccountingSalesInvoicesListResponse, ManagerAccountingSalesInvoicesListError, TData>({
+    ...managerAccountingSalesInvoicesListQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+
+export type ManagerAccountingPaymentsListError = Fetcher.ErrorWrapper<
+  | {
+      status: 502;
+      payload: {
+        error?: string;
+      };
+    }
+  | {
+      status: 403;
+      payload: {
+        detail?: string;
+      };
+    }
+>;
+
+export type ManagerAccountingPaymentsListResponse = {
+  business?: {
+    name?: string;
+  };
+  skip?: number;
+  pageSize?: number;
+  totalRecords?: number;
+  payments?: {
+    key?: string;
+    date?: string;
+    paidFrom?: string;
+    description?: string;
+    payee?: string;
+    amount?: { value?: number; currency?: string };
+  }[];
+};
+
+export type ManagerAccountingPaymentsListQueryParams = {
+  /**
+   * Offset for pagination
+   */
+  skip?: number;
+  /**
+   * Page size
+   */
+  pageSize?: number;
+  /**
+   * Field to sort by
+   */
+  sortBy?: string;
+  /**
+   * Sort descending
+   */
+  sortByDesc?: boolean;
+};
+
+export type ManagerAccountingPaymentsListVariables = {
+  queryParams?: ManagerAccountingPaymentsListQueryParams;
+} & AdminApiContext["fetcherOptions"];
+
+/**
+ * Retrieves payments live from Manager.io (read-only, not stored in our database).
+ * Read-only proxy to Manager.io - nothing is stored in our database.
+ */
+export const fetchManagerAccountingPaymentsList = (
+  variables: ManagerAccountingPaymentsListVariables,
+  signal?: AbortSignal,
+) =>
+  adminApiFetch<
+    ManagerAccountingPaymentsListResponse,
+    ManagerAccountingPaymentsListError,
+    undefined,
+    {},
+    ManagerAccountingPaymentsListQueryParams,
+    {}
+  >({ url: "/manager-accounting/payments", method: "get", ...variables, signal });
+
+/**
+ * Retrieves payments live from Manager.io (read-only, not stored in our database).
+ */
+export function managerAccountingPaymentsListQuery(
+  variables: ManagerAccountingPaymentsListVariables,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<ManagerAccountingPaymentsListResponse>;
+};
+
+export function managerAccountingPaymentsListQuery(
+  variables: ManagerAccountingPaymentsListVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<ManagerAccountingPaymentsListResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function managerAccountingPaymentsListQuery(
+  variables: ManagerAccountingPaymentsListVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/manager-accounting/payments",
+      operationId: "managerAccountingPaymentsList",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) =>
+            fetchManagerAccountingPaymentsList(variables, signal),
+  };
+}
+
+/**
+ * Retrieves payments live from Manager.io (read-only, not stored in our database).
+ */
+export const useSuspenseManagerAccountingPaymentsList = <TData = ManagerAccountingPaymentsListResponse>(
+  variables: ManagerAccountingPaymentsListVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ManagerAccountingPaymentsListResponse, ManagerAccountingPaymentsListError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useSuspenseQuery<ManagerAccountingPaymentsListResponse, ManagerAccountingPaymentsListError, TData>({
+    ...managerAccountingPaymentsListQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+/**
+ * Retrieves payments live from Manager.io (read-only, not stored in our database).
+ */
+export const useManagerAccountingPaymentsList = <TData = ManagerAccountingPaymentsListResponse>(
+  variables: ManagerAccountingPaymentsListVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ManagerAccountingPaymentsListResponse, ManagerAccountingPaymentsListError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useQuery<ManagerAccountingPaymentsListResponse, ManagerAccountingPaymentsListError, TData>({
+    ...managerAccountingPaymentsListQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+
+export type ManagerAccountingReceiptsListError = Fetcher.ErrorWrapper<
+  | {
+      status: 502;
+      payload: {
+        error?: string;
+      };
+    }
+  | {
+      status: 403;
+      payload: {
+        detail?: string;
+      };
+    }
+>;
+
+export type ManagerAccountingReceiptsListResponse = {
+  business?: {
+    name?: string;
+  };
+  skip?: number;
+  pageSize?: number;
+  totalRecords?: number;
+  receipts?: {
+    key?: string;
+    date?: string;
+    reference?: string | null;
+    receivedIn?: { key?: string; name?: string };
+    description?: string;
+    paidBy?: string;
+    costOfSales?: { value?: number; currency?: string } | null;
+    amount?: { value?: number; currency?: string };
+  }[];
+};
+
+export type ManagerAccountingReceiptsListQueryParams = {
+  /**
+   * Offset for pagination
+   */
+  skip?: number;
+  /**
+   * Page size
+   */
+  pageSize?: number;
+  /**
+   * Field to sort by
+   */
+  sortBy?: string;
+  /**
+   * Sort descending
+   */
+  sortByDesc?: boolean;
+};
+
+export type ManagerAccountingReceiptsListVariables = {
+  queryParams?: ManagerAccountingReceiptsListQueryParams;
+} & AdminApiContext["fetcherOptions"];
+
+/**
+ * Retrieves receipts live from Manager.io (read-only, not stored in our database).
+ * Read-only proxy to Manager.io - nothing is stored in our database.
+ */
+export const fetchManagerAccountingReceiptsList = (
+  variables: ManagerAccountingReceiptsListVariables,
+  signal?: AbortSignal,
+) =>
+  adminApiFetch<
+    ManagerAccountingReceiptsListResponse,
+    ManagerAccountingReceiptsListError,
+    undefined,
+    {},
+    ManagerAccountingReceiptsListQueryParams,
+    {}
+  >({ url: "/manager-accounting/receipts", method: "get", ...variables, signal });
+
+/**
+ * Retrieves receipts live from Manager.io (read-only, not stored in our database).
+ */
+export function managerAccountingReceiptsListQuery(
+  variables: ManagerAccountingReceiptsListVariables,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn: (options: QueryFnOptions) => Promise<ManagerAccountingReceiptsListResponse>;
+};
+
+export function managerAccountingReceiptsListQuery(
+  variables: ManagerAccountingReceiptsListVariables | reactQuery.SkipToken,
+): {
+  queryKey: reactQuery.QueryKey;
+  queryFn:
+    | ((options: QueryFnOptions) => Promise<ManagerAccountingReceiptsListResponse>)
+    | reactQuery.SkipToken;
+};
+
+export function managerAccountingReceiptsListQuery(
+  variables: ManagerAccountingReceiptsListVariables | reactQuery.SkipToken,
+) {
+  return {
+    queryKey: queryKeyFn({
+      path: "/manager-accounting/receipts",
+      operationId: "managerAccountingReceiptsList",
+      variables,
+    }),
+    queryFn:
+      variables === reactQuery.skipToken
+        ? reactQuery.skipToken
+        : ({ signal }: QueryFnOptions) =>
+            fetchManagerAccountingReceiptsList(variables, signal),
+  };
+}
+
+/**
+ * Retrieves receipts live from Manager.io (read-only, not stored in our database).
+ */
+export const useSuspenseManagerAccountingReceiptsList = <TData = ManagerAccountingReceiptsListResponse>(
+  variables: ManagerAccountingReceiptsListVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ManagerAccountingReceiptsListResponse, ManagerAccountingReceiptsListError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useSuspenseQuery<ManagerAccountingReceiptsListResponse, ManagerAccountingReceiptsListError, TData>({
+    ...managerAccountingReceiptsListQuery(deepMerge(fetcherOptions, variables)),
+    ...options,
+    ...queryOptions,
+  });
+};
+
+/**
+ * Retrieves receipts live from Manager.io (read-only, not stored in our database).
+ */
+export const useManagerAccountingReceiptsList = <TData = ManagerAccountingReceiptsListResponse>(
+  variables: ManagerAccountingReceiptsListVariables | reactQuery.SkipToken,
+  options?: Omit<
+    reactQuery.UseQueryOptions<ManagerAccountingReceiptsListResponse, ManagerAccountingReceiptsListError, TData>,
+    "queryKey" | "queryFn" | "initialData"
+  >,
+) => {
+  const { queryOptions, fetcherOptions } = useAdminApiContext(options);
+  return reactQuery.useQuery<ManagerAccountingReceiptsListResponse, ManagerAccountingReceiptsListError, TData>({
+    ...managerAccountingReceiptsListQuery(
+      variables === reactQuery.skipToken
+        ? variables
+        : deepMerge(fetcherOptions, variables),
+    ),
+    ...options,
+    ...queryOptions,
+  });
+};
+
 export type DepartmentListError = Fetcher.ErrorWrapper<undefined>;
 
 export type DepartmentListResponse = Schemas.Department[];
@@ -16216,6 +16668,23 @@ export type QueryOperation =
       path: "/dashboard/farm-trends";
       operationId: "dashboardFarmTrends";
       variables: DashboardFarmTrendsVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/manager-accounting/sales-invoices";
+      operationId: "managerAccountingSalesInvoicesList";
+      variables:
+        | ManagerAccountingSalesInvoicesListVariables
+        | reactQuery.SkipToken;
+    }
+  | {
+      path: "/manager-accounting/payments";
+      operationId: "managerAccountingPaymentsList";
+      variables: ManagerAccountingPaymentsListVariables | reactQuery.SkipToken;
+    }
+  | {
+      path: "/manager-accounting/receipts";
+      operationId: "managerAccountingReceiptsList";
+      variables: ManagerAccountingReceiptsListVariables | reactQuery.SkipToken;
     }
   | {
       path: "/department";
