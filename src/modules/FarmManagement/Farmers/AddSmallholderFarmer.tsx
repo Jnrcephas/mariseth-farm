@@ -59,6 +59,9 @@ const getSmallholderFarmerDefaultValues = (defaultData: any) => ({
     country: getStringValue(getCountryValue(defaultData?.country)),
     lead_farmer: getStringValue(getValueId(defaultData?.lead_farmer)),
 
+    has_disability: getStringValue(defaultData?.has_disability),
+    disability_details: defaultData?.disability_details || "",
+
     has_received_support: getStringValue(defaultData?.support_assistance?.has_received_support ?? defaultData?.support_assistance?.received_support),
     support_received: defaultData?.support_assistance?.support_received || defaultData?.support_assistance?.specify_support_received || "",
     areas_of_needed_assistance: defaultData?.support_assistance?.areas_of_needed_assistance || ""
@@ -121,6 +124,8 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
             country: values?.country,
             lead_farmer: values?.lead_farmer,
             farm: Number(values?.farm),
+            has_disability: stringToBool(values?.has_disability),
+            disability_details: values?.disability_details,
             support_assistance: {
                 has_received_support: stringToBool(values?.has_received_support),
                 support_received: values?.support_received,
@@ -332,6 +337,43 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                                 <FormLabel>Village/Community<div className='text-red-500'>*</div></FormLabel>
                                 <FormControl>
                                 <Input placeholder="Enter Community" {...field} required/>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <div>
+                            <Label className="capitalize mb-3">Does the farmer have any disability?<div className='text-red-500'>*</div></Label>
+                            <FormField
+                                control={form.control}
+                                name="has_disability"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <RadioGroup 
+                                            className="flex flex-row w-full gap-x-6"
+                                            required
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            {YES_NO_OPTIONS.map((item, idx) => (
+                                                <div key={idx} className="flex items-center space-x-2">
+                                                    <RadioGroupItem value={item.value} id={item.value} />
+                                                    <Label htmlFor={item.value} className="capitalize cursor-pointer">{item.label}</Label>
+                                                </div>
+                                            ))}
+                                        </RadioGroup>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="disability_details"
+                            render={({ field }) => (
+                            <FormItem className={`${form.watch("has_disability") !== "true" && "opacity-[40%]"}`}>
+                                <FormLabel>If Yes, Please Specify Here </FormLabel>
+                                <FormControl>
+                                <Input placeholder="e.g. Visual impairment, physical disability" {...field} disabled={form.watch("has_disability") !== "true"}/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

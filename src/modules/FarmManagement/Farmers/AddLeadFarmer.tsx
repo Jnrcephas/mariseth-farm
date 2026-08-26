@@ -57,6 +57,9 @@ const getLeadFarmerDefaultValues = (defaultData: any) => ({
     district: getStringValue(getValueId(defaultData?.district)),
     country: getStringValue(getCountryValue(defaultData?.country)),
 
+    has_disability: getStringValue(defaultData?.has_disability),
+    disability_details: defaultData?.disability_details || "",
+
     farming_type: getStringValue(defaultData?.leadership_experience?.farming_type),
     is_mentoring_other_farmers: getStringValue(defaultData?.leadership_experience?.is_mentoring_other_farmers),
     id_type: getIdTypeValue(defaultData?.id_type),
@@ -126,6 +129,8 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
             district: values?.district,
             country: values?.country,
             farm: Number(values?.farm),
+            has_disability: stringToBool(values?.has_disability),
+            disability_details: values?.disability_details,
             leadership_experience: {
                 farming_type: values?.farming_type,
                 is_mentoring_other_farmers: stringToBool(values?.is_mentoring_other_farmers),
@@ -349,6 +354,45 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                                 <FormLabel>Village/Community<div className='text-red-500'>*</div></FormLabel>
                                 <FormControl>
                                 <Input placeholder="Enter Community" {...field} required/>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <Label className="capitalize mb-3">Does the farmer have any disability?<div className='text-red-500'>*</div></Label>
+                            <FormField
+                                control={form.control}
+                                name="has_disability"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <RadioGroup 
+                                            className="flex flex-row w-full gap-x-6"
+                                            required
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            {YES_NO_OPTIONS.map((item, idx) => (
+                                                <div key={idx} className="flex items-center space-x-2">
+                                                    <RadioGroupItem value={item.value} id={item.value} />
+                                                    <Label htmlFor={item.value} className="capitalize cursor-pointer">{item.label}</Label>
+                                                </div>
+                                            ))}
+                                        </RadioGroup>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="disability_details"
+                            render={({ field }) => (
+                            <FormItem className={`${form.watch("has_disability") !== "true" && "opacity-[40%]"}`}>
+                                <FormLabel>If Yes, Please Specify Here </FormLabel>
+                                <FormControl>
+                                <Input placeholder="e.g. Visual impairment, physical disability" {...field} disabled={form.watch("has_disability") !== "true"}/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -666,5 +710,3 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
         </div>
     )
 }
-
-

@@ -30,6 +30,9 @@ export const externalFarmSchema = z.object({
   farming_methods: z.string(),
   irrigation: z.string(),
   has_access_to_market: z.string(),
+  labor_force_total: z.string().optional(),
+  labor_force_male: z.string().optional(),
+  labor_force_female: z.string().optional(),
 });
 
 export const internalFarmSchema = z.object({
@@ -52,6 +55,9 @@ export const internalFarmSchema = z.object({
     value: z.number(),
     label: z.string()
   })).optional(),
+  labor_force_total: z.string().optional(),
+  labor_force_male: z.string().optional(),
+  labor_force_female: z.string().optional(),
 });
 
 
@@ -76,6 +82,8 @@ export const leadFarmerSchema = z.object({
   district: z.string(),
   country: z.string(),
   farm: z.string().optional(),
+  has_disability: z.string().optional(),
+  disability_details: z.string().optional(),
   farming_type: z.string().optional(),
   is_mentoring_other_farmers: z.string().optional(),
   number_of_farmers_mentoring: z.string().optional(),
@@ -110,6 +118,8 @@ export const smallholderFarmerSchema = z.object({
   country: z.string(),
   lead_farmer: z.string(),
   farm: z.string().optional(),
+  has_disability: z.string().optional(),
+  disability_details: z.string().optional(),
   has_received_support: z.string().optional(),
   support_received: z.string().optional(),
   areas_of_needed_assistance: z.string().optional(),

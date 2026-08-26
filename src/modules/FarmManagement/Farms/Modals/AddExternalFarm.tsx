@@ -140,6 +140,9 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
             farming_methods: [values?.farming_methods],
             irrigation: values?.irrigation === "yes" ? true : false,
             has_access_to_market: values?.has_access_to_market === "yes" ? true : false,
+            labor_force_total: values?.labor_force_total ? Number(values?.labor_force_total) : undefined,
+            labor_force_male: values?.labor_force_male ? Number(values?.labor_force_male) : undefined,
+            labor_force_female: values?.labor_force_female ? Number(values?.labor_force_female) : undefined,
             ...(boundary ? { boundary } : {})
         } as any
 
@@ -496,6 +499,50 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
                                                 </RadioGroup> 
                                             )}/>
                                     </div>
+                                </div>
+                            </div>
+                            <div>
+                                <Label className="capitalize mb-3">Labor Force</Label>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                    <FormField
+                                        control={form.control}
+                                        name="labor_force_total"
+                                        render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Total Number of Workers</FormLabel>
+                                            <FormControl>
+                                            <Input placeholder="Enter Total" {...field} type="number" min={0} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="labor_force_male"
+                                        render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Number of Males</FormLabel>
+                                            <FormControl>
+                                            <Input placeholder="Enter Number" {...field} type="number" min={0} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="labor_force_female"
+                                        render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Number of Females</FormLabel>
+                                            <FormControl>
+                                            <Input placeholder="Enter Number" {...field} type="number" min={0} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                        )}
+                                    />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1">
