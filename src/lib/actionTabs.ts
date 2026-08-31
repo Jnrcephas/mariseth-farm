@@ -78,7 +78,7 @@ export const FINANCE_TABS: ActionTabConfig[] = [
   { label: "Waybills", href: routeTo.accountingWaybills, permission: "accounting|list_waybills" },
   { label: "Invoices", href: routeTo.accountingInvoices, permission: "accounting|list_invoices" },
   { label: "Manager Accounting", href: routeTo.accountingManagerAccounting, permission: "manager_accounting|list_sales_invoices" },
-  { label: "Accounting", href: "https://meshsuites.manager.io/businesses", external: true },
+  { label: "Accounting", href: "https://meshsuites.cpt.manager.cloud/login", external: true },
 ];
 
 // "Farm Monitoring" is a new sidebar item on its own (not merged with
