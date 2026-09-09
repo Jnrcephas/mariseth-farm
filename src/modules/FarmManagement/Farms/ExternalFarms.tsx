@@ -11,7 +11,7 @@ import ViewFarm from "./Modals/ViewFarm";
 import AddExternalFarmModal from "./Modals/AddExternalFarm";
 import DeleteFarmModal from "./Modals/DeleteFarm";
 import { useFarmManagementFarmList } from "@/apis/adminApiComponents";
-import { colorPalate, commaSeparator } from "@/lib/helpers";
+import { colorPalate, commaSeparator, formatDateReadable } from "@/lib/helpers";
 import ExternalFarmSearch from "./ExternalFarmSearch";
 import Link from "next/link";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
@@ -59,6 +59,17 @@ export default function ExternalFarms() {
     const columns: ColumnDef<any>[] = [
         { header: "Farm ID", accessorKey: "farm_id" },
         { header: "Farm Name", accessorKey: "name", },
+        {
+            header: "Date Added", accessorKey: "date_created",
+            cell: (_row) => {
+                const row = _row.cell.row.original
+                return (
+                    <div className="">
+                        {formatDateReadable(row?.date_created)}
+                    </div>
+                );
+            },
+        },
         {
             header: "Farmer", accessorKey: "farmer",
             cell: (_row) => {

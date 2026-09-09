@@ -1,6 +1,7 @@
 "use client"
 import { useWaybillRead } from "@/apis/adminApiComponents";
 import SuspensePageWrapper from "@/components/SuspensePageWrapper";
+import { AuthorizeAndRenderPage } from "@/components/Unauthorized";
 import { PageProps } from "@/lib/types";
 import PrintWaybillInbound from "@/modules/Accounting/Waybills/PrintWaybillInbound";
 import { use } from "react";
@@ -20,7 +21,7 @@ export default function Page({ params }: PageProps){
 
     return(
 
-        <div>
+        <AuthorizeAndRenderPage permission={"accounting|view_waybill"}>
             <SuspensePageWrapper isLoading={isPending}>
                 <div>
                     <div className="bg-[#fff] rounded-lg h-full">
@@ -32,6 +33,6 @@ export default function Page({ params }: PageProps){
                     </div>
                 </div>
             </SuspensePageWrapper>
-        </div>
+        </AuthorizeAndRenderPage>
     )
 }

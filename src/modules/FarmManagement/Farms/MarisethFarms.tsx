@@ -12,7 +12,7 @@ import ViewMarisethFarm from "./Modals/ViewMarisethFarm";
 import MarisethFarmSearch from "./MarisethFarmSearch";
 import { useHasAccess } from "@/hooks/auth/useHasAccess";
 import { Badge } from "@/components/ui/badge";
-import { colorPalate, commaSeparator } from "@/lib/helpers";
+import { colorPalate, commaSeparator, formatDateReadable } from "@/lib/helpers";
 
 
 export default function MarisethFarms() {
@@ -57,6 +57,17 @@ export default function MarisethFarms() {
     const columns: ColumnDef<any>[] = [
         { header: "Farm ID", accessorKey: "farm_id" },
         { header: "Farm Name", accessorKey: "name", },
+        {
+            header: "Date Added", accessorKey: "date_created",
+            cell: (_row) => {
+                const row = _row.cell.row.original
+                return (
+                    <div className="">
+                        {formatDateReadable(row?.date_created)}
+                    </div>
+                );
+            },
+        },
         { header: "Type of Farm", accessorKey: "type", },
         {
             header: "Size", accessorKey: "size",
