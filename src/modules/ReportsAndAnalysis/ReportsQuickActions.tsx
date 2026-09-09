@@ -32,7 +32,7 @@ const REPORTS_QUICK_ACTION_CARDS: ReportsQuickActionCardConfig[] = [
   },
   {
     title: "Financial Reports",
-    href: routeTo.accountingExpenses,
+    href: routeTo.accountingAnalytics,
     icon: FileSpreadsheet,
     bgColor: "#17A2A0",
   },

@@ -4,7 +4,7 @@ import { XCircle } from "lucide-react";
 import { Label, TextLabel } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { colorPalate } from "@/lib/helpers";
+import { colorPalate, formatDateReadable } from "@/lib/helpers";
 
 export default function ViewMarisethFarm({open, setOpen, data}:TViewFarmModal){
     return(
@@ -19,6 +19,7 @@ export default function ViewMarisethFarm({open, setOpen, data}:TViewFarmModal){
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <TextLabel title="Farm Name" subTitle={data?.name} />
                         <TextLabel title="Farm ID" subTitle={data?.farm_id}/>
+                        <TextLabel title="Date Added" subTitle={formatDateReadable(data?.date_created)}/>
                         <TextLabel title="Farm Location (GPS Coordinates if available)" subTitle={data?.location}/>
                         <TextLabel title="Farm Region" subTitle={data?.region?.name}/>
                         <TextLabel title="Farm District" subTitle={data?.district?.name}/>

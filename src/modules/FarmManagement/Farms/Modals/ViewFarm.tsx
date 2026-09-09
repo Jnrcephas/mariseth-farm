@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogPoweredByFooter, DialogTitle } from "@/com
 import { TViewFarmModal } from "../../utils/types";
 import { XCircle } from "lucide-react";
 import { Label, TextLabel } from "@/components/ui/label";
-import { colorPalate } from "@/lib/helpers";
+import { colorPalate, formatDateReadable } from "@/lib/helpers";
 import { Badge } from "@/components/ui/badge";
 
 export default function ViewFarm({open, setOpen, data}:TViewFarmModal){
@@ -18,6 +18,7 @@ export default function ViewFarm({open, setOpen, data}:TViewFarmModal){
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <TextLabel title="Farm Name" subTitle={data?.name} />
                         <TextLabel title="Farm ID" subTitle={data?.farm_id}/>
+                        <TextLabel title="Date Added" subTitle={formatDateReadable(data?.date_created)}/>
                         <TextLabel title="Farmer Name" subTitle={
                             <div>
                                 {data?.farmer?.first_name} {data?.farmer?.last_name}

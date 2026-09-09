@@ -21,7 +21,7 @@ const QUICK_ACTION_CARDS: QuickActionCardConfig[] = [
   },
   {
     title: "Accounting and Finance",
-    href: routeTo.accountingExpenses,
+    href: routeTo.accountingAnalytics,
     icon: ClipboardList,
     bgColor: "#79C044",
   },
