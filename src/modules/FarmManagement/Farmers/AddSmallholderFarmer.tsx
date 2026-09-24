@@ -62,7 +62,7 @@ const getSmallholderFarmerDefaultValues = (defaultData: any) => ({
     has_disability: getStringValue(defaultData?.has_disability),
     disability_details: defaultData?.disability_details || "",
 
-    has_received_support: getStringValue(defaultData?.support_assistance?.has_received_support ?? defaultData?.support_assistance?.received_support),
+    has_received_support: getStringValue(defaultData?.support_assistance?.has_received_support ?? defaultData?.support_assistance?.received_support), 
     support_received: defaultData?.support_assistance?.support_received || defaultData?.support_assistance?.specify_support_received || "",
     areas_of_needed_assistance: defaultData?.support_assistance?.areas_of_needed_assistance || ""
 });
@@ -123,7 +123,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
             district: values?.district,
             country: values?.country,
             lead_farmer: values?.lead_farmer,
-            farm: Number(values?.farm),
+            farm: values?.farm ? Number(values.farm) : undefined,
             has_disability: stringToBool(values?.has_disability),
             disability_details: values?.disability_details,
             support_assistance: {

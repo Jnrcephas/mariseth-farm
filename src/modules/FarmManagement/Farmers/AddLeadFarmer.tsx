@@ -9,7 +9,7 @@ import {
     FormLabel,
     FormMessage,
   } from '@/components/ui/form';
-  import { Input } from '@/components/ui/input';
+  import { Input } from '@/components/ui/input';  
 
   import {
     Select,
@@ -128,7 +128,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
             region: values?.region,
             district: values?.district,
             country: values?.country,
-            farm: Number(values?.farm),
+            farm: values?.farm ? Number(values.farm) : undefined,
             has_disability: stringToBool(values?.has_disability),
             disability_details: values?.disability_details,
             leadership_experience: {
