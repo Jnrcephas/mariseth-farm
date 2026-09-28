@@ -22,7 +22,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { internalFarmSchema } from "../../utils/validations";
 import { Label, LoadingLabel } from "@/components/ui/label";
-import { Loader, XCircle } from "lucide-react";
+import { Check, ChevronsUpDown, Loader, XCircle } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import {
     Dialog,
     DialogContent,
@@ -87,6 +90,9 @@ export default function AddMerisethFarmModal({ open, setOpen, defaultData, isEdi
     const regions = _regions?.results as Region[] || []
 
     const { districts } = useGetRegionDistricts(regions, Number(form.watch("region")))
+
+    const [districtOpen, setDistrictOpen] = useState(false)
+    const selectedDistrict = districts?.find((d) => String(d.id) === form.watch("district"))
 
     // "boundary" is a new field the backend added to the farm payload
     // (GeoJSON Polygon) - farms need one set before they can receive
@@ -260,25 +266,52 @@ export default function AddMerisethFarmModal({ open, setOpen, defaultData, isEdi
                                         control={form.control}
                                         name="district"
                                         render={({ field }) => (
-                                            <FormItem>
+                                            <FormItem className="flex flex-col">
                                                 <FormLabel>District<div className='text-red-500'>*</div></FormLabel>
-                                                <Select
-                                                    onValueChange={field.onChange}
-                                                    defaultValue={field.value}
-                                                >
-                                                    <FormControl>
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {districts?.map((item, idx) => (
-                                                            <SelectItem key={idx} value={String(item.id)}>
-                                                                {item.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                <Popover open={districtOpen} onOpenChange={setDistrictOpen}>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                role="combobox"
+                                                                className={cn("w-full justify-between font-normal", !selectedDistrict && "text-muted-foreground")}
+                                                            >
+                                                                {selectedDistrict ? selectedDistrict.name : "Select"}
+                                                                <ChevronsUpDown className="opacity-50" />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                                                        <Command>
+                                                            <CommandInput placeholder="Search district..." className="h-9" />
+                                                            {/* stopPropagation on wheel so the list scrolls inside the modal dialog */}
+                                                            <CommandList onWheel={(e) => e.stopPropagation()}>
+                                                                <CommandEmpty>{districts?.length ? "No district found." : "Select a region first."}</CommandEmpty>
+                                                                <CommandGroup>
+                                                                    {districts?.map((item) => (
+                                                                        <CommandItem
+                                                                            key={item.id}
+                                                                            value={item.name}
+                                                                            onSelect={() => {
+                                                                                form.setValue("district", String(item.id), { shouldValidate: true })
+                                                                                setDistrictOpen(false)
+                                                                            }}
+                                                                        >
+                                                                            {item.name}
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "ml-auto",
+                                                                                    String(item.id) === field.value ? "opacity-100" : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            </CommandList>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
                                                 <FormMessage />
                                             </FormItem>
                                         )}

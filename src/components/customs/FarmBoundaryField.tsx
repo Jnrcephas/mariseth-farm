@@ -66,6 +66,9 @@ export default function FarmBoundaryField({
 }) {
   const [pasteOpen, setPasteOpen] = useState(false)
   const [pasteText, setPasteText] = useState("")
+  // Bumped whenever the whole point list is replaced at once (bulk paste),
+  // which tells the map to zoom to the new boundary.
+  const [fitVersion, setFitVersion] = useState(0)
 
   const handleAddPoint = (pt: [number, number]) => {
     onChange([...value, pt])
@@ -94,6 +97,7 @@ export default function FarmBoundaryField({
       return
     }
     onChange(parsed)
+    setFitVersion((v) => v + 1)
     setPasteText("")
     setPasteOpen(false)
   }
@@ -129,7 +133,7 @@ export default function FarmBoundaryField({
       </div>
 
       <div className="h-[260px] rounded-lg overflow-hidden border border-[#E2E8F0]">
-        <FarmBoundaryMap center={center} points={value} onAddPoint={handleAddPoint} />
+        <FarmBoundaryMap center={center} points={value} onAddPoint={handleAddPoint} fitTrigger={fitVersion} />
       </div>
 
       {/* Editable coordinate list - stays in sync with the map. Useful when
