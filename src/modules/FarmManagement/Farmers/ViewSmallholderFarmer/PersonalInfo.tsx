@@ -8,6 +8,7 @@ import { TextLabel } from "@/components/ui/label"
 import { IFarmer } from "../../utils/types"
 import { formatDateReadable, formatGender } from "@/lib/helpers"
 import { formatPhoneNumberStartWithZero } from "@/modules/UserManagement/utils/helpers"
+import FarmerProfileInfo from "../FarmerProfileInfo"
 
 export default function LeadFarmerPersonalInfo({defaultData}:{defaultData: IFarmer}){
 
@@ -35,6 +36,7 @@ export default function LeadFarmerPersonalInfo({defaultData}:{defaultData: IFarm
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
+            <FarmerProfileInfo defaultData={defaultData} />
         </div>
     )
 }

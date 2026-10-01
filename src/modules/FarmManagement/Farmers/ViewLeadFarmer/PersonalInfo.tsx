@@ -8,6 +8,7 @@ import { TextLabel } from "@/components/ui/label"
 import { boolToYesNo, formatDateReadable, formatGender } from "@/lib/helpers"
 import { IFarmer } from "../../utils/types"
 import { formatPhoneNumberStartWithZero } from "@/modules/UserManagement/utils/helpers"
+import FarmerProfileInfo from "../FarmerProfileInfo"
 
 
 
@@ -37,6 +38,7 @@ export default function LeadFarmerPersonalInfo({defaultData}:{defaultData: IFarm
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
+            <FarmerProfileInfo defaultData={defaultData} />
             <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-2">
                     <AccordionTrigger className="border px-5 rounded-t-lg text-[#4A8D34]">Leadership & Experience</AccordionTrigger>

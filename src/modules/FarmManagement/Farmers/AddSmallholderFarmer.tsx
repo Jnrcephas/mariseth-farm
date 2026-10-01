@@ -37,6 +37,8 @@ import { FarmerCombobox } from "../utils/FarmerCombobox";
 import { FarmCombobox } from "../utils/FarmCombobox";
 import { Region } from "@/apis/adminApiSchemas";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
+import FarmerProfileFields from "../utils/FarmerProfileFields";
+import { buildFarmerProfilePayload, getFarmerProfileDefaultValues } from "../utils/helpers";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
 
 const getValueId = (value: any) => value?.id ?? value ?? "";
@@ -49,6 +51,7 @@ const idTypeMap = {
 const getIdTypeValue = (value: any) => idTypeMap[String(value)] || getStringValue(value);
 const getSmallholderFarmerDefaultValues = (defaultData: any) => ({
     ...defaultData,
+    ...getFarmerProfileDefaultValues(defaultData),
     phone_number: formatPhoneNumberWithPlus(defaultData?.phone_number),
     email: defaultData?.email || "",
     other_names: defaultData?.other_names || "",
@@ -131,6 +134,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                 support_received: values?.support_received,
                 areas_of_needed_assistance: values?.areas_of_needed_assistance
             },
+            ...buildFarmerProfilePayload(values),
             farmer_reg_request: farmerRegRequestId
         })
 
@@ -499,6 +503,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                             )}
                         />
                     </div>
+                    <FarmerProfileFields form={form} defaultData={defaultData} />
                     <div className="text-xl font-medium">Support & Assistance</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
