@@ -94,6 +94,17 @@ export const leadFarmerSchema = z.object({
   has_received_support: z.string().optional(),
   support_received: z.string().optional(),
   areas_of_needed_assistance: z.string().optional(),
+  project: z.string().optional(),
+  nationality: z.string().optional(),
+  marital_status: z.string().optional(),
+  alternative_phone_number: z.string().optional(),
+  education_level: z.string().optional(),
+  average_income: z.string().optional(),
+  number_of_households: z.string().optional(),
+  number_of_dependents: z.string().optional(),
+  years_of_experience: z.string().optional(),
+  number_of_farms: z.string().optional(),
+  consent: z.boolean().optional(),
 });
 
 export const smallholderFarmerSchema = z.object({
@@ -123,6 +134,17 @@ export const smallholderFarmerSchema = z.object({
   has_received_support: z.string().optional(),
   support_received: z.string().optional(),
   areas_of_needed_assistance: z.string().optional(),
+  project: z.string().optional(),
+  nationality: z.string().optional(),
+  marital_status: z.string().optional(),
+  alternative_phone_number: z.string().optional(),
+  education_level: z.string().optional(),
+  average_income: z.string().optional(),
+  number_of_households: z.string().optional(),
+  number_of_dependents: z.string().optional(),
+  years_of_experience: z.string().optional(),
+  number_of_farms: z.string().optional(),
+  consent: z.boolean().optional(),
 });
 
 export const cropSchema = z.object({

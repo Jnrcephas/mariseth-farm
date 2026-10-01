@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react"
+import { Check, ChevronsUpDown, Loader2, Plus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -19,6 +19,15 @@ export interface AsyncComboboxOption {
   value: string
   label: string
   raw?: any
+}
+
+export interface AsyncComboboxCreateOption {
+  /** Called with the trimmed search term when the user picks the "Create" row.
+   * The dropdown stays open (showing a spinner) until the promise settles,
+   * and closes on success. Handle errors (toasts etc.) in the caller. */
+  onCreate: (term: string) => Promise<unknown>
+  /** Label for the create row. Defaults to `Create "<term>"`. */
+  label?: (term: string) => string
 }
 
 export interface AsyncComboboxProps {
@@ -45,6 +54,8 @@ export interface AsyncComboboxProps {
   triggerClassName?: string
   contentClassName?: string
   required?: boolean
+  /** Optional "create new" row, shown when the typed term has no exact match. */
+  createOption?: AsyncComboboxCreateOption
 }
 
 /**
@@ -70,8 +81,34 @@ export function AsyncCombobox({
   triggerClassName,
   contentClassName,
   required,
+  createOption,
 }: AsyncComboboxProps) {
   const [open, setOpen] = React.useState(false)
+  const [isCreating, setIsCreating] = React.useState(false)
+
+  const trimmedTerm = searchTerm.trim()
+  const showCreate =
+    !!createOption &&
+    trimmedTerm.length > 0 &&
+    !isLoading &&
+    !options.some(
+      (option) => option.label.trim().toLowerCase() === trimmedTerm.toLowerCase(),
+    )
+
+  const handleCreate = async () => {
+    if (!createOption || isCreating) return
+    setIsCreating(true)
+    try {
+      await createOption.onCreate(trimmedTerm)
+      setOpen(false)
+      onSearchTermChange("")
+    } catch {
+      // The caller surfaces the error; keep the dropdown open so the user
+      // can fix the name and retry.
+    } finally {
+      setIsCreating(false)
+    }
+  }
 
   // Cache the label of whatever option we've most recently resolved for the
   // current value, so the trigger keeps showing the right text even after
@@ -174,6 +211,25 @@ export function AsyncCombobox({
                     </CommandItem>
                   ))}
                 </CommandGroup>
+                {showCreate && (
+                  <CommandGroup>
+                    <CommandItem
+                      value={`__create__${trimmedTerm}`}
+                      disabled={isCreating}
+                      onSelect={handleCreate}
+                      className="text-[#16A34A] font-medium"
+                    >
+                      {isCreating ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Plus className="size-4" />
+                      )}
+                      <span className="truncate">
+                        {createOption?.label?.(trimmedTerm) ?? `Create "${trimmedTerm}"`}
+                      </span>
+                    </CommandItem>
+                  </CommandGroup>
+                )}
               </>
             )}
           </CommandList>

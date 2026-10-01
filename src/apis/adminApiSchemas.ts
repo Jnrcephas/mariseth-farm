@@ -1358,6 +1358,23 @@ export type Farmer = {
    */
   id_type?: string | null;
   documents?: FarmerDocument[];
+  project?: number | { id: number; name: string } | null;
+  nationality?: string | null;
+  marital_status?: "married" | "single" | "divorced" | "widowed" | null;
+  alternative_phone_number?: string | null;
+  education_level?:
+    | "no_formal_education"
+    | "basic"
+    | "secondary"
+    | "tertiary"
+    | "vocational"
+    | null;
+  average_income?: number | string | null;
+  number_of_households?: number | null;
+  number_of_dependents?: number | null;
+  years_of_experience?: number | null;
+  number_of_falls?: number | null;
+  consent?: boolean;
 };
 
 export type Product = {

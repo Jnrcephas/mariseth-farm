@@ -36,6 +36,8 @@ import { Region } from "@/apis/adminApiSchemas";
 import useGetRegionDistricts from "../utils/hooks";
 import { FarmCombobox } from "../utils/FarmCombobox";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
+import FarmerProfileFields from "../utils/FarmerProfileFields";
+import { buildFarmerProfilePayload, getFarmerProfileDefaultValues } from "../utils/helpers";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
 
 const getValueId = (value: any) => value?.id ?? value ?? "";
@@ -48,6 +50,7 @@ const idTypeMap = {
 const getIdTypeValue = (value: any) => idTypeMap[String(value)] || getStringValue(value);
 const getLeadFarmerDefaultValues = (defaultData: any) => ({
     ...defaultData,
+    ...getFarmerProfileDefaultValues(defaultData),
     phone_number: formatPhoneNumberWithPlus(defaultData?.phone_number),
     email: defaultData?.email || "",
     other_names: defaultData?.other_names || "",
@@ -145,6 +148,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                 support_received: values?.support_received,
                 areas_of_needed_assistance: values?.areas_of_needed_assistance
             },
+            ...buildFarmerProfilePayload(values),
             farmer_reg_request: farmerRegRequestId
         }) 
         if(isEdit){
@@ -499,6 +503,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                             )}
                         />
                     </div>
+                    <FarmerProfileFields form={form} defaultData={defaultData} />
                     <div className="text-xl font-medium">Leadership & Experience</div>
                     <div className=""> 
                         <FormField

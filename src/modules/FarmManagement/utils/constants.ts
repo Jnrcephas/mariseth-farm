@@ -177,3 +177,28 @@ export const areasOfNeed = [
       },
     }),
   };
+
+
+// ---------------------------------------------------------------------------
+// Farmer profile choices. `value` must match the backend's
+// MARITAL_STATUS_CHOICES / EDUCATION_LEVEL_CHOICES exactly.
+// ---------------------------------------------------------------------------
+export const MARITAL_STATUS_OPTIONS = [
+  { value: "married", label: "Married" },
+  { value: "single", label: "Single" },
+  { value: "divorced", label: "Divorced" },
+  { value: "widowed", label: "Widowed" },
+]
+
+export const EDUCATION_LEVEL_OPTIONS = [
+  { value: "no_formal_education", label: "No Formal Education" },
+  { value: "basic", label: "Basic" },
+  { value: "secondary", label: "Secondary" },
+  { value: "tertiary", label: "Tertiary" },
+  { value: "vocational", label: "Vocational" },
+]
+
+export const labelFor = (
+  options: { value: string; label: string }[],
+  value?: string | null,
+) => options.find((o) => o.value === value)?.label ?? value ?? ""
