@@ -1,6 +1,7 @@
+import { farmerTypeLabel, farmerViewRoute } from "../utils/farmerTypes";
 import CustomTable, { IPagination } from "@/components/CustomTable";
 import { Badge } from "@/components/ui/badge";
-import { PAGE_SIZE, routeTo } from "@/lib/constants";
+import { PAGE_SIZE } from "@/lib/constants";
 import { ColumnDef } from "@tanstack/react-table";
 import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
@@ -77,16 +78,10 @@ export default function ExternalFarms() {
                 return (
                     <div className="capitalize flex flex-col">
                         <div>
-                            {row?.farmer?.type === "lead" ?
-                                <Link href={`${routeTo.viewLeadFarmer}/${row.farmer?.id}`} className="text-[#2563EB]">
-                                    {row?.farmer?.first_name} {row?.farmer?.last_name}
-                                    <div className="text-[#64748B]">Lead Farmer</div>
-                                </Link>
-                                : <Link href={`${routeTo.viewSmallholderFarmer}/${row.farmer?.id}`} className="text-[#2563EB]">
-                                    {row?.farmer?.first_name} {row?.farmer?.last_name}
-                                    <div className="text-[#64748B]">Smallholder Farmer</div>
-                                </Link>
-                            }
+                            <Link href={`${farmerViewRoute(row?.farmer?.type)}/${row.farmer?.id}`} className="text-[#2563EB]">
+                                {row?.farmer?.first_name} {row?.farmer?.last_name}
+                                <div className="text-[#64748B]">{farmerTypeLabel(row?.farmer?.type)}</div>
+                            </Link>
                         </div>
 
                     </div>

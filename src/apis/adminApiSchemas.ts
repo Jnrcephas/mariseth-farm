@@ -422,7 +422,7 @@ export type FullFarm = {
 
 export type FullFarmer = {
   id?: number;
-  type: "lead" | "smallholder";
+  type: "lead" | "smallholder" | "commercial";
   /**
    * @maxLength 50
    * @minLength 1
@@ -941,7 +941,7 @@ export type ShortFarmer = {
    * @minLength 1
    */
   last_name: string;
-  type: "lead" | "smallholder";
+  type: "lead" | "smallholder" | "commercial";
 };
 
 export type FullInputCredit = {
@@ -1301,7 +1301,7 @@ export type FarmerDocument = {
 
 export type Farmer = {
   id?: number;
-  type: "lead" | "smallholder";
+  type: "lead" | "smallholder" | "commercial";
   /**
    * @maxLength 100
    * @minLength 1

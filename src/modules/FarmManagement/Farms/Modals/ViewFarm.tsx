@@ -1,3 +1,4 @@
+import { farmerTypeLabel } from "../../utils/farmerTypes";
 import { Dialog, DialogContent, DialogPoweredByFooter, DialogTitle } from "@/components/ui/dialog";
 import { TViewFarmModal } from "../../utils/types";
 import { XCircle } from "lucide-react";
@@ -22,7 +23,7 @@ export default function ViewFarm({open, setOpen, data}:TViewFarmModal){
                         <TextLabel title="Farmer Name" subTitle={
                             <div>
                                 {data?.farmer?.first_name} {data?.farmer?.last_name}
-                                <div className="font-normal text-xs">{data?.farmer?.type === "lead" ? "Lead Farmer" : "Smallholder Farmer"}</div>
+                                <div className="font-normal text-xs">{farmerTypeLabel(data?.farmer?.type)}</div>
                             </div>}
                         />
                         <TextLabel title="Farm Location (GPS Coordinates if available)" subTitle={data?.location}/>

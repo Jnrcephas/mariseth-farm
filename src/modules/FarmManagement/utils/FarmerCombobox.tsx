@@ -10,7 +10,7 @@ import { useFarmerSearch } from "./hooks"
 interface FarmerComboboxProps {
   value?: string | null
   onChange: (value: string, option?: AsyncComboboxOption) => void
-  farmerType: "lead" | "smallholder" | ""
+  farmerType: "lead" | "smallholder" | "commercial" | ""
   /** Label to show for the currently selected farmer before it appears in a
    * search result page - e.g. `${first_name} ${last_name}` from an edit
    * form's `defaultData`. */

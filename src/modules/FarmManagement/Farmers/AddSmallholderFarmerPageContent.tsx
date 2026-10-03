@@ -6,8 +6,10 @@ import AddSmallholderFarmer from "./AddSmallholderFarmer";
 
 export default function AddSmallholderFarmerPageContent({
   farmerRegRequestId,
+  farmerType = "smallholder",
 }: {
   farmerRegRequestId?: number;
+  farmerType?: "smallholder" | "commercial";
 }) {
   const hasRegRequest = Boolean(farmerRegRequestId);
 
@@ -28,7 +30,7 @@ export default function AddSmallholderFarmerPageContent({
           Loading pre-filled request data...
         </div>
       )}
-      <AddSmallholderFarmer defaultData={data || {}} farmerRegRequestId={farmerRegRequestId} />
+      <AddSmallholderFarmer defaultData={data || {}} farmerRegRequestId={farmerRegRequestId} farmerType={farmerType} />
     </div>
   );
 }

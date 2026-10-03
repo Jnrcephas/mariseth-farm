@@ -15,10 +15,11 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Edit } from "lucide-react"
 import { useFarmManagementFarmRead } from "@/apis/adminApiComponents"
 import { IFarmer } from "../../utils/types"
+import { FARMER_TYPE_LABEL } from "../../utils/farmerTypes"
 import SuspenseWrapper from "@/components/SuspenseWrapper"
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized"
 
-export function ViewSmallholderFarmer({defaultData}:{defaultData: IFarmer}) {
+export function ViewSmallholderFarmer({defaultData, farmerType="smallholder"}:{defaultData: IFarmer; farmerType?: "smallholder" | "commercial"}) {
 
   const { data, isPending } = useFarmManagementFarmRead({
         pathParams: {id: Number(defaultData?.farm?.id),
@@ -33,7 +34,7 @@ export function ViewSmallholderFarmer({defaultData}:{defaultData: IFarmer}) {
                   <ArrowLeft className="text-[#16A34A]"/>Back
               </Button>
           </Link>
-          <Link href={`${routeTo.editSmallholderFarmer}/${defaultData?.id}`}>
+          <Link href={`${farmerType === "commercial" ? routeTo.editCommercialFarmer : routeTo.editSmallholderFarmer}/${defaultData?.id}`}>
             <Button variant="outline" className="bg-[#4A8D34] border-[#4A8D34] text-white hover:text-[#4A8D34] cursor-pointer">
               <Edit/>  Edit
             </Button>
@@ -46,7 +47,7 @@ export function ViewSmallholderFarmer({defaultData}:{defaultData: IFarmer}) {
             <TabsTrigger className="h-[28px] cursor-pointer" value="3">Credit History</TabsTrigger>
           </TabsList>
           <TabsContent value="1" className="p-5">
-            <LeadFarmerPersonalInfo defaultData={defaultData}/>
+            <LeadFarmerPersonalInfo defaultData={defaultData} farmerLabel={FARMER_TYPE_LABEL[farmerType]}/>
           </TabsContent>
           <TabsContent value="2" className="p-5">
             <SuspenseWrapper isLoading={isPending}>

@@ -18,6 +18,9 @@ export const routeTo = {
     addSmallholderFarmer: "/app/farm-management/farmers/add-smallholder-farmer",
     editSmallholderFarmer: "/app/farm-management/farmers/edit-smallholder-farmer",
     viewSmallholderFarmer: "/app/farm-management/farmers/view-smallholder-farmer",
+    addCommercialFarmer: "/app/farm-management/farmers/add-commercial-farmer",
+    editCommercialFarmer: "/app/farm-management/farmers/edit-commercial-farmer",
+    viewCommercialFarmer: "/app/farm-management/farmers/view-commercial-farmer",
     products: "/app/farm-management/products",
 
     warehouses: "/app/supply-chain-management/warehouses",

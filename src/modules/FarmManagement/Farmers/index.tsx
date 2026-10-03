@@ -1,6 +1,7 @@
 "use client"
 import LeadFarmers from "./LeadFarmers"
 import SmallholderFarmers from "./SmallholderFarmers"
+import CommercialFarmers from "./CommercialFarmers"
 import { useState } from "react"
 import { CirclePlus } from "lucide-react"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -11,11 +12,12 @@ import { useHasAccess } from "@/hooks/auth/useHasAccess"
 import { AuthorizeAndRenderPage } from "@/components/Unauthorized"
 import { cn } from "@/lib/utils"
 
-type FarmerTab = "lead" | "smallholder"
+type FarmerTab = "lead" | "smallholder" | "commercial"
 
 const FARMER_TABS: { key: FarmerTab; label: string }[] = [
   { key: "lead", label: "Lead Farmers" },
   { key: "smallholder", label: "Smallholder Farmers" },
+  { key: "commercial", label: "Commercial Farmers" },
 ]
 
 export function Farmers() {
@@ -69,12 +71,21 @@ export function Farmers() {
               >
                 Smallholder Farmers
               </DropdownMenuItem>,
+              <DropdownMenuItem
+                key="commercial-farmer"
+                onClick={() => router.push(routeTo.addCommercialFarmer)}
+                className="py-3 px-6 text-gray-700 font-normal text-sm hover:bg-gray-50 focus:bg-gray-50 cursor-pointer"
+              >
+                Commercial Farmers
+              </DropdownMenuItem>,
             ]}
           />
         )}
       </div>
 
-      {activeTab === "lead" ? <LeadFarmers /> : <SmallholderFarmers />}
+      {activeTab === "lead" && <LeadFarmers />}
+      {activeTab === "smallholder" && <SmallholderFarmers />}
+      {activeTab === "commercial" && <CommercialFarmers />}
     </AuthorizeAndRenderPage>
   )
 }

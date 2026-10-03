@@ -16,7 +16,7 @@ import { Region } from "@/apis/adminApiSchemas";
 import { Download, Loader, Search } from "lucide-react";
 import { toast } from "sonner";
 
-export default function SmallholderSearch({setFilters, filters, isLoading}:TSearchProps){
+export default function SmallholderSearch({setFilters, filters, isLoading, farmerType="smallholder"}:TSearchProps & {farmerType?: "smallholder" | "commercial"}){
 
     const form = useForm<z.infer<typeof searchFarmerSchema>>({
         resolver: zodResolver(searchFarmerSchema),
@@ -42,7 +42,7 @@ export default function SmallholderSearch({setFilters, filters, isLoading}:TSear
             district: "",
         })
         setFilters({
-            page: 1, page_size: PAGE_SIZE, farmer_type: "smallholder"
+            page: 1, page_size: PAGE_SIZE, farmer_type: farmerType
         })
     }
     function handleExport(){
