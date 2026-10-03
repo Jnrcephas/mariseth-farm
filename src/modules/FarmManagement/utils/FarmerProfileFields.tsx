@@ -24,16 +24,49 @@ import { NATIONALITY_OPTIONS } from "./nationalities"
 import { EDUCATION_LEVEL_OPTIONS, MARITAL_STATUS_OPTIONS } from "./constants"
 
 /**
- * The project + profile/socio-economic section shared by the Lead Farmer and
- * Smallholder Farmer forms. Field names match
- * `getFarmerProfileDefaultValues` / `buildFarmerProfilePayload` in ./helpers.
+ * Project picker (select an existing project or create one inline).
+ * Rendered at the very top of the farmer registration forms.
  */
-export default function FarmerProfileFields({
+export function ProjectField({
   form,
   defaultData,
 }: {
   form: UseFormReturn<any>
   defaultData?: any
+}) {
+  return (
+    <FormField
+      control={form.control}
+      name="project"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Project</FormLabel>
+          <FormControl>
+            <ProjectCombobox
+              value={field.value}
+              onChange={(value) => form.setValue("project", value, { shouldDirty: true })}
+              selectedLabel={defaultData?.project?.name}
+            />
+          </FormControl>
+          <p className="text-xs text-muted-foreground">
+            Can&apos;t find it? Type the project name and choose &quot;Create project&quot;.
+          </p>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
+}
+
+/**
+ * The profile/socio-economic section shared by the Lead, Smallholder and
+ * Commercial Farmer forms (the Project picker lives in <ProjectField/>). Field names match
+ * `getFarmerProfileDefaultValues` / `buildFarmerProfilePayload` in ./helpers.
+ */
+export default function FarmerProfileFields({
+  form,
+}: {
+  form: UseFormReturn<any>
 }) {
   const numberField = (
     name: string,
@@ -65,29 +98,8 @@ export default function FarmerProfileFields({
 
   return (
     <>
-      <div className="text-xl font-medium">Project & Profile Details</div>
+      <div className="text-xl font-medium">Profile Details</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <FormField
-          control={form.control}
-          name="project"
-          render={({ field }) => (
-            <FormItem className="md:col-span-2">
-              <FormLabel>Project</FormLabel>
-              <FormControl>
-                <ProjectCombobox
-                  value={field.value}
-                  onChange={(value) => form.setValue("project", value, { shouldDirty: true })}
-                  selectedLabel={defaultData?.project?.name}
-                />
-              </FormControl>
-              <p className="text-xs text-muted-foreground">
-                Can&apos;t find it? Type the project name and choose &quot;Create project&quot;.
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={form.control}
           name="nationality"

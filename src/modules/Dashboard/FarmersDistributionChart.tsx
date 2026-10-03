@@ -53,6 +53,7 @@ export default function FarmersDistributionChart({ data }: { data: any }) {
         items={[
           { label: "Smallholder Farmer", count: data?.farmer_type?.smallholder_farmer || 0, color: "#8B7CF6" },
           { label: "Lead Farmers", count: data?.farmer_type?.lead_farmer || 0, color: "#E2E8F0" },
+          { label: "Commercial Farmers", count: data?.farmer_type?.commercial_farmer || 0, color: "#4A8D34" },
         ]}
       />
     </div>

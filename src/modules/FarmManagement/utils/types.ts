@@ -4,7 +4,7 @@ export type FilterProps = {
     page?: number;
     page_size?: number;
     query?: string;
-    farmer_type?: "lead" | "smallholder"
+    farmer_type?: "lead" | "smallholder" | "commercial"
     order_type?: "inflow" | "outflow";
   }
 export type FilterPropsProduct = {

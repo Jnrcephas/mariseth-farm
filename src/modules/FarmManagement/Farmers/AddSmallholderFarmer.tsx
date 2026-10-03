@@ -37,7 +37,8 @@ import { FarmerCombobox } from "../utils/FarmerCombobox";
 import { FarmCombobox } from "../utils/FarmCombobox";
 import { Region } from "@/apis/adminApiSchemas";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
-import FarmerProfileFields from "../utils/FarmerProfileFields";
+import FarmerProfileFields, { ProjectField } from "../utils/FarmerProfileFields";
+import { FARMER_TYPE_LABEL } from "../utils/farmerTypes";
 import { buildFarmerProfilePayload, getFarmerProfileDefaultValues } from "../utils/helpers";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
 
@@ -65,12 +66,17 @@ const getSmallholderFarmerDefaultValues = (defaultData: any) => ({
     has_disability: getStringValue(defaultData?.has_disability),
     disability_details: defaultData?.disability_details || "",
 
-    has_received_support: getStringValue(defaultData?.support_assistance?.has_received_support ?? defaultData?.support_assistance?.received_support), 
+    has_received_support: getStringValue(defaultData?.support_assistance?.has_received_support ?? defaultData?.support_assistance?.received_support),
     support_received: defaultData?.support_assistance?.support_received || defaultData?.support_assistance?.specify_support_received || "",
     areas_of_needed_assistance: defaultData?.support_assistance?.areas_of_needed_assistance || ""
 });
 
-export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegRequestId}:{isEdit?: boolean; defaultData?: any; farmerRegRequestId?: number}) {
+export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegRequestId, farmerType="smallholder"}:{isEdit?: boolean; defaultData?: any; farmerRegRequestId?: number; farmerType?: "smallholder" | "commercial"}) {
+
+    // Smallholder and Commercial farmers share this form. The only differences:
+    // the payload `type`, the labels, and commercial farmers have no lead farmer.
+    const isCommercial = farmerType === "commercial"
+    const farmerLabel = FARMER_TYPE_LABEL[farmerType]
 
     const router = useRouter()
     const form = useForm<z.infer<typeof smallholderFarmerSchema>>({
@@ -90,7 +96,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
     
     const {mutate, isPending} = useFarmManagementFarmerCreate({
         onSuccess: () => {
-            toast.success("Smallholder Farmer added successfully")
+            toast.success(`${farmerLabel} added successfully`)
             router.push(routeTo.farmers)
         },
         onError: (errors: any) =>{
@@ -100,7 +106,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
 
     const {mutate: updateMutate, isPending: isUpdating} = useFarmManagementFarmerUpdate({
         onSuccess: () => {
-            toast.success("Smallholder Farmer updated successfully")
+            toast.success(`${farmerLabel} updated successfully`)
             router.push(routeTo.farmers)
         },
         onError: (errors: any) =>{
@@ -110,7 +116,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
 
     function onSubmit(values: z.infer<typeof smallholderFarmerSchema>) {
         const payload = cleanJsonData({
-            type: "smallholder" as const,
+            type: farmerType,
             first_name: values?.first_name,
             last_name: values?.last_name,
             other_names: values?.other_names,
@@ -125,8 +131,8 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
             region: values?.region,
             district: values?.district,
             country: values?.country,
-            lead_farmer: values?.lead_farmer,
-            farm: values?.farm ? Number(values.farm) : undefined,
+            lead_farmer: isCommercial ? undefined : values?.lead_farmer,
+            farm: Number(values?.farm),
             has_disability: stringToBool(values?.has_disability),
             disability_details: values?.disability_details,
             support_assistance: {
@@ -165,7 +171,8 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
             </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 container md:w-[833px] mx-auto">
-                    <div className="text-xl font-medium">Smallholder Farmer - Personal Information</div>
+                    <ProjectField form={form} defaultData={defaultData} />
+                    <div className="text-xl font-medium">{farmerLabel} - Personal Information</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <FormField
                             control={form.control}
@@ -481,6 +488,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                             </FormItem>
                             )}
                         />
+                        {!isCommercial && (
                         <FormField
                             control={form.control}
                             name="lead_farmer"
@@ -502,8 +510,9 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                             </FormItem>
                             )}
                         />
+                        )}
                     </div>
-                    <FarmerProfileFields form={form} defaultData={defaultData} />
+                    <FarmerProfileFields form={form} />
                     <div className="text-xl font-medium">Support & Assistance</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>

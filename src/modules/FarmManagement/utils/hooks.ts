@@ -45,7 +45,7 @@ function getFarmerLabel(item: any) {
  * mapping results into `{ value, label, raw }` options.
  */
 export function useFarmerSearch(
-  farmer_type: "lead" | "smallholder" | "",
+  farmer_type: "lead" | "smallholder" | "commercial" | "",
   search: string,
 ) {
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS)

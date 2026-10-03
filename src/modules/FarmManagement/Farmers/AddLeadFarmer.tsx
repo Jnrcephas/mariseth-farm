@@ -9,7 +9,7 @@ import {
     FormLabel,
     FormMessage,
   } from '@/components/ui/form';
-  import { Input } from '@/components/ui/input';  
+  import { Input } from '@/components/ui/input';
 
   import {
     Select,
@@ -36,7 +36,7 @@ import { Region } from "@/apis/adminApiSchemas";
 import useGetRegionDistricts from "../utils/hooks";
 import { FarmCombobox } from "../utils/FarmCombobox";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
-import FarmerProfileFields from "../utils/FarmerProfileFields";
+import FarmerProfileFields, { ProjectField } from "../utils/FarmerProfileFields";
 import { buildFarmerProfilePayload, getFarmerProfileDefaultValues } from "../utils/helpers";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
 
@@ -131,7 +131,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
             region: values?.region,
             district: values?.district,
             country: values?.country,
-            farm: values?.farm ? Number(values.farm) : undefined,
+            farm: Number(values?.farm),
             has_disability: stringToBool(values?.has_disability),
             disability_details: values?.disability_details,
             leadership_experience: {
@@ -179,6 +179,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
             </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 container md:w-[833px] mx-auto">
+                    <ProjectField form={form} defaultData={defaultData} />
                     <div className="text-xl font-medium">Lead Farmer - Personal Information</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <FormField
@@ -503,7 +504,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                             )}
                         />
                     </div>
-                    <FarmerProfileFields form={form} defaultData={defaultData} />
+                    <FarmerProfileFields form={form} />
                     <div className="text-xl font-medium">Leadership & Experience</div>
                     <div className=""> 
                         <FormField
