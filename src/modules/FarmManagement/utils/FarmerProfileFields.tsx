@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   Select,
   SelectContent,
@@ -18,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CEDI } from "@/lib/constants"
+import { CEDI, YES_NO_OPTIONS } from "@/lib/constants"
 import { ProjectCombobox } from "./ProjectCombobox"
 import { NATIONALITY_OPTIONS } from "./nationalities"
 import { EDUCATION_LEVEL_OPTIONS, MARITAL_STATUS_OPTIONS } from "./constants"
@@ -55,6 +57,45 @@ export function ProjectField({
         </FormItem>
       )}
     />
+  )
+}
+
+/**
+ * "Is the farmer a refugee?" Yes / No. Shared by the lead farmer and the
+ * smallholder / commercial farmer forms so all three types ask it identically.
+ * Defaults to No (see getFarmerProfileDefaultValues), so it never blocks
+ * submitting. The radio ids are unique per field: the other Yes/No questions
+ * on these forms reuse the bare ids "true"/"false", which makes clicking a
+ * label toggle the wrong group - don't copy that here.
+ */
+export function RefugeeField({ form }: { form: UseFormReturn<any> }) {
+  return (
+    <div>
+      <Label className="capitalize mb-3">Is the farmer a refugee?</Label>
+      <FormField
+        control={form.control}
+        name="is_refugee"
+        render={({ field }) => (
+          <FormItem>
+            <RadioGroup
+              className="flex flex-row w-full gap-x-6"
+              onValueChange={field.onChange}
+              value={field.value}
+            >
+              {YES_NO_OPTIONS.map((item) => (
+                <div key={item.value} className="flex items-center space-x-2">
+                  <RadioGroupItem value={item.value} id={`is_refugee-${item.value}`} />
+                  <Label htmlFor={`is_refugee-${item.value}`} className="capitalize cursor-pointer">
+                    {item.label}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
   )
 }
 

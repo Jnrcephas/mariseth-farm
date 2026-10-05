@@ -54,6 +54,8 @@ export type TViewFlowModal = {
 }
 
 export interface IFarmer extends Omit<Farmer, "region" | "district" | "farm"> {
+    /** Not in the generated API types yet; set by the farmer forms. */
+    is_refugee?: boolean | null
     region: {
         name: string
         id: string
