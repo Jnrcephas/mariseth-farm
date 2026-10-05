@@ -36,7 +36,7 @@ import { Region } from "@/apis/adminApiSchemas";
 import useGetRegionDistricts from "../utils/hooks";
 import { FarmCombobox } from "../utils/FarmCombobox";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
-import FarmerProfileFields, { ProjectField } from "../utils/FarmerProfileFields";
+import FarmerProfileFields, { ProjectField, RefugeeField } from "../utils/FarmerProfileFields";
 import { buildFarmerProfilePayload, getFarmerProfileDefaultValues } from "../utils/helpers";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
 
@@ -403,6 +403,9 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                             </FormItem>
                             )}
                         />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <RefugeeField form={form} />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <FormField

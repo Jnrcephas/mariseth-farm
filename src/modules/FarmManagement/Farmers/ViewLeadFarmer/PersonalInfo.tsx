@@ -33,6 +33,7 @@ export default function LeadFarmerPersonalInfo({defaultData}:{defaultData: IFarm
                             <TextLabel title={"Region"} subTitle={defaultData?.region?.name} variant="dark"/>
                             <TextLabel title={"District"} subTitle={defaultData?.district?.name} variant="dark"/>
                             <TextLabel title={"Country"} subTitle={defaultData?.country} variant="dark"/>
+                            <TextLabel title={"Refugee"} subTitle={boolToYesNo(defaultData?.is_refugee as boolean)} variant="dark"/>
 
                         </div>
                     </AccordionContent>

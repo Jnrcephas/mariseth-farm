@@ -37,7 +37,7 @@ import { FarmerCombobox } from "../utils/FarmerCombobox";
 import { FarmCombobox } from "../utils/FarmCombobox";
 import { Region } from "@/apis/adminApiSchemas";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
-import FarmerProfileFields, { ProjectField } from "../utils/FarmerProfileFields";
+import FarmerProfileFields, { ProjectField, RefugeeField } from "../utils/FarmerProfileFields";
 import { FARMER_TYPE_LABEL } from "../utils/farmerTypes";
 import { buildFarmerProfilePayload, getFarmerProfileDefaultValues } from "../utils/helpers";
 import { formatPhoneNumberWithOutPlus, formatPhoneNumberWithPlus } from "@/modules/UserManagement/utils/helpers";
@@ -390,6 +390,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                             </FormItem>
                             )}
                         />
+                        <RefugeeField form={form} />
                         <FormField
                             control={form.control}
                             name="region"

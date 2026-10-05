@@ -1,3 +1,4 @@
+import { stringToBool } from "@/lib/helpers"
 import {
   formatPhoneNumberWithOutPlus,
   formatPhoneNumberWithPlus,
@@ -32,6 +33,9 @@ export const getFarmerProfileDefaultValues = (d: any) => ({
   years_of_experience: toStr(d?.years_of_experience),
   number_of_farms: toStr(d?.[NUMBER_OF_FARMS_API_KEY] ?? d?.number_of_farms),
   consent: Boolean(d?.consent),
+  // Radio value ("true"/"false"). Defaults to "false" (No) for new farmers and
+  // for records that don't have the field yet.
+  is_refugee: toStr(d?.is_refugee) === "true" ? "true" : "false",
 })
 
 /** API payload fragment for the new fields. Empty values are omitted. */
@@ -49,4 +53,6 @@ export const buildFarmerProfilePayload = (v: any) => ({
   years_of_experience: toNumber(v?.years_of_experience),
   [NUMBER_OF_FARMS_API_KEY]: toNumber(v?.number_of_farms),
   consent: Boolean(v?.consent),
+  // Always sent as a real boolean (false is kept by cleanJsonData).
+  is_refugee: stringToBool(v?.is_refugee),
 })

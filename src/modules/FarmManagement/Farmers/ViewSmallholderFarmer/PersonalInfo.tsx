@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/accordion"
 import { TextLabel } from "@/components/ui/label"
 import { IFarmer } from "../../utils/types"
-import { formatDateReadable, formatGender } from "@/lib/helpers"
+import { boolToYesNo, formatDateReadable, formatGender } from "@/lib/helpers"
 import { formatPhoneNumberStartWithZero } from "@/modules/UserManagement/utils/helpers"
 import FarmerProfileInfo from "../FarmerProfileInfo"
 
@@ -31,6 +31,7 @@ export default function LeadFarmerPersonalInfo({defaultData, farmerLabel="Smallh
                             <TextLabel title={"Region"} subTitle={defaultData?.region?.name} variant="dark"/>
                             <TextLabel title={"District"} subTitle={defaultData?.district?.name} variant="dark"/>
                             <TextLabel title={"Country"} subTitle={defaultData?.country} variant="dark"/>
+                            <TextLabel title={"Refugee"} subTitle={boolToYesNo(defaultData?.is_refugee as boolean)} variant="dark"/>
 
                         </div>
                     </AccordionContent>
