@@ -50,7 +50,7 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
 
 
 
-export default function AddMerisethFarmModal({ open, setOpen, defaultData, isEdit, refetch }: TAddFarmModal) {
+export default function AddMerisethFarmModal({ open, setOpen, defaultData, isEdit, refetch, onCreated }: TAddFarmModal) {
 
     const modalTitle = isEdit ? "Edit Meriseth Farm" : "Register New Meriseth Farm";
     const submitTitle = isEdit ? "Update Farm" : "Register Farm";
@@ -103,7 +103,8 @@ export default function AddMerisethFarmModal({ open, setOpen, defaultData, isEdi
     )
 
     const { mutate, isPending } = useFarmManagementFarmCreate({
-        onSuccess: () => {
+        onSuccess: (createdFarm) => {
+            if (onCreated) onCreated(createdFarm)
             if (refetch) refetch()
             setOpen(false)
             toast.success("Farm Added Successfully")

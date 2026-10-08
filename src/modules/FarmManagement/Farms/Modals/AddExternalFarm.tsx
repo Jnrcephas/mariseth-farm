@@ -49,7 +49,7 @@ const GHANA_CENTER: [number, number] = [7.9465, -1.0232]
 
 
 
-export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit, refetch}:TAddFarmModal){
+export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit, refetch, onCreated}:TAddFarmModal){
 
     const modalTitle = isEdit ? "Edit External Farm" : "Register New External Farm";
     const submitTitle = isEdit ? "Update Farm" : "Register Farm";
@@ -102,7 +102,8 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
     }
 
     const {mutate, isPending} = useFarmManagementFarmCreate({
-        onSuccess: () =>{
+        onSuccess: (createdFarm) => {
+            if (onCreated) onCreated(createdFarm)
             if(refetch) refetch()
             setOpen(false)
             toast.success("Farm Added Successfully")

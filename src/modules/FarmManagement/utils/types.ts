@@ -1,4 +1,4 @@
-import { Farm, Farmer, Product } from "@/apis/adminApiSchemas";
+import { Farm, Farmer, FullFarm, Product } from "@/apis/adminApiSchemas";
 
 export type FilterProps = {
     page?: number;
@@ -30,6 +30,9 @@ export type TAddFarmModal = {
   defaultData?: any
   isEdit?: boolean
   refetch?: () => void;
+  /** Called with the newly created farm (create mode only), e.g. so a parent
+   * form can auto-select it. */
+  onCreated?: (farm: FullFarm) => void;
 }
 
 export type TModal = {
