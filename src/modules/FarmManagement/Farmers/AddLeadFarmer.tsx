@@ -19,7 +19,7 @@ import {
     SelectValue,
   } from '@/components/ui/select';
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -35,6 +35,7 @@ import {  cleanJsonData, getErrorMap, stringToBool } from "@/lib/helpers";
 import { Region } from "@/apis/adminApiSchemas";
 import useGetRegionDistricts from "../utils/hooks";
 import { FarmCombobox } from "../utils/FarmCombobox";
+import { CreateFarmInline } from "../utils/CreateFarmInline";
 import { areasOfNeed, ID_TYPE_OPTIONS } from "../utils/constants";
 import FarmerProfileFields, { ProjectField, RefugeeField } from "../utils/FarmerProfileFields";
 import { buildFarmerProfilePayload, getFarmerProfileDefaultValues } from "../utils/helpers";
@@ -80,6 +81,9 @@ const getLeadFarmerDefaultValues = (defaultData: any) => ({
 export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestId}:{isEdit?: boolean; defaultData?: any; farmerRegRequestId?: number}) {
 
     const router = useRouter()
+    // Name of a farm created inline via the "Create Farm" shortcut, so the farm
+    // picker can show it immediately without waiting for a search result.
+    const [createdFarmLabel, setCreatedFarmLabel] = useState<string | undefined>()
     const form = useForm<z.infer<typeof leadFarmerSchema>>({
         resolver: zodResolver(leadFarmerSchema),
         defaultValues: getLeadFarmerDefaultValues(defaultData)
@@ -499,9 +503,15 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                                     <FarmCombobox
                                         value={field.value}
                                         onChange={(value) => form.setValue("farm", value)}
-                                        selectedLabel={defaultData?.farm?.name}
+                                        selectedLabel={createdFarmLabel ?? defaultData?.farm?.name}
                                     />
                                 </FormControl>
+                                <CreateFarmInline
+                                    onFarmCreated={(farm) => {
+                                        setCreatedFarmLabel(farm.name ?? undefined)
+                                        form.setValue("farm", String(farm.id), { shouldDirty: true, shouldValidate: true })
+                                    }}
+                                />
                                 <FormMessage />
                             </FormItem>
                             )}
