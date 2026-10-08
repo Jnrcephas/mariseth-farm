@@ -131,8 +131,8 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
             region: values?.region,
             district: values?.district,
             country: values?.country,
-            lead_farmer: isCommercial ? undefined : values?.lead_farmer,
-            farm: Number(values?.farm),
+            lead_farmer: isCommercial ? undefined : (values?.lead_farmer || undefined),
+            farm: values?.farm ? Number(values.farm) : undefined,
             has_disability: stringToBool(values?.has_disability),
             disability_details: values?.disability_details,
             support_assistance: {
@@ -495,16 +495,13 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                             name="lead_farmer"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Select Lead Farmer
-                                    <div className='text-red-500'>*</div>
-                                </FormLabel>
+                                <FormLabel>Select Lead Farmer</FormLabel>
                                 <FormControl>
                                     <FarmerCombobox
                                         value={field.value}
                                         onChange={(value) => form.setValue("lead_farmer", value)}
                                         farmerType="lead"
                                         selectedLabel={defaultData?.lead_farmer ? `${defaultData.lead_farmer?.first_name} ${defaultData.lead_farmer?.last_name}` : undefined}
-                                        required
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -513,7 +510,6 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                         />
                         )}
                     </div>
-                    <FarmerProfileFields form={form} />
                     <div className="text-xl font-medium">Support & Assistance</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
@@ -576,7 +572,7 @@ export default function AddSmallholderFarmer({isEdit, defaultData={}, farmerRegR
                         </FormItem>
                         )}
                     />
-                     
+                    <FarmerProfileFields form={form} />
                     <div className="flex justify-end">
                         <Button type="submit" className="bg-[#16A34A] text-white w-fulls rounded-md cursor-pointer"> 
                              <LoadingLabel isLoading={isPending || isUpdating}>{isEdit ? "Update" : "Submit"}</LoadingLabel>

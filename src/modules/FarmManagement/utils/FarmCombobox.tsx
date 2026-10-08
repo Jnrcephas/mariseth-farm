@@ -17,7 +17,7 @@ interface FarmComboboxProps {
   disabled?: boolean
   required?: boolean
   className?: string
-}
+} 
 
 /**
  * Server-side, search-as-you-type farm picker. Drop-in replacement for the

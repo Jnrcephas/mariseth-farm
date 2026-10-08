@@ -4,7 +4,7 @@ export const externalFarmSchema = z.object({
     name: z.string().min(2, {
     message: 'Farm name must be at least 2 characters.',
   }),
-  farmer: z.string(),
+  farmer: z.string().optional(),
   location: z.string().min(2, {
     message: 'Location must be at least 2 characters.',
   }),
@@ -33,6 +33,7 @@ export const externalFarmSchema = z.object({
   labor_force_total: z.string().optional(),
   labor_force_male: z.string().optional(),
   labor_force_female: z.string().optional(),
+  labor_force_age_18_35: z.string().optional(),
 });
 
 export const internalFarmSchema = z.object({
@@ -58,6 +59,7 @@ export const internalFarmSchema = z.object({
   labor_force_total: z.string().optional(),
   labor_force_male: z.string().optional(),
   labor_force_female: z.string().optional(),
+  labor_force_age_18_35: z.string().optional(),
 });
 
 
@@ -84,7 +86,6 @@ export const leadFarmerSchema = z.object({
   farm: z.string().optional(),
   has_disability: z.string().optional(),
   disability_details: z.string().optional(),
-  is_refugee: z.string().optional(),
   farming_type: z.string().optional(),
   is_mentoring_other_farmers: z.string().optional(),
   number_of_farmers_mentoring: z.string().optional(),
@@ -95,17 +96,6 @@ export const leadFarmerSchema = z.object({
   has_received_support: z.string().optional(),
   support_received: z.string().optional(),
   areas_of_needed_assistance: z.string().optional(),
-  project: z.string().optional(),
-  nationality: z.string().optional(),
-  marital_status: z.string().optional(),
-  alternative_phone_number: z.string().optional(),
-  education_level: z.string().optional(),
-  average_income: z.string().optional(),
-  number_of_households: z.string().optional(),
-  number_of_dependents: z.string().optional(),
-  years_of_experience: z.string().optional(),
-  number_of_farms: z.string().optional(),
-  consent: z.boolean().optional(),
 });
 
 export const smallholderFarmerSchema = z.object({
@@ -128,25 +118,13 @@ export const smallholderFarmerSchema = z.object({
   region: z.string(),
   district: z.string(),
   country: z.string(),
-  lead_farmer: z.string(),
+  lead_farmer: z.string().optional(),
   farm: z.string().optional(),
   has_disability: z.string().optional(),
   disability_details: z.string().optional(),
-  is_refugee: z.string().optional(),
   has_received_support: z.string().optional(),
   support_received: z.string().optional(),
   areas_of_needed_assistance: z.string().optional(),
-  project: z.string().optional(),
-  nationality: z.string().optional(),
-  marital_status: z.string().optional(),
-  alternative_phone_number: z.string().optional(),
-  education_level: z.string().optional(),
-  average_income: z.string().optional(),
-  number_of_households: z.string().optional(),
-  number_of_dependents: z.string().optional(),
-  years_of_experience: z.string().optional(),
-  number_of_farms: z.string().optional(),
-  consent: z.boolean().optional(),
 });
 
 export const cropSchema = z.object({

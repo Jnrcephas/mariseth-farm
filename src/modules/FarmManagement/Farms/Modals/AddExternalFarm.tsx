@@ -199,16 +199,13 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
                                     name="farmer"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                        <FormLabel>Select Lead Farmer
-                                            <div className='text-red-500'>*</div>
-                                        </FormLabel>
+                                        <FormLabel>Select Lead Farmer</FormLabel>
                                         <FormControl>
                                             <FarmerCombobox
                                                 value={field.value}
                                                 onChange={(value) => form.setValue("farmer", value)}
                                                 farmerType=""
                                                 selectedLabel={defaultData?.farmer ? farmerFullName(defaultData.farmer) : undefined}
-                                                required
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -577,6 +574,21 @@ export default function AddExternalFarmModal({open, setOpen, defaultData, isEdit
                                         )}
                                     />
                                 </div>
+                            </div>
+                            <div className="grid grid-cols-1">
+                                <FormField
+                                    control={form.control}
+                                    name="labor_force_age_18_35"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>How Many Fall Between 18-35 Years</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter Number" {...field} type="number" min={0} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                             <div className="grid grid-cols-1">
                                 <Label className="capitalize mb-3">Farm Boundary</Label>

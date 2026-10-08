@@ -131,7 +131,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
             region: values?.region,
             district: values?.district,
             country: values?.country,
-            farm: Number(values?.farm),
+            farm: values?.farm ? Number(values.farm) : undefined,
             has_disability: stringToBool(values?.has_disability),
             disability_details: values?.disability_details,
             leadership_experience: {
@@ -507,7 +507,6 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                             )}
                         />
                     </div>
-                    <FarmerProfileFields form={form} />
                     <div className="text-xl font-medium">Leadership & Experience</div>
                     <div className=""> 
                         <FormField
@@ -708,6 +707,7 @@ export default function AddLeadFarmer({isEdit, defaultData={}, farmerRegRequestI
                         </FormItem>
                         )}
                     />
+                    <FarmerProfileFields form={form} />
                     <div className="flex justify-end">
                         <Button type="submit" className="bg-[#16A34A] text-white w-fulls rounded-md cursor-pointer"> 
                              <LoadingLabel isLoading={isPending || isUpdating}>{isEdit ? "Update" : "Submit"}</LoadingLabel>

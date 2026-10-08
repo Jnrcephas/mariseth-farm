@@ -21,7 +21,7 @@ export default function CommercialFarmers(){
     const {hasAccess: view_farmer} = useHasAccess("farmer|view_farmer")
 
     const router = useRouter()
-    const [deleteModal, setDeleteModal] = useState(false)
+    const [deleteModal, setDeleteModal] = useState(false)  
     const [selected, setSelected] = useState<any>({})
 
     const [filters, setFilters] = useState<FilterProps>({

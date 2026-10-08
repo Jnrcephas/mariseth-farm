@@ -438,6 +438,21 @@ export default function AddMerisethFarmModal({ open, setOpen, defaultData, isEdi
                                 </div>
                             </div>
                             <div className="grid grid-cols-1">
+                                <FormField
+                                    control={form.control}
+                                    name="labor_force_age_18_35"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>How Many Fall Between 18-35 Years</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter Number" {...field} type="number" min={0} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="grid grid-cols-1">
                                 <Label className="capitalize mb-3">Farm Boundary </Label>
                                 <FarmBoundaryField
                                     center={GHANA_CENTER}
